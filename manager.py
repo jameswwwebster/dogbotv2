@@ -404,7 +404,20 @@ class ManagerApp(tk.Tk):
 
         lbl(p, "Channel ID", dim=True).pack(fill="x", padx=20)
         self._push_ch = tk.StringVar()
-        inp(p, self._push_ch).pack(padx=20, pady=(2, 10), fill="x")
+        inp(p, self._push_ch).pack(padx=20, pady=(2, 6), fill="x")
+
+        # Presets
+        presets = [
+            ("General Chat",   "472851820448972800"),
+            ("Announcements",  "478724610330722305"),
+        ]
+        pf = tk.Frame(p, bg=BG)
+        pf.pack(padx=20, pady=(0, 10), fill="x")
+        for name, ch_id in presets:
+            tk.Button(pf, text=name, bg=BG_CARD, fg=FG_DIM,
+                      font=("Segoe UI", 9), relief="flat", cursor="hand2",
+                      command=lambda c=ch_id: self._push_ch.set(c)
+                      ).pack(side="left", padx=(0, 6))
 
         lbl(p, "Message  (supports @mentions and :emojis:)", dim=True).pack(fill="x", padx=20)
         self._push_text = tk.Text(p, height=7, bg=BG_INPUT, fg=FG,
