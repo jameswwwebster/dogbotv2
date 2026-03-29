@@ -4,5 +4,6 @@
     "webhook_url": "",
     "hug_enabled": true,
     "clear_enabled": true,
-    "remindme_enabled": true
+    "remindme_enabled": true,
+    "spank_enabled": true
 }

@@ -476,14 +476,17 @@ class ManagerApp(tk.Tk):
         section(p, "Fun Features", "Toggle extra bot commands. Deploy to apply.")
 
         feats = load_features()
-        self._rng_var = tk.BooleanVar(value=feats.get("rng_enabled", False))
-        self._hug_var = tk.BooleanVar(value=feats.get("hug_enabled", False))
+        self._rng_var   = tk.BooleanVar(value=feats.get("rng_enabled",   False))
+        self._hug_var   = tk.BooleanVar(value=feats.get("hug_enabled",   False))
+        self._spank_var = tk.BooleanVar(value=feats.get("spank_enabled", False))
 
         for var, title, desc in [
-            (self._rng_var, "!RNG",
+            (self._rng_var,   "!RNG",
              'Picks a random number 1–100.\nResponds: "DogBot rolled a X!"'),
-            (self._hug_var, "!hug @user",
+            (self._hug_var,   "!hug @user",
              "Give someone a hug.\nResponds: \"[sender] hugs [target]! 🤗\""),
+            (self._spank_var, "!spank @user",
+             "Give someone a spank. 🥵🥵\nResponds: \"[sender] spanks [target]!\""),
         ]:
             card = tk.Frame(p, bg=BG_CARD)
             card.pack(padx=20, pady=4, fill="x")
@@ -501,8 +504,9 @@ class ManagerApp(tk.Tk):
 
     def _save_features(self):
         d = load_features()
-        d["rng_enabled"] = self._rng_var.get()
-        d["hug_enabled"] = self._hug_var.get()
+        d["rng_enabled"]   = self._rng_var.get()
+        d["hug_enabled"]   = self._hug_var.get()
+        d["spank_enabled"] = self._spank_var.get()
         save_features(d)
         self.set_status("Saved. Deploy to apply.")
 

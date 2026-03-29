@@ -234,6 +234,16 @@ async def hug_cmd(ctx, target: discord.Member = None):
     await ctx.send(f"{ctx.author.mention} hugs {target.mention}! 🤗")
 
 
+@bot.command(name="spank")
+async def spank_cmd(ctx, target: discord.Member = None):
+    if not load_features().get("spank_enabled"):
+        return
+    if not target:
+        await ctx.send("Mention someone to spank! e.g. `!spank @user`")
+        return
+    await ctx.send(f"🥵🥵 {ctx.author.mention} spanks {target.mention}! 🥵🥵")
+
+
 @bot.command(name="clear")
 async def clear_cmd(ctx, amount: int = None):
     if not load_features().get("clear_enabled"):
