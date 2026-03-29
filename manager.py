@@ -3,13 +3,30 @@ from tkinter import ttk, messagebox
 import json
 import os
 import subprocess
+import urllib.request
+import urllib.error
+from datetime import datetime, timezone, timedelta
 
 COMMANDS_FILE = os.path.join(os.path.dirname(__file__), "commands.json")
 REMINDERS_FILE = os.path.join(os.path.dirname(__file__), "reminders.json")
 QUESTIONS_FILE = os.path.join(os.path.dirname(__file__), "questions.json")
+FEATURES_FILE  = os.path.join(os.path.dirname(__file__), "features.json")
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
+BG       = "#2b2d31"
+BG_CARD  = "#313338"
+BG_INPUT = "#1e1f22"
+FG       = "white"
+FG_DIM   = "#b5bac1"
+ACCENT   = "#5865f2"
+RED      = "#ed4245"
+GREY     = "#4f545c"
+GREEN    = "#3ba55d"
+GOLD     = "#f0b232"
+
+
+# ── I/O helpers ───────────────────────────────────────────────────────────────
 
 def load_commands():
     if not os.path.exists(COMMANDS_FILE):
@@ -17,23 +34,9 @@ def load_commands():
     with open(COMMANDS_FILE, "r") as f:
         return json.load(f)
 
-
-def save_commands(cmds):
+def save_commands(d):
     with open(COMMANDS_FILE, "w") as f:
-        json.dump(cmds, f, indent=4)
-
-
-def load_questions():
-    if not os.path.exists(QUESTIONS_FILE):
-        return {"channel_id": None, "questions": []}
-    with open(QUESTIONS_FILE, "r") as f:
-        return json.load(f)
-
-
-def save_questions(data):
-    with open(QUESTIONS_FILE, "w") as f:
-        json.dump(data, f, indent=4)
-
+        json.dump(d, f, indent=4)
 
 def load_reminders():
     if not os.path.exists(REMINDERS_FILE):
@@ -41,445 +44,533 @@ def load_reminders():
     with open(REMINDERS_FILE, "r") as f:
         return json.load(f)
 
-
-def save_reminders(reminders):
+def save_reminders(d):
     with open(REMINDERS_FILE, "w") as f:
-        json.dump(reminders, f, indent=4)
+        json.dump(d, f, indent=4)
 
+def load_questions():
+    if not os.path.exists(QUESTIONS_FILE):
+        return {"command": "", "questions": []}
+    with open(QUESTIONS_FILE, "r") as f:
+        return json.load(f)
+
+def save_questions(d):
+    with open(QUESTIONS_FILE, "w") as f:
+        json.dump(d, f, indent=4)
+
+def load_features():
+    defaults = {"gmt_offset": 0, "rng_enabled": False, "webhook_url": ""}
+    if not os.path.exists(FEATURES_FILE):
+        return defaults
+    with open(FEATURES_FILE, "r") as f:
+        data = json.load(f)
+    for k, v in defaults.items():
+        data.setdefault(k, v)
+    return data
+
+def save_features(d):
+    with open(FEATURES_FILE, "w") as f:
+        json.dump(d, f, indent=4)
+
+
+# ── Widget helpers ─────────────────────────────────────────────────────────────
+
+def label(parent, text, large=False, dim=False, **kw):
+    return tk.Label(parent, text=text, bg=BG, fg=FG_DIM if dim else FG,
+                    font=("Segoe UI", 13 if large else 10, "bold" if large else "normal"), **kw)
+
+def entry(parent, var, **kw):
+    return tk.Entry(parent, textvariable=var, bg=BG_INPUT, fg=FG,
+                    insertbackground=FG, relief="flat", font=("Consolas", 11), **kw)
+
+def btn(parent, text, color, cmd, **kw):
+    return tk.Button(parent, text=text, bg=color, fg=FG, font=("Segoe UI", 10, "bold"),
+                     relief="flat", cursor="hand2", pady=6, command=cmd, **kw)
+
+def scrolled_listbox(parent, width, height):
+    f = tk.Frame(parent, bg=BG)
+    lb = tk.Listbox(f, width=width, height=height, bg=BG_INPUT, fg=FG,
+                    selectbackground=ACCENT, font=("Consolas", 11),
+                    activestyle="none", relief="flat")
+    sb = ttk.Scrollbar(f, orient="vertical", command=lb.yview)
+    lb.config(yscrollcommand=sb.set)
+    lb.pack(side="left", fill="both", expand=True)
+    sb.pack(side="right", fill="y")
+    return f, lb
+
+
+# ── App ────────────────────────────────────────────────────────────────────────
 
 class ManagerApp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Discord Bot — Manager")
         self.resizable(False, False)
-        self.configure(bg="#2b2d31")
+        self.configure(bg=BG)
         self._build_ui()
 
     def _build_ui(self):
         style = ttk.Style(self)
         style.theme_use("default")
-        style.configure("TNotebook", background="#2b2d31", borderwidth=0)
-        style.configure("TNotebook.Tab", background="#1e1f22", foreground="white",
+        style.configure("TNotebook", background=BG, borderwidth=0)
+        style.configure("TNotebook.Tab", background=BG_CARD, foreground=FG,
                         padding=[12, 6], font=("Segoe UI", 10, "bold"))
-        style.map("TNotebook.Tab", background=[("selected", "#5865f2")])
+        style.map("TNotebook.Tab", background=[("selected", ACCENT)])
 
-        notebook = ttk.Notebook(self)
-        notebook.pack(fill="both", expand=True, padx=12, pady=12)
+        nb = ttk.Notebook(self)
+        nb.pack(fill="both", expand=True, padx=12, pady=12)
 
-        # --- Commands tab ---
-        cmd_frame = tk.Frame(notebook, bg="#2b2d31")
-        notebook.add(cmd_frame, text="Commands")
-        self._build_commands_tab(cmd_frame)
+        for name, builder in [
+            ("Commands",     self._build_commands_tab),
+            ("Reminders",    self._build_reminders_tab),
+            ("Questions",    self._build_questions_tab),
+            ("Push Message", self._build_push_tab),
+            ("Fun Features", self._build_features_tab),
+        ]:
+            f = tk.Frame(nb, bg=BG)
+            nb.add(f, text=name)
+            builder(f)
 
-        # --- Reminders tab ---
-        rem_frame = tk.Frame(notebook, bg="#2b2d31")
-        notebook.add(rem_frame, text="Reminders")
-        self._build_reminders_tab(rem_frame)
+        btn(self, "Save & Deploy to GitHub", GREEN, self.deploy).pack(
+            fill="x", padx=12, pady=(0, 6))
 
-        # --- Questions tab ---
-        q_frame = tk.Frame(notebook, bg="#2b2d31")
-        notebook.add(q_frame, text="Questions")
-        self._build_questions_tab(q_frame)
+        self.status_lbl = tk.Label(self, text="", bg=BG, fg=FG_DIM, font=("Segoe UI", 9))
+        self.status_lbl.pack(pady=(0, 8))
 
-        # --- Deploy button (shared) ---
-        btn_opts = {"font": ("Segoe UI", 10, "bold"), "relief": "flat", "cursor": "hand2", "pady": 6}
-        tk.Button(
-            self, text="Save & Deploy to GitHub", bg="#3ba55d", fg="white",
-            command=self.deploy, **btn_opts
-        ).pack(fill="x", padx=12, pady=(0, 6))
+    # ── Commands ──────────────────────────────────────────────────────────────
 
-        self.status = tk.Label(self, text="", bg="#2b2d31", fg="#b5bac1", font=("Segoe UI", 9))
-        self.status.pack(pady=(0, 8))
+    def _build_commands_tab(self, p):
+        label(p, "Custom Commands", large=True).pack(pady=(12, 2))
+        label(p, "Add a command and the response the bot will give.", dim=True).pack(pady=(0, 8))
 
-    # ------------------------------------------------------------------ Commands tab
+        lf, self.cmd_lb = scrolled_listbox(p, 52, 10)
+        lf.pack(padx=12, fill="x")
+        self.cmd_lb.bind("<<ListboxSelect>>", self._on_cmd_select)
 
-    def _build_commands_tab(self, parent):
-        pad = {"padx": 10, "pady": 6}
-        btn_opts = {"font": ("Segoe UI", 10, "bold"), "relief": "flat", "cursor": "hand2", "pady": 6}
+        row = tk.Frame(p, bg=BG)
+        row.pack(padx=12, pady=(8, 4), fill="x")
+        row.columnconfigure(0, weight=1)
+        row.columnconfigure(1, weight=3)
 
-        tk.Label(parent, text="Custom Commands", bg="#2b2d31", fg="white",
-                 font=("Segoe UI", 13, "bold")).grid(row=0, column=0, columnspan=3, pady=(12, 4))
+        label(row, "!command", dim=True).grid(row=0, column=0, pady=(0, 2))
+        label(row, "Response", dim=True).grid(row=0, column=1, pady=(0, 2))
 
-        frame = tk.Frame(parent, bg="#2b2d31")
-        frame.grid(row=1, column=0, columnspan=3, padx=12, pady=6)
-
-        self.cmd_listbox = tk.Listbox(frame, width=50, height=10, bg="#1e1f22", fg="white",
-                                      selectbackground="#5865f2", font=("Consolas", 11),
-                                      activestyle="none", relief="flat")
-        self.cmd_listbox.pack(side="left", fill="both")
-        self.cmd_listbox.bind("<<ListboxSelect>>", self.on_cmd_select)
-
-        sb = ttk.Scrollbar(frame, orient="vertical", command=self.cmd_listbox.yview)
-        sb.pack(side="right", fill="y")
-        self.cmd_listbox.config(yscrollcommand=sb.set)
-
-        tk.Label(parent, text="!command", bg="#2b2d31", fg="#b5bac1",
-                 font=("Segoe UI", 10)).grid(row=2, column=0, **pad, sticky="w")
-        tk.Label(parent, text="Response", bg="#2b2d31", fg="#b5bac1",
-                 font=("Segoe UI", 10)).grid(row=2, column=1, columnspan=2, **pad, sticky="w")
-
-        self.cmd_var = tk.StringVar()
+        self.cmd_var  = tk.StringVar()
         self.resp_var = tk.StringVar()
+        entry(row, self.cmd_var).grid( row=1, column=0, padx=(0, 4), sticky="ew")
+        entry(row, self.resp_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
 
-        tk.Entry(parent, textvariable=self.cmd_var, width=16, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=3, column=0, padx=(12, 4), pady=2, sticky="ew")
-        tk.Entry(parent, textvariable=self.resp_var, width=34, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=3, column=1, columnspan=2, padx=(4, 12), pady=2, sticky="ew")
+        bf = tk.Frame(p, bg=BG)
+        bf.pack(padx=12, pady=8, fill="x")
+        btn(bf, "Add / Update", ACCENT, self._add_cmd).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "Delete",       RED,   self._del_cmd).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        btn(bf, "Clear",        GREY,  self._clear_cmd).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
-        bf = tk.Frame(parent, bg="#2b2d31")
-        bf.grid(row=4, column=0, columnspan=3, pady=10, padx=12, sticky="ew")
+        self._refresh_cmds()
 
-        tk.Button(bf, text="Add / Update", bg="#5865f2", fg="white",
-                  command=self.add_or_update_cmd, **btn_opts).pack(side="left", expand=True, fill="x", padx=(0, 4))
-        tk.Button(bf, text="Delete", bg="#ed4245", fg="white",
-                  command=self.delete_cmd, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 4))
-        tk.Button(bf, text="Clear", bg="#4f545c", fg="white",
-                  command=self.clear_cmd_fields, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 0))
+    def _refresh_cmds(self):
+        self.cmd_lb.delete(0, "end")
+        self._cmds = load_commands()
+        for cmd, resp in self._cmds.items():
+            self.cmd_lb.insert("end", f"!{cmd:<18} {resp}")
 
-        self.refresh_cmd_list()
-
-    # ------------------------------------------------------------------ Reminders tab
-
-    def _build_reminders_tab(self, parent):
-        btn_opts = {"font": ("Segoe UI", 10, "bold"), "relief": "flat", "cursor": "hand2", "pady": 6}
-
-        tk.Label(parent, text="Scheduled Reminders", bg="#2b2d31", fg="white",
-                 font=("Segoe UI", 13, "bold")).grid(row=0, column=0, columnspan=4, pady=(12, 4))
-
-        frame = tk.Frame(parent, bg="#2b2d31")
-        frame.grid(row=1, column=0, columnspan=4, padx=12, pady=6)
-
-        self.rem_listbox = tk.Listbox(frame, width=60, height=8, bg="#1e1f22", fg="white",
-                                      selectbackground="#5865f2", font=("Consolas", 10),
-                                      activestyle="none", relief="flat")
-        self.rem_listbox.pack(side="left", fill="both")
-        self.rem_listbox.bind("<<ListboxSelect>>", self.on_rem_select)
-
-        sb = ttk.Scrollbar(frame, orient="vertical", command=self.rem_listbox.yview)
-        sb.pack(side="right", fill="y")
-        self.rem_listbox.config(yscrollcommand=sb.set)
-
-        # Labels
-        for col, text in enumerate(["Day", "Time (HH:MM)", "Channel ID", "Message"]):
-            tk.Label(parent, text=text, bg="#2b2d31", fg="#b5bac1",
-                     font=("Segoe UI", 10)).grid(row=2, column=col, padx=(12 if col == 0 else 4, 4), pady=4, sticky="w")
-
-        self.rem_day_var = tk.StringVar(value="Wednesday")
-        self.rem_time_var = tk.StringVar(value="12:00")
-        self.rem_channel_var = tk.StringVar()
-        self.rem_msg_var = tk.StringVar()
-
-        ttk.Combobox(parent, textvariable=self.rem_day_var, values=DAYS, state="readonly",
-                     width=11, font=("Segoe UI", 10)
-                     ).grid(row=3, column=0, padx=(12, 4), pady=2, sticky="ew")
-
-        tk.Entry(parent, textvariable=self.rem_time_var, width=10, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=3, column=1, padx=4, pady=2, sticky="ew")
-
-        tk.Entry(parent, textvariable=self.rem_channel_var, width=20, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=3, column=2, padx=4, pady=2, sticky="ew")
-
-        tk.Entry(parent, textvariable=self.rem_msg_var, width=30, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=3, column=3, padx=(4, 12), pady=2, sticky="ew")
-
-        bf = tk.Frame(parent, bg="#2b2d31")
-        bf.grid(row=4, column=0, columnspan=4, pady=10, padx=12, sticky="ew")
-
-        tk.Button(bf, text="Add / Update", bg="#5865f2", fg="white",
-                  command=self.add_or_update_reminder, **btn_opts).pack(side="left", expand=True, fill="x", padx=(0, 4))
-        tk.Button(bf, text="Delete", bg="#ed4245", fg="white",
-                  command=self.delete_reminder, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 4))
-        tk.Button(bf, text="Clear", bg="#4f545c", fg="white",
-                  command=self.clear_rem_fields, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 0))
-
-        self.refresh_rem_list()
-
-    # ------------------------------------------------------------------ Commands logic
-
-    def refresh_cmd_list(self):
-        self.cmd_listbox.delete(0, "end")
-        cmds = load_commands()
-        for cmd, resp in cmds.items():
-            self.cmd_listbox.insert("end", f"!{cmd:<20} {resp}")
-        self._cmds_cache = cmds
-
-    def on_cmd_select(self, _=None):
-        sel = self.cmd_listbox.curselection()
+    def _on_cmd_select(self, _=None):
+        sel = self.cmd_lb.curselection()
         if not sel:
             return
-        cmd = list(self._cmds_cache.keys())[sel[0]]
+        cmd = list(self._cmds.keys())[sel[0]]
         self.cmd_var.set(cmd)
-        self.resp_var.set(self._cmds_cache[cmd])
+        self.resp_var.set(self._cmds[cmd])
 
-    def add_or_update_cmd(self):
-        cmd = self.cmd_var.get().strip().lstrip("!").lower()
+    def _add_cmd(self):
+        cmd  = self.cmd_var.get().strip().lstrip("!").lower()
         resp = self.resp_var.get().strip()
         if not cmd or not resp:
-            messagebox.showwarning("Missing input", "Fill in both the command and the response.")
+            messagebox.showwarning("Missing input", "Fill in both fields.")
             return
-        cmds = load_commands()
-        cmds[cmd] = resp
-        save_commands(cmds)
-        self.refresh_cmd_list()
-        self.clear_cmd_fields()
+        d = load_commands()
+        d[cmd] = resp
+        save_commands(d)
+        self._refresh_cmds()
+        self._clear_cmd()
         self.set_status(f'Saved "!{cmd}"')
 
-    def delete_cmd(self):
+    def _del_cmd(self):
         cmd = self.cmd_var.get().strip().lstrip("!").lower()
         if not cmd:
             messagebox.showwarning("No selection", "Select a command first.")
             return
-        cmds = load_commands()
-        if cmd not in cmds:
-            messagebox.showwarning("Not found", f'Command "!{cmd}" does not exist.')
+        d = load_commands()
+        if cmd not in d:
+            messagebox.showwarning("Not found", f'"!{cmd}" does not exist.')
             return
         if not messagebox.askyesno("Confirm", f'Delete "!{cmd}"?'):
             return
-        del cmds[cmd]
-        save_commands(cmds)
-        self.refresh_cmd_list()
-        self.clear_cmd_fields()
+        del d[cmd]
+        save_commands(d)
+        self._refresh_cmds()
+        self._clear_cmd()
         self.set_status(f'Deleted "!{cmd}"')
 
-    def clear_cmd_fields(self):
+    def _clear_cmd(self):
         self.cmd_var.set("")
         self.resp_var.set("")
-        self.cmd_listbox.selection_clear(0, "end")
+        self.cmd_lb.selection_clear(0, "end")
 
-    # ------------------------------------------------------------------ Reminders logic
+    # ── Reminders ─────────────────────────────────────────────────────────────
 
-    def refresh_rem_list(self):
-        self.rem_listbox.delete(0, "end")
-        self._reminders_cache = load_reminders()
-        for r in self._reminders_cache:
-            day = DAYS[r["day"]]
-            self.rem_listbox.insert("end", f"{day:<12} {r['time']}  #{r['channel_id']}  {r['message']}")
+    def _build_reminders_tab(self, p):
+        label(p, "Scheduled Reminders", large=True).pack(pady=(12, 2))
+        label(p, "Times are in your local timezone based on the offset below.", dim=True).pack(pady=(0, 6))
 
-    def on_rem_select(self, _=None):
-        sel = self.rem_listbox.curselection()
+        # Clock + offset row
+        clock_row = tk.Frame(p, bg=BG)
+        clock_row.pack(pady=(0, 8))
+
+        self._clock_lbl = tk.Label(clock_row, text="", bg=BG, fg=GOLD,
+                                   font=("Segoe UI", 11, "bold"))
+        self._clock_lbl.pack(side="left", padx=(0, 16))
+
+        tk.Label(clock_row, text="Offset:", bg=BG, fg=FG_DIM,
+                 font=("Segoe UI", 10)).pack(side="left")
+
+        feats = load_features()
+        self._offset_var = tk.StringVar(value=str(feats.get("gmt_offset", 0)))
+        offset_cb = ttk.Combobox(clock_row, textvariable=self._offset_var,
+                                 values=["0", "1", "2"], width=4, state="readonly",
+                                 font=("Segoe UI", 10))
+        offset_cb.pack(side="left", padx=4)
+        offset_cb.bind("<<ComboboxSelected>>", self._save_offset)
+
+        tk.Label(clock_row, text="(0=GMT  1=CET/BST  2=CEST)", bg=BG, fg=FG_DIM,
+                 font=("Segoe UI", 9)).pack(side="left", padx=(4, 0))
+
+        self._tick_clock()
+
+        # Listbox
+        lf, self.rem_lb = scrolled_listbox(p, 58, 7)
+        lf.pack(padx=12, fill="x")
+        self.rem_lb.bind("<<ListboxSelect>>", self._on_rem_select)
+
+        # Fields
+        fields = tk.Frame(p, bg=BG)
+        fields.pack(padx=12, pady=(8, 4), fill="x")
+        for i, w in enumerate([1, 1, 2, 3]):
+            fields.columnconfigure(i, weight=w)
+
+        for col, txt in enumerate(["Day", "Time (HH:MM)", "Channel ID", "Message"]):
+            label(fields, txt, dim=True).grid(row=0, column=col, pady=(0, 2))
+
+        self.rem_day_var  = tk.StringVar(value="Wednesday")
+        self.rem_time_var = tk.StringVar(value="12:00")
+        self.rem_ch_var   = tk.StringVar()
+        self.rem_msg_var  = tk.StringVar()
+
+        ttk.Combobox(fields, textvariable=self.rem_day_var, values=DAYS,
+                     state="readonly", font=("Segoe UI", 10)
+                     ).grid(row=1, column=0, padx=2, sticky="ew")
+        entry(fields, self.rem_time_var).grid(row=1, column=1, padx=2, sticky="ew")
+        entry(fields, self.rem_ch_var  ).grid(row=1, column=2, padx=2, sticky="ew")
+        entry(fields, self.rem_msg_var ).grid(row=1, column=3, padx=2, sticky="ew")
+
+        bf = tk.Frame(p, bg=BG)
+        bf.pack(padx=12, pady=8, fill="x")
+        btn(bf, "Add / Update", ACCENT, self._add_rem ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "Delete",       RED,   self._del_rem ).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        btn(bf, "Clear",        GREY,  self._clear_rem).pack(side="left", expand=True, fill="x", padx=(4, 0))
+
+        self._refresh_rems()
+
+    def _tick_clock(self):
+        try:
+            offset = int(self._offset_var.get())
+        except (ValueError, AttributeError):
+            offset = 0
+        now = datetime.now(timezone.utc) + timedelta(hours=offset)
+        sign = f"+{offset}" if offset >= 0 else str(offset)
+        self._clock_lbl.config(text=f"🕐  {now.strftime('%H:%M:%S')}  (UTC{sign})")
+        self.after(1000, self._tick_clock)
+
+    def _save_offset(self, *_):
+        try:
+            offset = int(self._offset_var.get())
+        except ValueError:
+            return
+        d = load_features()
+        d["gmt_offset"] = offset
+        save_features(d)
+
+    def _refresh_rems(self):
+        self.rem_lb.delete(0, "end")
+        self._rems = load_reminders()
+        for r in self._rems:
+            self.rem_lb.insert("end",
+                f"{DAYS[r['day']]:<12} {r['time']}  #{r['channel_id']}  {r['message']}")
+
+    def _on_rem_select(self, _=None):
+        sel = self.rem_lb.curselection()
         if not sel:
             return
-        r = self._reminders_cache[sel[0]]
+        r = self._rems[sel[0]]
         self.rem_day_var.set(DAYS[r["day"]])
         self.rem_time_var.set(r["time"])
-        self.rem_channel_var.set(str(r["channel_id"]))
+        self.rem_ch_var.set(str(r["channel_id"]))
         self.rem_msg_var.set(r["message"])
 
-    def add_or_update_reminder(self):
-        day_name = self.rem_day_var.get()
-        time_str = self.rem_time_var.get().strip()
-        channel = self.rem_channel_var.get().strip()
-        msg = self.rem_msg_var.get().strip()
-
-        if not all([day_name, time_str, channel, msg]):
+    def _add_rem(self):
+        day  = self.rem_day_var.get()
+        time = self.rem_time_var.get().strip()
+        ch   = self.rem_ch_var.get().strip()
+        msg  = self.rem_msg_var.get().strip()
+        if not all([day, time, ch, msg]):
             messagebox.showwarning("Missing input", "Fill in all fields.")
             return
-
         try:
-            h, m = map(int, time_str.split(":"))
+            h, m = map(int, time.split(":"))
             assert 0 <= h <= 23 and 0 <= m <= 59
         except Exception:
-            messagebox.showwarning("Invalid time", "Use HH:MM format, e.g. 12:00")
+            messagebox.showwarning("Invalid time", "Use HH:MM format.")
             return
-
         try:
-            channel_id = int(channel)
+            ch_id = int(ch)
         except ValueError:
-            messagebox.showwarning("Invalid channel ID", "Channel ID must be a number.")
+            messagebox.showwarning("Invalid channel", "Channel ID must be a number.")
             return
-
-        day_idx = DAYS.index(day_name)
-        reminders = load_reminders()
-
-        # Check if selected item to update
-        sel = self.rem_listbox.curselection()
-        new_entry = {"day": day_idx, "time": time_str, "channel_id": channel_id, "message": msg}
+        rems = load_reminders()
+        entry_data = {"day": DAYS.index(day), "time": time, "channel_id": ch_id, "message": msg}
+        sel = self.rem_lb.curselection()
         if sel:
-            reminders[sel[0]] = new_entry
+            rems[sel[0]] = entry_data
         else:
-            reminders.append(new_entry)
+            rems.append(entry_data)
+        save_reminders(rems)
+        self._refresh_rems()
+        self._clear_rem()
+        self.set_status(f"Saved reminder for {day} at {time}")
 
-        save_reminders(reminders)
-        self.refresh_rem_list()
-        self.clear_rem_fields()
-        self.set_status(f"Saved reminder for {day_name} at {time_str}")
-
-    def delete_reminder(self):
-        sel = self.rem_listbox.curselection()
+    def _del_rem(self):
+        sel = self.rem_lb.curselection()
         if not sel:
             messagebox.showwarning("No selection", "Select a reminder first.")
             return
         if not messagebox.askyesno("Confirm", "Delete this reminder?"):
             return
-        reminders = load_reminders()
-        reminders.pop(sel[0])
-        save_reminders(reminders)
-        self.refresh_rem_list()
-        self.clear_rem_fields()
+        rems = load_reminders()
+        rems.pop(sel[0])
+        save_reminders(rems)
+        self._refresh_rems()
+        self._clear_rem()
         self.set_status("Reminder deleted.")
 
-    def clear_rem_fields(self):
+    def _clear_rem(self):
         self.rem_day_var.set("Wednesday")
         self.rem_time_var.set("12:00")
-        self.rem_channel_var.set("")
+        self.rem_ch_var.set("")
         self.rem_msg_var.set("")
-        self.rem_listbox.selection_clear(0, "end")
+        self.rem_lb.selection_clear(0, "end")
 
-    # ------------------------------------------------------------------ Questions tab
+    # ── Questions ─────────────────────────────────────────────────────────────
 
-    def _build_questions_tab(self, parent):
-        btn_opts = {"font": ("Segoe UI", 10, "bold"), "relief": "flat", "cursor": "hand2", "pady": 6}
+    def _build_questions_tab(self, p):
+        label(p, "Daily Questions", large=True).pack(pady=(12, 2))
+        label(p, "Picks a random question each time the command is used.", dim=True).pack(pady=(0, 8))
 
-        tk.Label(parent, text="Daily Questions", bg="#2b2d31", fg="white",
-                 font=("Segoe UI", 13, "bold")).grid(row=0, column=0, columnspan=3, pady=(12, 4))
-
-        tk.Label(parent, text="Use the command in Discord to cycle through questions",
-                 bg="#2b2d31", fg="#b5bac1", font=("Segoe UI", 9)).grid(row=1, column=0, columnspan=3, pady=(0, 8))
-
-        tk.Label(parent, text="Command (without !)", bg="#2b2d31", fg="#b5bac1",
-                 font=("Segoe UI", 10)).grid(row=2, column=0, padx=12, sticky="w")
-
+        label(p, "Command (without !)", dim=True).pack()
         self.q_cmd_var = tk.StringVar()
-        self.q_cmd_var.trace_add("write", self._save_q_command)
-        tk.Entry(parent, textvariable=self.q_cmd_var, width=24, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=3, column=0, columnspan=3, padx=12, pady=(0, 10), sticky="ew")
+        self.q_cmd_var.trace_add("write", self._save_q_cmd)
+        entry(p, self.q_cmd_var).pack(padx=12, pady=(2, 8), fill="x")
 
-        frame = tk.Frame(parent, bg="#2b2d31")
-        frame.grid(row=4, column=0, columnspan=3, padx=12, pady=4)
+        lf, self.q_lb = scrolled_listbox(p, 55, 7)
+        lf.pack(padx=12, fill="x")
+        self.q_lb.bind("<<ListboxSelect>>", self._on_q_select)
 
-        self.q_listbox = tk.Listbox(frame, width=55, height=9, bg="#1e1f22", fg="white",
-                                    selectbackground="#5865f2", font=("Consolas", 11),
-                                    activestyle="none", relief="flat")
-        self.q_listbox.pack(side="left", fill="both")
-        self.q_listbox.bind("<<ListboxSelect>>", self.on_q_select)
+        row = tk.Frame(p, bg=BG)
+        row.pack(padx=12, pady=(8, 4), fill="x")
+        row.columnconfigure(0, weight=3)
+        row.columnconfigure(1, weight=2)
 
-        sb = ttk.Scrollbar(frame, orient="vertical", command=self.q_listbox.yview)
-        sb.pack(side="right", fill="y")
-        self.q_listbox.config(yscrollcommand=sb.set)
+        label(row, "Question", dim=True).grid(row=0, column=0, pady=(0, 2))
+        label(row, "Answer (spoiler)", dim=True).grid(row=0, column=1, pady=(0, 2))
 
-        tk.Label(parent, text="Question", bg="#2b2d31", fg="#b5bac1",
-                 font=("Segoe UI", 10)).grid(row=5, column=0, padx=12, pady=(8, 2), sticky="w")
-        tk.Label(parent, text="Answer (shown as spoiler)", bg="#2b2d31", fg="#b5bac1",
-                 font=("Segoe UI", 10)).grid(row=5, column=1, columnspan=2, padx=4, pady=(8, 2), sticky="w")
-
-        self.q_text_var = tk.StringVar()
+        self.q_text_var   = tk.StringVar()
         self.q_answer_var = tk.StringVar()
-        tk.Entry(parent, textvariable=self.q_text_var, width=32, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=6, column=0, padx=(12, 4), pady=2, sticky="ew")
-        tk.Entry(parent, textvariable=self.q_answer_var, width=22, bg="#1e1f22", fg="white",
-                 insertbackground="white", relief="flat", font=("Consolas", 11)
-                 ).grid(row=6, column=1, columnspan=2, padx=(4, 12), pady=2, sticky="ew")
+        entry(row, self.q_text_var  ).grid(row=1, column=0, padx=(0, 4), sticky="ew")
+        entry(row, self.q_answer_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
 
-        bf = tk.Frame(parent, bg="#2b2d31")
-        bf.grid(row=7, column=0, columnspan=3, pady=10, padx=12, sticky="ew")
+        bf = tk.Frame(p, bg=BG)
+        bf.pack(padx=12, pady=8, fill="x")
+        btn(bf, "Add / Update", ACCENT, self._add_q ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "Delete",       RED,   self._del_q ).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        btn(bf, "Clear",        GREY,  self._clear_q).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
-        tk.Button(bf, text="Add / Update", bg="#5865f2", fg="white",
-                  command=self.add_or_update_question, **btn_opts).pack(side="left", expand=True, fill="x", padx=(0, 4))
-        tk.Button(bf, text="Delete", bg="#ed4245", fg="white",
-                  command=self.delete_question, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 4))
-        tk.Button(bf, text="Clear", bg="#4f545c", fg="white",
-                  command=self.clear_q_fields, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 0))
+        self._refresh_qs()
 
-        self.refresh_q_list()
-
-    def _save_q_command(self, *_):
+    def _save_q_cmd(self, *_):
         cmd = self.q_cmd_var.get().strip().lstrip("!")
-        data = load_questions()
-        data["command"] = cmd
-        save_questions(data)
+        d = load_questions()
+        d["command"] = cmd
+        save_questions(d)
 
-    def refresh_q_list(self):
-        self.q_listbox.delete(0, "end")
-        data = load_questions()
-        if data.get("command"):
-            self.q_cmd_var.set(data["command"])
-        for q in data.get("questions", []):
-            self.q_listbox.insert("end", f"{q['question']}  ||{q['answer']}||")
-        self._questions_cache = data.get("questions", [])
+    def _refresh_qs(self):
+        self.q_lb.delete(0, "end")
+        d = load_questions()
+        if d.get("command"):
+            self.q_cmd_var.set(d["command"])
+        self._qs = d.get("questions", [])
+        for q in self._qs:
+            self.q_lb.insert("end", f"{q['question']}  ||{q['answer']}||")
 
-    def on_q_select(self, _=None):
-        sel = self.q_listbox.curselection()
+    def _on_q_select(self, _=None):
+        sel = self.q_lb.curselection()
         if not sel:
             return
-        entry = self._questions_cache[sel[0]]
-        self.q_text_var.set(entry["question"])
-        self.q_answer_var.set(entry["answer"])
+        q = self._qs[sel[0]]
+        self.q_text_var.set(q["question"])
+        self.q_answer_var.set(q["answer"])
 
-    def add_or_update_question(self):
-        question = self.q_text_var.get().strip()
-        answer = self.q_answer_var.get().strip()
-        if not question or not answer:
-            messagebox.showwarning("Missing input", "Fill in both the question and the answer.")
+    def _add_q(self):
+        q = self.q_text_var.get().strip()
+        a = self.q_answer_var.get().strip()
+        if not q or not a:
+            messagebox.showwarning("Missing input", "Fill in both fields.")
             return
-
-        data = load_questions()
-        entry = {"question": question, "answer": answer}
-
-        sel = self.q_listbox.curselection()
+        d = load_questions()
+        item = {"question": q, "answer": a}
+        sel = self.q_lb.curselection()
         if sel:
-            data["questions"][sel[0]] = entry
+            d["questions"][sel[0]] = item
         else:
-            data["questions"].append(entry)
-
-        save_questions(data)
-        self.refresh_q_list()
-        self.clear_q_fields()
+            d["questions"].append(item)
+        save_questions(d)
+        self._refresh_qs()
+        self._clear_q()
         self.set_status("Question saved.")
 
-    def delete_question(self):
-        sel = self.q_listbox.curselection()
+    def _del_q(self):
+        sel = self.q_lb.curselection()
         if not sel:
             messagebox.showwarning("No selection", "Select a question first.")
             return
         if not messagebox.askyesno("Confirm", "Delete this question?"):
             return
-        data = load_questions()
-        data["questions"].pop(sel[0])
-        # Keep index in bounds
-        if data["questions"] and data.get("current_index", 0) >= len(data["questions"]):
-            data["current_index"] = 0
-        save_questions(data)
-        self.refresh_q_list()
-        self.clear_q_fields()
+        d = load_questions()
+        d["questions"].pop(sel[0])
+        save_questions(d)
+        self._refresh_qs()
+        self._clear_q()
         self.set_status("Question deleted.")
 
-    def clear_q_fields(self):
+    def _clear_q(self):
         self.q_text_var.set("")
         self.q_answer_var.set("")
-        self.q_listbox.selection_clear(0, "end")
+        self.q_lb.selection_clear(0, "end")
 
-    # ------------------------------------------------------------------ Deploy
+    # ── Push Message ──────────────────────────────────────────────────────────
+
+    def _build_push_tab(self, p):
+        label(p, "Push Message", large=True).pack(pady=(12, 2))
+        label(p, "Send a one-time message instantly via a Discord webhook.", dim=True).pack(pady=(0, 12))
+
+        label(p, "Webhook URL", dim=True).pack()
+        self._webhook_var = tk.StringVar(value=load_features().get("webhook_url", ""))
+        self._webhook_var.trace_add("write", self._save_webhook)
+        entry(p, self._webhook_var).pack(padx=12, pady=(2, 12), fill="x")
+
+        label(p, "Message", dim=True).pack()
+        self._push_text = tk.Text(p, height=7, bg=BG_INPUT, fg=FG,
+                                  insertbackground=FG, relief="flat",
+                                  font=("Consolas", 11), wrap="word")
+        self._push_text.pack(padx=12, pady=(2, 12), fill="x")
+
+        btn(p, "Send", ACCENT, self._send_push).pack(padx=12, fill="x")
+
+        label(p, "To create a webhook: Discord channel settings → Integrations → Webhooks",
+              dim=True).pack(pady=(10, 0))
+
+    def _save_webhook(self, *_):
+        d = load_features()
+        d["webhook_url"] = self._webhook_var.get().strip()
+        save_features(d)
+
+    def _send_push(self):
+        url = self._webhook_var.get().strip()
+        msg = self._push_text.get("1.0", "end-1c").strip()
+        if not url:
+            messagebox.showwarning("No webhook", "Enter a webhook URL first.")
+            return
+        if not msg:
+            messagebox.showwarning("No message", "Enter a message.")
+            return
+        payload = json.dumps({"content": msg}).encode("utf-8")
+        req = urllib.request.Request(
+            url, data=payload,
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        try:
+            with urllib.request.urlopen(req) as resp:
+                if resp.status in (200, 204):
+                    self._push_text.delete("1.0", "end")
+                    self.set_status("Message sent!")
+                else:
+                    messagebox.showerror("Failed", f"Discord returned {resp.status}")
+        except urllib.error.HTTPError as e:
+            messagebox.showerror("HTTP Error", f"{e.code}: {e.reason}")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+
+    # ── Fun Features ──────────────────────────────────────────────────────────
+
+    def _build_features_tab(self, p):
+        label(p, "Fun Features", large=True).pack(pady=(12, 2))
+        label(p, "Toggle extra bot commands. Deploy after changing.", dim=True).pack(pady=(0, 12))
+
+        feats = load_features()
+        self._rng_var = tk.BooleanVar(value=feats.get("rng_enabled", False))
+
+        card = tk.Frame(p, bg=BG_CARD)
+        card.pack(padx=12, fill="x")
+
+        info = tk.Frame(card, bg=BG_CARD)
+        info.pack(side="left", padx=12, pady=10, fill="x", expand=True)
+        tk.Label(info, text="!RNG", bg=BG_CARD, fg=FG,
+                 font=("Segoe UI", 11, "bold")).pack(anchor="w")
+        tk.Label(info, text="Picks a random number between 1–100.\nResponds: DogBot rolled a X!",
+                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9)).pack(anchor="w")
+
+        tk.Checkbutton(card, variable=self._rng_var, bg=BG_CARD,
+                       activebackground=BG_CARD, command=self._save_features
+                       ).pack(side="right", padx=12)
+
+        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=12, pady=16, fill="x")
+
+    def _save_features(self):
+        d = load_features()
+        d["rng_enabled"] = self._rng_var.get()
+        save_features(d)
+        self.set_status("Saved. Deploy to apply.")
+
+    # ── Deploy ────────────────────────────────────────────────────────────────
 
     def deploy(self):
-        repo_dir = os.path.dirname(os.path.realpath(__file__))
+        repo = os.path.dirname(os.path.realpath(__file__))
         try:
-            result = subprocess.run(
-                ["git", "add", "."], cwd=repo_dir,
-                capture_output=True, text=True
-            )
-            if result.returncode != 0:
-                messagebox.showerror("Deploy failed", f"git add failed in:\n{repo_dir}\n\n{result.stderr}")
+            r = subprocess.run(["git", "add", "."], cwd=repo, capture_output=True, text=True)
+            if r.returncode != 0:
+                messagebox.showerror("Deploy failed", r.stderr)
                 return
-            result = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=repo_dir)
-            if result.returncode == 0:
+            if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=repo).returncode == 0:
                 self.set_status("No changes to deploy.")
                 return
-            subprocess.run(["git", "commit", "-m", "Update bot data"], cwd=repo_dir, check=True)
-            subprocess.run(["git", "push"], cwd=repo_dir, check=True)
+            subprocess.run(["git", "commit", "-m", "Update bot data"], cwd=repo, check=True)
+            subprocess.run(["git", "push"], cwd=repo, check=True)
             self.set_status("Deployed! Railway will redeploy automatically.")
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Deploy failed", str(e))
 
     def set_status(self, msg):
-        self.status.config(text=msg)
-        self.after(4000, lambda: self.status.config(text=""))
+        self.status_lbl.config(text=msg)
+        self.after(4000, lambda: self.status_lbl.config(text=""))
 
 
 if __name__ == "__main__":
