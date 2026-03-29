@@ -6,6 +6,7 @@ import subprocess
 
 COMMANDS_FILE = os.path.join(os.path.dirname(__file__), "commands.json")
 REMINDERS_FILE = os.path.join(os.path.dirname(__file__), "reminders.json")
+QUESTIONS_FILE = os.path.join(os.path.dirname(__file__), "questions.json")
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -20,6 +21,18 @@ def load_commands():
 def save_commands(cmds):
     with open(COMMANDS_FILE, "w") as f:
         json.dump(cmds, f, indent=4)
+
+
+def load_questions():
+    if not os.path.exists(QUESTIONS_FILE):
+        return {"channel_id": None, "questions": []}
+    with open(QUESTIONS_FILE, "r") as f:
+        return json.load(f)
+
+
+def save_questions(data):
+    with open(QUESTIONS_FILE, "w") as f:
+        json.dump(data, f, indent=4)
 
 
 def load_reminders():
@@ -62,6 +75,11 @@ class ManagerApp(tk.Tk):
         rem_frame = tk.Frame(notebook, bg="#2b2d31")
         notebook.add(rem_frame, text="Reminders")
         self._build_reminders_tab(rem_frame)
+
+        # --- Questions tab ---
+        q_frame = tk.Frame(notebook, bg="#2b2d31")
+        notebook.add(q_frame, text="Questions")
+        self._build_questions_tab(q_frame)
 
         # --- Deploy button (shared) ---
         btn_opts = {"font": ("Segoe UI", 10, "bold"), "relief": "flat", "cursor": "hand2", "pady": 6}
@@ -311,6 +329,133 @@ class ManagerApp(tk.Tk):
         self.rem_channel_var.set("")
         self.rem_msg_var.set("")
         self.rem_listbox.selection_clear(0, "end")
+
+    # ------------------------------------------------------------------ Questions tab
+
+    def _build_questions_tab(self, parent):
+        btn_opts = {"font": ("Segoe UI", 10, "bold"), "relief": "flat", "cursor": "hand2", "pady": 6}
+
+        tk.Label(parent, text="Daily Questions", bg="#2b2d31", fg="white",
+                 font=("Segoe UI", 13, "bold")).grid(row=0, column=0, columnspan=3, pady=(12, 4))
+
+        tk.Label(parent, text="Use the command in Discord to cycle through questions",
+                 bg="#2b2d31", fg="#b5bac1", font=("Segoe UI", 9)).grid(row=1, column=0, columnspan=3, pady=(0, 8))
+
+        tk.Label(parent, text="Command (without !)", bg="#2b2d31", fg="#b5bac1",
+                 font=("Segoe UI", 10)).grid(row=2, column=0, padx=12, sticky="w")
+
+        self.q_cmd_var = tk.StringVar()
+        self.q_cmd_var.trace_add("write", self._save_q_command)
+        tk.Entry(parent, textvariable=self.q_cmd_var, width=24, bg="#1e1f22", fg="white",
+                 insertbackground="white", relief="flat", font=("Consolas", 11)
+                 ).grid(row=3, column=0, columnspan=3, padx=12, pady=(0, 10), sticky="ew")
+
+        frame = tk.Frame(parent, bg="#2b2d31")
+        frame.grid(row=4, column=0, columnspan=3, padx=12, pady=4)
+
+        self.q_listbox = tk.Listbox(frame, width=55, height=9, bg="#1e1f22", fg="white",
+                                    selectbackground="#5865f2", font=("Consolas", 11),
+                                    activestyle="none", relief="flat")
+        self.q_listbox.pack(side="left", fill="both")
+        self.q_listbox.bind("<<ListboxSelect>>", self.on_q_select)
+
+        sb = ttk.Scrollbar(frame, orient="vertical", command=self.q_listbox.yview)
+        sb.pack(side="right", fill="y")
+        self.q_listbox.config(yscrollcommand=sb.set)
+
+        tk.Label(parent, text="Question", bg="#2b2d31", fg="#b5bac1",
+                 font=("Segoe UI", 10)).grid(row=5, column=0, padx=12, pady=(8, 2), sticky="w")
+        tk.Label(parent, text="Answer (shown as spoiler)", bg="#2b2d31", fg="#b5bac1",
+                 font=("Segoe UI", 10)).grid(row=5, column=1, columnspan=2, padx=4, pady=(8, 2), sticky="w")
+
+        self.q_text_var = tk.StringVar()
+        self.q_answer_var = tk.StringVar()
+        tk.Entry(parent, textvariable=self.q_text_var, width=32, bg="#1e1f22", fg="white",
+                 insertbackground="white", relief="flat", font=("Consolas", 11)
+                 ).grid(row=6, column=0, padx=(12, 4), pady=2, sticky="ew")
+        tk.Entry(parent, textvariable=self.q_answer_var, width=22, bg="#1e1f22", fg="white",
+                 insertbackground="white", relief="flat", font=("Consolas", 11)
+                 ).grid(row=6, column=1, columnspan=2, padx=(4, 12), pady=2, sticky="ew")
+
+        bf = tk.Frame(parent, bg="#2b2d31")
+        bf.grid(row=7, column=0, columnspan=3, pady=10, padx=12, sticky="ew")
+
+        tk.Button(bf, text="Add / Update", bg="#5865f2", fg="white",
+                  command=self.add_or_update_question, **btn_opts).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        tk.Button(bf, text="Delete", bg="#ed4245", fg="white",
+                  command=self.delete_question, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        tk.Button(bf, text="Clear", bg="#4f545c", fg="white",
+                  command=self.clear_q_fields, **btn_opts).pack(side="left", expand=True, fill="x", padx=(4, 0))
+
+        self.refresh_q_list()
+
+    def _save_q_command(self, *_):
+        cmd = self.q_cmd_var.get().strip().lstrip("!")
+        data = load_questions()
+        data["command"] = cmd
+        save_questions(data)
+
+    def refresh_q_list(self):
+        self.q_listbox.delete(0, "end")
+        data = load_questions()
+        if data.get("command"):
+            self.q_cmd_var.set(data["command"])
+        idx = data.get("current_index", 0)
+        for i, q in enumerate(data.get("questions", [])):
+            marker = "▶ " if i == idx else "  "
+            self.q_listbox.insert("end", f"{marker}{q['question']}  ||{q['answer']}||")
+        self._questions_cache = data.get("questions", [])
+
+    def on_q_select(self, _=None):
+        sel = self.q_listbox.curselection()
+        if not sel:
+            return
+        entry = self._questions_cache[sel[0]]
+        self.q_text_var.set(entry["question"])
+        self.q_answer_var.set(entry["answer"])
+
+    def add_or_update_question(self):
+        question = self.q_text_var.get().strip()
+        answer = self.q_answer_var.get().strip()
+        if not question or not answer:
+            messagebox.showwarning("Missing input", "Fill in both the question and the answer.")
+            return
+
+        data = load_questions()
+        entry = {"question": question, "answer": answer}
+
+        sel = self.q_listbox.curselection()
+        if sel:
+            data["questions"][sel[0]] = entry
+        else:
+            data["questions"].append(entry)
+
+        save_questions(data)
+        self.refresh_q_list()
+        self.clear_q_fields()
+        self.set_status("Question saved.")
+
+    def delete_question(self):
+        sel = self.q_listbox.curselection()
+        if not sel:
+            messagebox.showwarning("No selection", "Select a question first.")
+            return
+        if not messagebox.askyesno("Confirm", "Delete this question?"):
+            return
+        data = load_questions()
+        data["questions"].pop(sel[0])
+        # Keep index in bounds
+        if data["questions"] and data.get("current_index", 0) >= len(data["questions"]):
+            data["current_index"] = 0
+        save_questions(data)
+        self.refresh_q_list()
+        self.clear_q_fields()
+        self.set_status("Question deleted.")
+
+    def clear_q_fields(self):
+        self.q_text_var.set("")
+        self.q_answer_var.set("")
+        self.q_listbox.selection_clear(0, "end")
 
     # ------------------------------------------------------------------ Deploy
 

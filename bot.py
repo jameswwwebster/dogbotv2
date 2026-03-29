@@ -16,6 +16,7 @@ bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
 COMMANDS_FILE = "commands.json"
 REMINDERS_FILE = "reminders.json"
+QUESTIONS_FILE = "questions.json"
 
 
 def load_custom_commands():
@@ -43,11 +44,24 @@ def resolve_mentions(text, guild):
     return re.sub(r'@([^\s<>@#&!]+)', replace_mention, text)
 
 
+def load_questions():
+    if not os.path.exists(QUESTIONS_FILE):
+        return {"channel_id": None, "current_index": 0, "questions": []}
+    with open(QUESTIONS_FILE, "r") as f:
+        return json.load(f)
+
+
+def save_questions(data):
+    with open(QUESTIONS_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
 def load_reminders():
     if not os.path.exists(REMINDERS_FILE):
         return []
     with open(REMINDERS_FILE, "r") as f:
         return json.load(f)
+
 
 
 @tasks.loop(minutes=1)
@@ -75,6 +89,24 @@ async def on_message(message):
 
     if message.content.startswith("!"):
         trigger = message.content[1:].lower().strip()
+
+        # Question command
+        q_data = load_questions()
+        q_cmd = q_data.get("command", "").lower().lstrip("!")
+        if q_cmd and trigger == q_cmd:
+            questions = q_data.get("questions", [])
+            if not questions:
+                await message.channel.send("No questions available yet.")
+                return
+            idx = q_data.get("current_index", 0) % len(questions)
+            entry = questions[idx]
+            msg = f"Question: {entry['question']} -> Answer ||{entry['answer']}||"
+            await message.channel.send(msg)
+            q_data["current_index"] = (idx + 1) % len(questions)
+            save_questions(q_data)
+            return
+
+        # Custom commands
         custom_cmds = load_custom_commands()
         if trigger in custom_cmds:
             text = resolve_mentions(custom_cmds[trigger], message.guild)
