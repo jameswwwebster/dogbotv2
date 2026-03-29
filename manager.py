@@ -315,9 +315,15 @@ class ManagerApp(tk.Tk):
     # ------------------------------------------------------------------ Deploy
 
     def deploy(self):
-        repo_dir = os.path.dirname(os.path.abspath(__file__))
+        repo_dir = os.path.dirname(os.path.realpath(__file__))
         try:
-            subprocess.run(["git", "add", "."], cwd=repo_dir, check=True)
+            result = subprocess.run(
+                ["git", "add", "."], cwd=repo_dir,
+                capture_output=True, text=True
+            )
+            if result.returncode != 0:
+                messagebox.showerror("Deploy failed", f"git add failed in:\n{repo_dir}\n\n{result.stderr}")
+                return
             result = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=repo_dir)
             if result.returncode == 0:
                 self.set_status("No changes to deploy.")
