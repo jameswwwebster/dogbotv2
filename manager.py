@@ -3,14 +3,13 @@ from tkinter import ttk, messagebox
 import json
 import os
 import subprocess
-import urllib.request
-import urllib.error
 from datetime import datetime, timezone, timedelta
 
-COMMANDS_FILE = os.path.join(os.path.dirname(__file__), "commands.json")
-REMINDERS_FILE = os.path.join(os.path.dirname(__file__), "reminders.json")
-QUESTIONS_FILE = os.path.join(os.path.dirname(__file__), "questions.json")
-FEATURES_FILE  = os.path.join(os.path.dirname(__file__), "features.json")
+COMMANDS_FILE      = os.path.join(os.path.dirname(__file__), "commands.json")
+REMINDERS_FILE     = os.path.join(os.path.dirname(__file__), "reminders.json")
+QUESTIONS_FILE     = os.path.join(os.path.dirname(__file__), "questions.json")
+FEATURES_FILE      = os.path.join(os.path.dirname(__file__), "features.json")
+PUSH_MESSAGES_FILE = os.path.join(os.path.dirname(__file__), "push_messages.json")
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -26,77 +25,94 @@ GREEN    = "#3ba55d"
 GOLD     = "#f0b232"
 
 
-# ── I/O helpers ───────────────────────────────────────────────────────────────
+# ── I/O ───────────────────────────────────────────────────────────────────────
 
 def load_commands():
-    if not os.path.exists(COMMANDS_FILE):
-        return {}
-    with open(COMMANDS_FILE, "r") as f:
-        return json.load(f)
+    if not os.path.exists(COMMANDS_FILE): return {}
+    with open(COMMANDS_FILE) as f: return json.load(f)
 
 def save_commands(d):
-    with open(COMMANDS_FILE, "w") as f:
-        json.dump(d, f, indent=4)
+    with open(COMMANDS_FILE, "w") as f: json.dump(d, f, indent=4)
 
 def load_reminders():
-    if not os.path.exists(REMINDERS_FILE):
-        return []
-    with open(REMINDERS_FILE, "r") as f:
-        return json.load(f)
+    if not os.path.exists(REMINDERS_FILE): return []
+    with open(REMINDERS_FILE) as f: return json.load(f)
 
 def save_reminders(d):
-    with open(REMINDERS_FILE, "w") as f:
-        json.dump(d, f, indent=4)
+    with open(REMINDERS_FILE, "w") as f: json.dump(d, f, indent=4)
 
 def load_questions():
-    if not os.path.exists(QUESTIONS_FILE):
-        return {"command": "", "questions": []}
-    with open(QUESTIONS_FILE, "r") as f:
-        return json.load(f)
+    if not os.path.exists(QUESTIONS_FILE): return {"command": "", "questions": []}
+    with open(QUESTIONS_FILE) as f: return json.load(f)
 
 def save_questions(d):
-    with open(QUESTIONS_FILE, "w") as f:
-        json.dump(d, f, indent=4)
+    with open(QUESTIONS_FILE, "w") as f: json.dump(d, f, indent=4)
 
 def load_features():
-    defaults = {"gmt_offset": 0, "rng_enabled": False, "webhook_url": ""}
-    if not os.path.exists(FEATURES_FILE):
-        return defaults
-    with open(FEATURES_FILE, "r") as f:
-        data = json.load(f)
-    for k, v in defaults.items():
-        data.setdefault(k, v)
+    defaults = {"gmt_offset": 0, "rng_enabled": False}
+    if not os.path.exists(FEATURES_FILE): return defaults
+    with open(FEATURES_FILE) as f: data = json.load(f)
+    for k, v in defaults.items(): data.setdefault(k, v)
     return data
 
 def save_features(d):
-    with open(FEATURES_FILE, "w") as f:
-        json.dump(d, f, indent=4)
+    with open(FEATURES_FILE, "w") as f: json.dump(d, f, indent=4)
+
+def load_push_messages():
+    if not os.path.exists(PUSH_MESSAGES_FILE): return []
+    with open(PUSH_MESSAGES_FILE) as f: return json.load(f)
+
+def save_push_messages(d):
+    with open(PUSH_MESSAGES_FILE, "w") as f: json.dump(d, f, indent=4)
 
 
 # ── Widget helpers ─────────────────────────────────────────────────────────────
 
-def label(parent, text, large=False, dim=False, **kw):
-    return tk.Label(parent, text=text, bg=BG, fg=FG_DIM if dim else FG,
-                    font=("Segoe UI", 13 if large else 10, "bold" if large else "normal"), **kw)
+def lbl(parent, text, large=False, dim=False, **kw):
+    return tk.Label(parent, text=text, bg=BG,
+                    fg=FG_DIM if dim else FG,
+                    font=("Segoe UI", 13 if large else 10,
+                          "bold" if large else "normal"),
+                    anchor="center", **kw)
 
-def entry(parent, var, **kw):
+def inp(parent, var, **kw):
     return tk.Entry(parent, textvariable=var, bg=BG_INPUT, fg=FG,
-                    insertbackground=FG, relief="flat", font=("Consolas", 11), **kw)
+                    insertbackground=FG, relief="flat",
+                    font=("Consolas", 11), **kw)
 
 def btn(parent, text, color, cmd, **kw):
-    return tk.Button(parent, text=text, bg=color, fg=FG, font=("Segoe UI", 10, "bold"),
-                     relief="flat", cursor="hand2", pady=6, command=cmd, **kw)
+    return tk.Button(parent, text=text, bg=color, fg=FG,
+                     font=("Segoe UI", 10, "bold"), relief="flat",
+                     cursor="hand2", pady=6, command=cmd, **kw)
 
-def scrolled_listbox(parent, width, height):
-    f = tk.Frame(parent, bg=BG)
-    lb = tk.Listbox(f, width=width, height=height, bg=BG_INPUT, fg=FG,
-                    selectbackground=ACCENT, font=("Consolas", 11),
-                    activestyle="none", relief="flat")
+def scrolled_lb(parent, width, height):
+    f  = tk.Frame(parent, bg=BG)
+    lb = tk.Listbox(f, width=width, height=height,
+                    bg=BG_INPUT, fg=FG, selectbackground=ACCENT,
+                    font=("Consolas", 11), activestyle="none", relief="flat")
     sb = ttk.Scrollbar(f, orient="vertical", command=lb.yview)
     lb.config(yscrollcommand=sb.set)
     lb.pack(side="left", fill="both", expand=True)
     sb.pack(side="right", fill="y")
     return f, lb
+
+def section(parent, title, subtitle=None):
+    """Centered section header with optional subtitle."""
+    lbl(parent, title, large=True).pack(fill="x", pady=(12, 2))
+    if subtitle:
+        lbl(parent, subtitle, dim=True).pack(fill="x", pady=(0, 8))
+
+def field_row(parent, labels, weights):
+    """Returns a frame configured as a centered field row."""
+    row = tk.Frame(parent, bg=BG)
+    row.pack(padx=20, pady=(6, 2), fill="x")
+    for i, w in enumerate(weights):
+        row.columnconfigure(i, weight=w)
+    for i, text in enumerate(labels):
+        tk.Label(row, text=text, bg=BG, fg=FG_DIM,
+                 font=("Segoe UI", 10), anchor="center"
+                 ).grid(row=0, column=i, pady=(0, 2), sticky="ew")
+    return row
 
 
 # ── App ────────────────────────────────────────────────────────────────────────
@@ -133,272 +149,205 @@ class ManagerApp(tk.Tk):
 
         btn(self, "Save & Deploy to GitHub", GREEN, self.deploy).pack(
             fill="x", padx=12, pady=(0, 6))
-
-        self.status_lbl = tk.Label(self, text="", bg=BG, fg=FG_DIM, font=("Segoe UI", 9))
-        self.status_lbl.pack(pady=(0, 8))
+        self._status = tk.Label(self, text="", bg=BG, fg=FG_DIM, font=("Segoe UI", 9))
+        self._status.pack(pady=(0, 8))
 
     # ── Commands ──────────────────────────────────────────────────────────────
 
     def _build_commands_tab(self, p):
-        label(p, "Custom Commands", large=True).pack(pady=(12, 2))
-        label(p, "Add a command and the response the bot will give.", dim=True).pack(pady=(0, 8))
+        section(p, "Custom Commands", "Add a command and the bot's response.")
 
-        lf, self.cmd_lb = scrolled_listbox(p, 52, 10)
-        lf.pack(padx=12, fill="x")
-        self.cmd_lb.bind("<<ListboxSelect>>", self._on_cmd_select)
+        lf, self._cmd_lb = scrolled_lb(p, 52, 10)
+        lf.pack(padx=20, fill="x")
+        self._cmd_lb.bind("<<ListboxSelect>>", self._on_cmd_sel)
 
-        row = tk.Frame(p, bg=BG)
-        row.pack(padx=12, pady=(8, 4), fill="x")
-        row.columnconfigure(0, weight=1)
-        row.columnconfigure(1, weight=3)
-
-        label(row, "!command", dim=True).grid(row=0, column=0, pady=(0, 2))
-        label(row, "Response", dim=True).grid(row=0, column=1, pady=(0, 2))
-
-        self.cmd_var  = tk.StringVar()
-        self.resp_var = tk.StringVar()
-        entry(row, self.cmd_var).grid( row=1, column=0, padx=(0, 4), sticky="ew")
-        entry(row, self.resp_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
+        row = field_row(p, ["!command", "Response"], [1, 3])
+        self._cmd_var  = tk.StringVar()
+        self._resp_var = tk.StringVar()
+        inp(row, self._cmd_var ).grid(row=1, column=0, padx=(0, 4), sticky="ew")
+        inp(row, self._resp_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
 
         bf = tk.Frame(p, bg=BG)
-        bf.pack(padx=12, pady=8, fill="x")
-        btn(bf, "Add / Update", ACCENT, self._add_cmd).pack(side="left", expand=True, fill="x", padx=(0, 4))
-        btn(bf, "Delete",       RED,   self._del_cmd).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        bf.pack(padx=20, pady=8, fill="x")
+        btn(bf, "Add / Update", ACCENT, self._add_cmd ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "Delete",       RED,   self._del_cmd ).pack(side="left", expand=True, fill="x", padx=(4, 4))
         btn(bf, "Clear",        GREY,  self._clear_cmd).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         self._refresh_cmds()
 
     def _refresh_cmds(self):
-        self.cmd_lb.delete(0, "end")
-        self._cmds = load_commands()
-        for cmd, resp in self._cmds.items():
-            self.cmd_lb.insert("end", f"!{cmd:<18} {resp}")
+        self._cmd_lb.delete(0, "end")
+        self.__cmds = load_commands()
+        for cmd, resp in self.__cmds.items():
+            self._cmd_lb.insert("end", f"!{cmd:<18} {resp}")
 
-    def _on_cmd_select(self, _=None):
-        sel = self.cmd_lb.curselection()
-        if not sel:
-            return
-        cmd = list(self._cmds.keys())[sel[0]]
-        self.cmd_var.set(cmd)
-        self.resp_var.set(self._cmds[cmd])
+    def _on_cmd_sel(self, _=None):
+        sel = self._cmd_lb.curselection()
+        if not sel: return
+        cmd = list(self.__cmds.keys())[sel[0]]
+        self._cmd_var.set(cmd)
+        self._resp_var.set(self.__cmds[cmd])
 
     def _add_cmd(self):
-        cmd  = self.cmd_var.get().strip().lstrip("!").lower()
-        resp = self.resp_var.get().strip()
+        cmd  = self._cmd_var.get().strip().lstrip("!").lower()
+        resp = self._resp_var.get().strip()
         if not cmd or not resp:
             messagebox.showwarning("Missing input", "Fill in both fields.")
             return
-        d = load_commands()
-        d[cmd] = resp
-        save_commands(d)
-        self._refresh_cmds()
-        self._clear_cmd()
+        d = load_commands(); d[cmd] = resp; save_commands(d)
+        self._refresh_cmds(); self._clear_cmd()
         self.set_status(f'Saved "!{cmd}"')
 
     def _del_cmd(self):
-        cmd = self.cmd_var.get().strip().lstrip("!").lower()
+        cmd = self._cmd_var.get().strip().lstrip("!").lower()
         if not cmd:
-            messagebox.showwarning("No selection", "Select a command first.")
-            return
+            messagebox.showwarning("No selection", "Select a command first."); return
         d = load_commands()
         if cmd not in d:
-            messagebox.showwarning("Not found", f'"!{cmd}" does not exist.')
-            return
-        if not messagebox.askyesno("Confirm", f'Delete "!{cmd}"?'):
-            return
-        del d[cmd]
-        save_commands(d)
-        self._refresh_cmds()
-        self._clear_cmd()
+            messagebox.showwarning("Not found", f'"!{cmd}" does not exist.'); return
+        if not messagebox.askyesno("Confirm", f'Delete "!{cmd}"?'): return
+        del d[cmd]; save_commands(d)
+        self._refresh_cmds(); self._clear_cmd()
         self.set_status(f'Deleted "!{cmd}"')
 
     def _clear_cmd(self):
-        self.cmd_var.set("")
-        self.resp_var.set("")
-        self.cmd_lb.selection_clear(0, "end")
+        self._cmd_var.set(""); self._resp_var.set("")
+        self._cmd_lb.selection_clear(0, "end")
 
     # ── Reminders ─────────────────────────────────────────────────────────────
 
     def _build_reminders_tab(self, p):
-        label(p, "Scheduled Reminders", large=True).pack(pady=(12, 2))
-        label(p, "Times are in your local timezone based on the offset below.", dim=True).pack(pady=(0, 6))
+        section(p, "Scheduled Reminders", "Enter times in your local timezone.")
 
-        # Clock + offset row
-        clock_row = tk.Frame(p, bg=BG)
-        clock_row.pack(pady=(0, 8))
+        # Clock row
+        cr = tk.Frame(p, bg=BG)
+        cr.pack(pady=(0, 8))
 
-        self._clock_lbl = tk.Label(clock_row, text="", bg=BG, fg=GOLD,
+        self._clock_lbl = tk.Label(cr, text="", bg=BG, fg=GOLD,
                                    font=("Segoe UI", 11, "bold"))
         self._clock_lbl.pack(side="left", padx=(0, 16))
 
-        tk.Label(clock_row, text="Offset:", bg=BG, fg=FG_DIM,
+        tk.Label(cr, text="Offset:", bg=BG, fg=FG_DIM,
                  font=("Segoe UI", 10)).pack(side="left")
 
-        feats = load_features()
-        self._offset_var = tk.StringVar(value=str(feats.get("gmt_offset", 0)))
-        offset_cb = ttk.Combobox(clock_row, textvariable=self._offset_var,
-                                 values=["0", "1", "2"], width=4, state="readonly",
-                                 font=("Segoe UI", 10))
-        offset_cb.pack(side="left", padx=4)
-        offset_cb.bind("<<ComboboxSelected>>", self._save_offset)
+        self._offset_var = tk.StringVar(value=str(load_features().get("gmt_offset", 0)))
+        cb = ttk.Combobox(cr, textvariable=self._offset_var,
+                          values=["0", "1", "2"], width=4, state="readonly",
+                          font=("Segoe UI", 10))
+        cb.pack(side="left", padx=4)
+        cb.bind("<<ComboboxSelected>>", self._save_offset)
 
-        tk.Label(clock_row, text="(0=GMT  1=CET/BST  2=CEST)", bg=BG, fg=FG_DIM,
+        tk.Label(cr, text="(0 = GMT   1 = CET/BST   2 = CEST)", bg=BG, fg=FG_DIM,
                  font=("Segoe UI", 9)).pack(side="left", padx=(4, 0))
+        self._tick()
 
-        self._tick_clock()
+        lf, self._rem_lb = scrolled_lb(p, 58, 7)
+        lf.pack(padx=20, fill="x")
+        self._rem_lb.bind("<<ListboxSelect>>", self._on_rem_sel)
 
-        # Listbox
-        lf, self.rem_lb = scrolled_listbox(p, 58, 7)
-        lf.pack(padx=12, fill="x")
-        self.rem_lb.bind("<<ListboxSelect>>", self._on_rem_select)
+        row = field_row(p, ["Day", "Time (HH:MM)", "Channel ID", "Message"], [1, 1, 2, 3])
+        self._rem_day  = tk.StringVar(value="Wednesday")
+        self._rem_time = tk.StringVar(value="12:00")
+        self._rem_ch   = tk.StringVar()
+        self._rem_msg  = tk.StringVar()
 
-        # Fields
-        fields = tk.Frame(p, bg=BG)
-        fields.pack(padx=12, pady=(8, 4), fill="x")
-        for i, w in enumerate([1, 1, 2, 3]):
-            fields.columnconfigure(i, weight=w)
-
-        for col, txt in enumerate(["Day", "Time (HH:MM)", "Channel ID", "Message"]):
-            label(fields, txt, dim=True).grid(row=0, column=col, pady=(0, 2))
-
-        self.rem_day_var  = tk.StringVar(value="Wednesday")
-        self.rem_time_var = tk.StringVar(value="12:00")
-        self.rem_ch_var   = tk.StringVar()
-        self.rem_msg_var  = tk.StringVar()
-
-        ttk.Combobox(fields, textvariable=self.rem_day_var, values=DAYS,
+        ttk.Combobox(row, textvariable=self._rem_day, values=DAYS,
                      state="readonly", font=("Segoe UI", 10)
                      ).grid(row=1, column=0, padx=2, sticky="ew")
-        entry(fields, self.rem_time_var).grid(row=1, column=1, padx=2, sticky="ew")
-        entry(fields, self.rem_ch_var  ).grid(row=1, column=2, padx=2, sticky="ew")
-        entry(fields, self.rem_msg_var ).grid(row=1, column=3, padx=2, sticky="ew")
+        inp(row, self._rem_time).grid(row=1, column=1, padx=2, sticky="ew")
+        inp(row, self._rem_ch  ).grid(row=1, column=2, padx=2, sticky="ew")
+        inp(row, self._rem_msg ).grid(row=1, column=3, padx=2, sticky="ew")
 
         bf = tk.Frame(p, bg=BG)
-        bf.pack(padx=12, pady=8, fill="x")
+        bf.pack(padx=20, pady=8, fill="x")
         btn(bf, "Add / Update", ACCENT, self._add_rem ).pack(side="left", expand=True, fill="x", padx=(0, 4))
         btn(bf, "Delete",       RED,   self._del_rem ).pack(side="left", expand=True, fill="x", padx=(4, 4))
         btn(bf, "Clear",        GREY,  self._clear_rem).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         self._refresh_rems()
 
-    def _tick_clock(self):
-        try:
-            offset = int(self._offset_var.get())
-        except (ValueError, AttributeError):
-            offset = 0
-        now = datetime.now(timezone.utc) + timedelta(hours=offset)
+    def _tick(self):
+        try:    offset = int(self._offset_var.get())
+        except: offset = 0
+        now  = datetime.now(timezone.utc) + timedelta(hours=offset)
         sign = f"+{offset}" if offset >= 0 else str(offset)
-        self._clock_lbl.config(text=f"🕐  {now.strftime('%H:%M:%S')}  (UTC{sign})")
-        self.after(1000, self._tick_clock)
+        self._clock_lbl.config(text=f"🕐  {now.strftime('%H:%M:%S')}  UTC{sign}")
+        self.after(1000, self._tick)
 
     def _save_offset(self, *_):
-        try:
-            offset = int(self._offset_var.get())
-        except ValueError:
-            return
-        d = load_features()
-        d["gmt_offset"] = offset
-        save_features(d)
+        try:    offset = int(self._offset_var.get())
+        except: return
+        d = load_features(); d["gmt_offset"] = offset; save_features(d)
 
     def _refresh_rems(self):
-        self.rem_lb.delete(0, "end")
-        self._rems = load_reminders()
-        for r in self._rems:
-            self.rem_lb.insert("end",
+        self._rem_lb.delete(0, "end")
+        self.__rems = load_reminders()
+        for r in self.__rems:
+            self._rem_lb.insert("end",
                 f"{DAYS[r['day']]:<12} {r['time']}  #{r['channel_id']}  {r['message']}")
 
-    def _on_rem_select(self, _=None):
-        sel = self.rem_lb.curselection()
-        if not sel:
-            return
-        r = self._rems[sel[0]]
-        self.rem_day_var.set(DAYS[r["day"]])
-        self.rem_time_var.set(r["time"])
-        self.rem_ch_var.set(str(r["channel_id"]))
-        self.rem_msg_var.set(r["message"])
+    def _on_rem_sel(self, _=None):
+        sel = self._rem_lb.curselection()
+        if not sel: return
+        r = self.__rems[sel[0]]
+        self._rem_day.set(DAYS[r["day"]]); self._rem_time.set(r["time"])
+        self._rem_ch.set(str(r["channel_id"])); self._rem_msg.set(r["message"])
 
     def _add_rem(self):
-        day  = self.rem_day_var.get()
-        time = self.rem_time_var.get().strip()
-        ch   = self.rem_ch_var.get().strip()
-        msg  = self.rem_msg_var.get().strip()
+        day = self._rem_day.get(); time = self._rem_time.get().strip()
+        ch  = self._rem_ch.get().strip(); msg = self._rem_msg.get().strip()
         if not all([day, time, ch, msg]):
-            messagebox.showwarning("Missing input", "Fill in all fields.")
-            return
+            messagebox.showwarning("Missing input", "Fill in all fields."); return
         try:
-            h, m = map(int, time.split(":"))
-            assert 0 <= h <= 23 and 0 <= m <= 59
-        except Exception:
-            messagebox.showwarning("Invalid time", "Use HH:MM format.")
-            return
-        try:
-            ch_id = int(ch)
-        except ValueError:
-            messagebox.showwarning("Invalid channel", "Channel ID must be a number.")
-            return
+            h, m = map(int, time.split(":")); assert 0 <= h <= 23 and 0 <= m <= 59
+        except:
+            messagebox.showwarning("Invalid time", "Use HH:MM format."); return
+        try:    ch_id = int(ch)
+        except: messagebox.showwarning("Invalid channel", "Must be a number."); return
         rems = load_reminders()
-        entry_data = {"day": DAYS.index(day), "time": time, "channel_id": ch_id, "message": msg}
-        sel = self.rem_lb.curselection()
-        if sel:
-            rems[sel[0]] = entry_data
-        else:
-            rems.append(entry_data)
-        save_reminders(rems)
-        self._refresh_rems()
-        self._clear_rem()
+        entry = {"day": DAYS.index(day), "time": time, "channel_id": ch_id, "message": msg}
+        sel = self._rem_lb.curselection()
+        if sel: rems[sel[0]] = entry
+        else:   rems.append(entry)
+        save_reminders(rems); self._refresh_rems(); self._clear_rem()
         self.set_status(f"Saved reminder for {day} at {time}")
 
     def _del_rem(self):
-        sel = self.rem_lb.curselection()
+        sel = self._rem_lb.curselection()
         if not sel:
-            messagebox.showwarning("No selection", "Select a reminder first.")
-            return
-        if not messagebox.askyesno("Confirm", "Delete this reminder?"):
-            return
-        rems = load_reminders()
-        rems.pop(sel[0])
-        save_reminders(rems)
-        self._refresh_rems()
-        self._clear_rem()
+            messagebox.showwarning("No selection", "Select a reminder first."); return
+        if not messagebox.askyesno("Confirm", "Delete this reminder?"): return
+        rems = load_reminders(); rems.pop(sel[0]); save_reminders(rems)
+        self._refresh_rems(); self._clear_rem()
         self.set_status("Reminder deleted.")
 
     def _clear_rem(self):
-        self.rem_day_var.set("Wednesday")
-        self.rem_time_var.set("12:00")
-        self.rem_ch_var.set("")
-        self.rem_msg_var.set("")
-        self.rem_lb.selection_clear(0, "end")
+        self._rem_day.set("Wednesday"); self._rem_time.set("12:00")
+        self._rem_ch.set(""); self._rem_msg.set("")
+        self._rem_lb.selection_clear(0, "end")
 
     # ── Questions ─────────────────────────────────────────────────────────────
 
     def _build_questions_tab(self, p):
-        label(p, "Daily Questions", large=True).pack(pady=(12, 2))
-        label(p, "Picks a random question each time the command is used.", dim=True).pack(pady=(0, 8))
+        section(p, "Daily Questions", "Picks a random question each time the command is used.")
 
-        label(p, "Command (without !)", dim=True).pack()
-        self.q_cmd_var = tk.StringVar()
-        self.q_cmd_var.trace_add("write", self._save_q_cmd)
-        entry(p, self.q_cmd_var).pack(padx=12, pady=(2, 8), fill="x")
+        lbl(p, "Command (without !)", dim=True).pack(fill="x", padx=20)
+        self._q_cmd_var = tk.StringVar()
+        self._q_cmd_var.trace_add("write", self._save_q_cmd)
+        inp(p, self._q_cmd_var).pack(padx=20, pady=(2, 8), fill="x")
 
-        lf, self.q_lb = scrolled_listbox(p, 55, 7)
-        lf.pack(padx=12, fill="x")
-        self.q_lb.bind("<<ListboxSelect>>", self._on_q_select)
+        lf, self._q_lb = scrolled_lb(p, 55, 7)
+        lf.pack(padx=20, fill="x")
+        self._q_lb.bind("<<ListboxSelect>>", self._on_q_sel)
 
-        row = tk.Frame(p, bg=BG)
-        row.pack(padx=12, pady=(8, 4), fill="x")
-        row.columnconfigure(0, weight=3)
-        row.columnconfigure(1, weight=2)
-
-        label(row, "Question", dim=True).grid(row=0, column=0, pady=(0, 2))
-        label(row, "Answer (spoiler)", dim=True).grid(row=0, column=1, pady=(0, 2))
-
-        self.q_text_var   = tk.StringVar()
-        self.q_answer_var = tk.StringVar()
-        entry(row, self.q_text_var  ).grid(row=1, column=0, padx=(0, 4), sticky="ew")
-        entry(row, self.q_answer_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
+        row = field_row(p, ["Question", "Answer (spoiler)"], [3, 2])
+        self._q_text   = tk.StringVar()
+        self._q_answer = tk.StringVar()
+        inp(row, self._q_text  ).grid(row=1, column=0, padx=(0, 4), sticky="ew")
+        inp(row, self._q_answer).grid(row=1, column=1, padx=(4, 0), sticky="ew")
 
         bf = tk.Frame(p, bg=BG)
-        bf.pack(padx=12, pady=8, fill="x")
+        bf.pack(padx=20, pady=8, fill="x")
         btn(bf, "Add / Update", ACCENT, self._add_q ).pack(side="left", expand=True, fill="x", padx=(0, 4))
         btn(bf, "Delete",       RED,   self._del_q ).pack(side="left", expand=True, fill="x", padx=(4, 4))
         btn(bf, "Clear",        GREY,  self._clear_q).pack(side="left", expand=True, fill="x", padx=(4, 0))
@@ -406,171 +355,158 @@ class ManagerApp(tk.Tk):
         self._refresh_qs()
 
     def _save_q_cmd(self, *_):
-        cmd = self.q_cmd_var.get().strip().lstrip("!")
-        d = load_questions()
-        d["command"] = cmd
+        d = load_questions(); d["command"] = self._q_cmd_var.get().strip().lstrip("!")
         save_questions(d)
 
     def _refresh_qs(self):
-        self.q_lb.delete(0, "end")
+        self._q_lb.delete(0, "end")
         d = load_questions()
-        if d.get("command"):
-            self.q_cmd_var.set(d["command"])
-        self._qs = d.get("questions", [])
-        for q in self._qs:
-            self.q_lb.insert("end", f"{q['question']}  ||{q['answer']}||")
+        if d.get("command"): self._q_cmd_var.set(d["command"])
+        self.__qs = d.get("questions", [])
+        for q in self.__qs:
+            self._q_lb.insert("end", f"{q['question']}  ||{q['answer']}||")
 
-    def _on_q_select(self, _=None):
-        sel = self.q_lb.curselection()
-        if not sel:
-            return
-        q = self._qs[sel[0]]
-        self.q_text_var.set(q["question"])
-        self.q_answer_var.set(q["answer"])
+    def _on_q_sel(self, _=None):
+        sel = self._q_lb.curselection()
+        if not sel: return
+        q = self.__qs[sel[0]]
+        self._q_text.set(q["question"]); self._q_answer.set(q["answer"])
 
     def _add_q(self):
-        q = self.q_text_var.get().strip()
-        a = self.q_answer_var.get().strip()
+        q = self._q_text.get().strip(); a = self._q_answer.get().strip()
         if not q or not a:
-            messagebox.showwarning("Missing input", "Fill in both fields.")
-            return
-        d = load_questions()
-        item = {"question": q, "answer": a}
-        sel = self.q_lb.curselection()
-        if sel:
-            d["questions"][sel[0]] = item
-        else:
-            d["questions"].append(item)
-        save_questions(d)
-        self._refresh_qs()
-        self._clear_q()
+            messagebox.showwarning("Missing input", "Fill in both fields."); return
+        d = load_questions(); item = {"question": q, "answer": a}
+        sel = self._q_lb.curselection()
+        if sel: d["questions"][sel[0]] = item
+        else:   d["questions"].append(item)
+        save_questions(d); self._refresh_qs(); self._clear_q()
         self.set_status("Question saved.")
 
     def _del_q(self):
-        sel = self.q_lb.curselection()
+        sel = self._q_lb.curselection()
         if not sel:
-            messagebox.showwarning("No selection", "Select a question first.")
-            return
-        if not messagebox.askyesno("Confirm", "Delete this question?"):
-            return
-        d = load_questions()
-        d["questions"].pop(sel[0])
-        save_questions(d)
-        self._refresh_qs()
-        self._clear_q()
+            messagebox.showwarning("No selection", "Select a question first."); return
+        if not messagebox.askyesno("Confirm", "Delete this question?"): return
+        d = load_questions(); d["questions"].pop(sel[0]); save_questions(d)
+        self._refresh_qs(); self._clear_q()
         self.set_status("Question deleted.")
 
     def _clear_q(self):
-        self.q_text_var.set("")
-        self.q_answer_var.set("")
-        self.q_lb.selection_clear(0, "end")
+        self._q_text.set(""); self._q_answer.set("")
+        self._q_lb.selection_clear(0, "end")
 
     # ── Push Message ──────────────────────────────────────────────────────────
 
     def _build_push_tab(self, p):
-        label(p, "Push Message", large=True).pack(pady=(12, 2))
-        label(p, "Send a one-time message instantly via a Discord webhook.", dim=True).pack(pady=(0, 12))
+        section(p, "Push Message",
+                "Queues a one-time message sent by the bot on next deploy.")
 
-        label(p, "Webhook URL", dim=True).pack()
-        self._webhook_var = tk.StringVar(value=load_features().get("webhook_url", ""))
-        self._webhook_var.trace_add("write", self._save_webhook)
-        entry(p, self._webhook_var).pack(padx=12, pady=(2, 12), fill="x")
+        lbl(p, "Channel ID", dim=True).pack(fill="x", padx=20)
+        self._push_ch = tk.StringVar()
+        inp(p, self._push_ch).pack(padx=20, pady=(2, 10), fill="x")
 
-        label(p, "Message", dim=True).pack()
+        lbl(p, "Message  (supports @mentions and :emojis:)", dim=True).pack(fill="x", padx=20)
         self._push_text = tk.Text(p, height=7, bg=BG_INPUT, fg=FG,
                                   insertbackground=FG, relief="flat",
                                   font=("Consolas", 11), wrap="word")
-        self._push_text.pack(padx=12, pady=(2, 12), fill="x")
+        self._push_text.pack(padx=20, pady=(2, 10), fill="x")
 
-        btn(p, "Send", ACCENT, self._send_push).pack(padx=12, fill="x")
+        # Show any already queued messages
+        self._push_queue_lbl = tk.Label(p, text="", bg=BG, fg=FG_DIM,
+                                        font=("Segoe UI", 9))
+        self._push_queue_lbl.pack(fill="x", padx=20)
+        self._refresh_push_label()
 
-        label(p, "To create a webhook: Discord channel settings → Integrations → Webhooks",
-              dim=True).pack(pady=(10, 0))
+        bf = tk.Frame(p, bg=BG)
+        bf.pack(padx=20, pady=8, fill="x")
+        btn(bf, "Queue & Deploy", ACCENT, self._queue_push).pack(
+            side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "Clear Queue", RED, self._clear_push_queue).pack(
+            side="left", expand=True, fill="x", padx=(4, 0))
 
-    def _save_webhook(self, *_):
-        d = load_features()
-        d["webhook_url"] = self._webhook_var.get().strip()
-        save_features(d)
+    def _refresh_push_label(self):
+        msgs = load_push_messages()
+        if msgs:
+            self._push_queue_lbl.config(text=f"{len(msgs)} message(s) queued for next deploy.")
+        else:
+            self._push_queue_lbl.config(text="No messages queued.")
 
-    def _send_push(self):
-        url = self._webhook_var.get().strip()
+    def _queue_push(self):
+        ch  = self._push_ch.get().strip()
         msg = self._push_text.get("1.0", "end-1c").strip()
-        if not url:
-            messagebox.showwarning("No webhook", "Enter a webhook URL first.")
-            return
+        if not ch:
+            messagebox.showwarning("Missing channel", "Enter a channel ID."); return
         if not msg:
-            messagebox.showwarning("No message", "Enter a message.")
-            return
-        payload = json.dumps({"content": msg}).encode("utf-8")
-        req = urllib.request.Request(
-            url, data=payload,
-            headers={"Content-Type": "application/json"},
-            method="POST"
-        )
-        try:
-            with urllib.request.urlopen(req) as resp:
-                if resp.status in (200, 204):
-                    self._push_text.delete("1.0", "end")
-                    self.set_status("Message sent!")
-                else:
-                    messagebox.showerror("Failed", f"Discord returned {resp.status}")
-        except urllib.error.HTTPError as e:
-            messagebox.showerror("HTTP Error", f"{e.code}: {e.reason}")
-        except Exception as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showwarning("Missing message", "Enter a message."); return
+        try:    ch_id = int(ch)
+        except: messagebox.showwarning("Invalid channel", "Channel ID must be a number."); return
+
+        msgs = load_push_messages()
+        msgs.append({"channel_id": ch_id, "message": msg})
+        save_push_messages(msgs)
+        self._push_text.delete("1.0", "end")
+        self._refresh_push_label()
+        self.set_status("Queued. Deploying...")
+        self.deploy(clear_push_after=True)
+
+    def _clear_push_queue(self):
+        if not messagebox.askyesno("Confirm", "Clear all queued messages?"): return
+        save_push_messages([])
+        self._refresh_push_label()
+        self.set_status("Queue cleared.")
 
     # ── Fun Features ──────────────────────────────────────────────────────────
 
     def _build_features_tab(self, p):
-        label(p, "Fun Features", large=True).pack(pady=(12, 2))
-        label(p, "Toggle extra bot commands. Deploy after changing.", dim=True).pack(pady=(0, 12))
+        section(p, "Fun Features", "Toggle extra bot commands. Deploy to apply.")
 
         feats = load_features()
         self._rng_var = tk.BooleanVar(value=feats.get("rng_enabled", False))
 
         card = tk.Frame(p, bg=BG_CARD)
-        card.pack(padx=12, fill="x")
+        card.pack(padx=20, pady=4, fill="x")
 
         info = tk.Frame(card, bg=BG_CARD)
         info.pack(side="left", padx=12, pady=10, fill="x", expand=True)
         tk.Label(info, text="!RNG", bg=BG_CARD, fg=FG,
-                 font=("Segoe UI", 11, "bold")).pack(anchor="w")
-        tk.Label(info, text="Picks a random number between 1–100.\nResponds: DogBot rolled a X!",
-                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9)).pack(anchor="w")
+                 font=("Segoe UI", 11, "bold")).pack(anchor="center")
+        tk.Label(info, text='Picks a random number 1–100.\nResponds: "DogBot rolled a X!"',
+                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
+                 anchor="center", justify="center").pack(anchor="center")
 
         tk.Checkbutton(card, variable=self._rng_var, bg=BG_CARD,
                        activebackground=BG_CARD, command=self._save_features
                        ).pack(side="right", padx=12)
 
-        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=12, pady=16, fill="x")
+        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=16, fill="x")
 
     def _save_features(self):
-        d = load_features()
-        d["rng_enabled"] = self._rng_var.get()
-        save_features(d)
+        d = load_features(); d["rng_enabled"] = self._rng_var.get(); save_features(d)
         self.set_status("Saved. Deploy to apply.")
 
     # ── Deploy ────────────────────────────────────────────────────────────────
 
-    def deploy(self):
+    def deploy(self, clear_push_after=False):
         repo = os.path.dirname(os.path.realpath(__file__))
         try:
             r = subprocess.run(["git", "add", "."], cwd=repo, capture_output=True, text=True)
             if r.returncode != 0:
-                messagebox.showerror("Deploy failed", r.stderr)
-                return
+                messagebox.showerror("Deploy failed", r.stderr); return
             if subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=repo).returncode == 0:
-                self.set_status("No changes to deploy.")
-                return
+                self.set_status("No changes to deploy."); return
             subprocess.run(["git", "commit", "-m", "Update bot data"], cwd=repo, check=True)
             subprocess.run(["git", "push"], cwd=repo, check=True)
+            if clear_push_after:
+                save_push_messages([])
+                self._refresh_push_label()
             self.set_status("Deployed! Railway will redeploy automatically.")
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Deploy failed", str(e))
 
     def set_status(self, msg):
-        self.status_lbl.config(text=msg)
-        self.after(4000, lambda: self.status_lbl.config(text=""))
+        self._status.config(text=msg)
+        self.after(4000, lambda: self._status.config(text=""))
 
 
 if __name__ == "__main__":

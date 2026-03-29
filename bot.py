@@ -15,10 +15,11 @@ intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
-COMMANDS_FILE = "commands.json"
-REMINDERS_FILE = "reminders.json"
-QUESTIONS_FILE = "questions.json"
-FEATURES_FILE  = "features.json"
+COMMANDS_FILE      = "commands.json"
+REMINDERS_FILE     = "reminders.json"
+QUESTIONS_FILE     = "questions.json"
+FEATURES_FILE      = "features.json"
+PUSH_MESSAGES_FILE = "push_messages.json"
 
 
 def load_custom_commands():
@@ -53,8 +54,19 @@ def load_reminders():
         return json.load(f)
 
 
+def load_push_messages():
+    if not os.path.exists(PUSH_MESSAGES_FILE):
+        return []
+    with open(PUSH_MESSAGES_FILE, "r") as f:
+        return json.load(f)
+
+
+def save_push_messages(data):
+    with open(PUSH_MESSAGES_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+
 def resolve_emojis(text, guild):
-    """Replace :emojiname: with the proper <:name:id> Discord syntax."""
     if guild is None:
         return text
 
@@ -69,7 +81,6 @@ def resolve_emojis(text, guild):
 
 
 def resolve_mentions(text, guild):
-    """Replace @Name with proper role/member mention syntax."""
     if guild is None:
         return text
 
@@ -113,6 +124,18 @@ async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
     check_reminders.start()
 
+    # Send and clear any queued push messages
+    pending = load_push_messages()
+    if pending:
+        for entry in pending:
+            channel = bot.get_channel(entry["channel_id"])
+            if channel:
+                text = resolve_text(entry["message"], channel.guild)
+                await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
+            else:
+                print(f"[Push] Channel {entry['channel_id']} not found.")
+        save_push_messages([])
+
 
 @bot.event
 async def on_message(message):
@@ -121,7 +144,6 @@ async def on_message(message):
 
     if message.content.startswith("!"):
         trigger = message.content[1:].lower().strip()
-
         features = load_features()
 
         # RNG command
