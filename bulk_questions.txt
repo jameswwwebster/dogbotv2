@@ -1,0 +1,458 @@
+What location does fairy ring code AIP teleport you to?
+Zanaris
+
+What location does fairy ring code AJR teleport you to?
+Kandarin: Slayer cave south-east of Rellekka (Fremennik Slayer Dungeon)
+
+What location does fairy ring code AKQ teleport you to?
+Kandarin: Piscatoris Hunter area
+
+What location does fairy ring code AKS teleport you to?
+Feldip Hills: Jungle Hunter area
+
+What location does fairy ring code ALQ teleport you to?
+Morytania: Haunted Woods east of Canifis
+
+What Firemaking level is required to burn Achey logs?
+1
+
+What Firemaking level is required to burn Maple logs?
+45
+
+What Firemaking level is required to burn Yew logs?
+60
+
+What Firemaking level is required to burn Elder logs?
+90
+
+How many variants of the dragonfire shield exist?
+4
+
+Do waterfiends have an elite Slayer variant?
+Yes
+
+Do harpie bug swarms have an elite Slayer variant?
+Yes
+
+Do Cyclipses have an elite Slayer variant?
+Yes
+
+Do goblins have an elite Slayer variant?
+No
+
+What is the primary currency used in The Arc?
+Chimes
+
+What is the first island players arrive at in The Arc?
+Waiko
+
+Who assigns Slayer contracts on Aminishi in The Arc?
+Ling
+
+Which quest unlocks access to The Arc?
+Impressing the Locals
+
+From which port do players sail to The Arc?
+Port Sarim
+
+What Woodcutting level is required to cut bamboo in The Arc?
+90
+
+What title is awarded for fully completing The Arc?
+Salty
+
+Which island is the furthest east in The Arc?
+Goshima
+
+What reward is given for finding a castaway in The Arc?
+Taijitu
+
+What is Menaphos also known as?
+The Golden City
+
+Which quest is required to access Menaphos?
+The Jack of Spades
+
+How many districts does Menaphos have?
+4
+
+In which region is Menaphos located?
+Kharidian Desert
+
+What title is awarded for completing most content in Menaphos?
+Sandy
+
+What minigame is found in each district of Menaphos?
+Shifting Tombs
+
+In which city does The Jack of Spades quest begin?
+Al Kharid
+
+What Hunter creature requires level 73 Hunter to catch in Menaphos?
+Plover bird
+
+Which god controls the Pharaoh of Menaphos?
+Amascut
+
+Which city is connected to Menaphos via a bridge?
+Sophanem
+
+Which district of Menaphos contains acadia trees and the Golden Palace?
+Imperial
+
+What Woodcutting level is required to cut acadia trees in Menaphos?
+50
+
+Who is the ruler of Lumbridge?
+Duke Horacio
+
+Which kingdom is Lumbridge part of?
+Misthalin
+
+Which river runs through Lumbridge?
+River Lum
+
+What is the name of the quest given by the Lumbridge cook?
+Cook's Assistant
+
+Which shop in Lumbridge repairs Barrows armour?
+Bob's Brilliant Axes
+
+Which god is worshipped in the Lumbridge church?
+Saradomin
+
+Which guild is accessed via a trapdoor above the Lumbridge furnace?
+Thieves' Guild
+
+Which underground city is accessed from the Lumbridge castle basement?
+Dorgesh-Kaan
+
+Who is the owner of the Thieves' Guild in Lumbridge?
+Darren Lightfinger
+
+Who owns the farm north of Lumbridge castle?
+Fred the Farmer
+
+Which two gods fought in the Battle of Lumbridge?
+Zamorak and Saradomin
+
+Who is the ruler of Varrock?
+King Roald
+
+Where is the Grand Exchange located relative to Varrock?
+North-west of Varrock
+
+Which kingdom is Varrock part of?
+Misthalin
+
+Which two guilds are located just outside Varrock's walls?
+Cooks' Guild and Champions' Guild
+
+What is the name of the dungeon beneath Varrock containing moss giants and deadly red spiders?
+Varrock Sewers
+
+What was Varrock's original name?
+Avarrocka
+
+Which tavern in Varrock is home to Dr. Harlow?
+Blue Moon Inn
+
+Which shop in Varrock teleports players to the Rune Essence mine?
+Aubury's Rune Shop
+
+Which quest involving King Roald grants access to Morytania?
+Priest in Peril
+
+Which kingdom is Ardougne part of?
+Kandarin
+
+Which river is Ardougne named after?
+River Dougne
+
+Which quest unlocks the Ardougne Teleport spell?
+Plague City
+
+What are the two sections of Ardougne called?
+West Ardougne and East Ardougne
+
+Which city can players sail to from Ardougne, and how much does it cost?
+Brimhaven for 30 coins
+
+Which two sons divided Ardougne between them?
+Tyras and Lathas
+
+What is the name of the zoo in Ardougne?
+Ardougne Zoo
+
+Which exclusive guild is located in Yanille?
+Wizards' Guild
+
+What Magic level is required to enter the Wizards' Guild in Yanille?
+66
+
+Which creatures beset Yanille from the south and west?
+Ogres
+
+Which quest is started just outside the north-west wall of Yanille?
+Watchtower
+
+What Construction level is required to move your player-owned house to Yanille?
+50
+
+What is the name of the tavern in Yanille?
+Dragon Inn
+
+Which city lies to the south of Yanille?
+Ardougne
+
+Which ogre city lies to the south of Yanille?
+Gu'Tanoth
+
+Which kingdom is Falador the capital of?
+Asgarnia
+
+Which guild is located in the south-eastern section of Falador, close to the east bank?
+Mining Guild
+
+Who rules Falador in place of the ailing King Vallance?
+Sir Amik Varze
+
+What is the name of the only bar in Falador?
+Rising Sun Inn
+
+Which boss can be found beneath Falador Park?
+Giant mole
+
+What is at the centre of Falador, serving as the home of the White Knights?
+White Knights' Castle
+
+Which Falador location serves as a hub for training Smithing and earning respect?
+Artisans' Workshop
+
+Which quest must be completed to access Prifddinas?
+Plague's End
+
+Prifddinas is the capital city of which region?
+Tirannwn
+
+How many elven clan districts does Prifddinas have?
+8
+
+What is the name of the central hub structure in Prifddinas?
+Tower of Voices
+
+Which Prifddinas clan district is associated with Farming and Woodcutting?
+Crwys
+
+Which Prifddinas clan district is associated with Mining and Smithing?
+Trahaearn
+
+Which Prifddinas clan district is associated with Melee and Slayer?
+Iorwerth
+
+Which Prifddinas clan district is associated with Agility and Prayer?
+Hefin
+
+Which Prifddinas clan district is associated with Magic and Ranged?
+Cadarn
+
+Which Prifddinas clan district is associated with Summoning and Divination?
+Amlodd
+
+Which Prifddinas clan district is associated with Crafting and Construction?
+Ithell
+
+Which Prifddinas clan district is associated with Dungeoneering and Herblore?
+Meilyr
+
+What is the name of the feature that boosts two Prifddinas districts at a time, changing every hour?
+Voice of Seren
+
+Which Slayer master is found in the Iorwerth district, requiring 85 Slayer and combat level 120?
+Morvran
+
+Which exclusive guild is located in the Cadarn district of Prifddinas?
+Max Guild
+
+What material is produced by playing the harps in the Ithell district?
+Harmonic dust
+
+Which agility course in Prifddinas is considered one of the best in the game?
+Hefin Agility Course
+
+What is the name of the AFK Agility training method in the Hefin district?
+Serenity posts
+
+What Mining training method in the Trahaearn district works similarly to ivy, requiring level 89?
+Seren Stones
+
+What fairy ring code teleports players to the Amlodd district of Prifddinas?
+DJS
+
+What are the special farming patches in the Meilyr district called?
+Harmony pillars
+
+In which age was Prifddinas originally created?
+First Age
+
+What is the name of the weekly D&D in the Iorwerth district?
+Rush of Blood
+
+What items do Hefin monks sell that are used to cleanse the Corrupted Seren Stone?
+Cleansing crystals
+
+What material do the Seren Stones in the Trahaearn district produce when mined?
+Corrupted ore
+
+What is Prifddinas also commonly known as?
+Crystal City
+
+Which clan leader in Prifddinas can upgrade dragon tools into crystal tools for 4,000 harmonic dust each?
+Lady Ithell
+
+Which NPC in the Amlodd district rewards players for catching one of each impling?
+Daffyd
+
+Which elven clan leader waits at the gate of Prifddinas to greet the player upon their first visit?
+Arianwyn
+
+What item is crafted from Ithell crystal sandstone using the robust glassmaking machine?
+Crystal flask
+
+Which god reshaped Prifddinas entirely from crystals?
+Seren
+
+From which homeworld did the elves travel to Gielinor before founding Prifddinas?
+Tarddiad
+
+What plant grows on Harmony pillars in the Meilyr district and is used to make perfect juju potions?
+Harmony moss
+
+Due to which conflict was Prifddinas reverted to crystal seed form before being restored in Plague's End?
+Elven Civil War
+
+What is the actual name of Barbarian Village, as learned during the Gunnar's Ground quest?
+Gunnarsgrunn
+
+Who is the current leader of Barbarian Village?
+Chieftain Gunthor
+
+Which dungeon can be accessed through a hole in the mining area of Barbarian Village?
+Stronghold of Security
+
+Which quest must be completed to unlock the spas and shops in Oo'glog?
+As a First Resort
+
+In which region is Oo'glog located?
+Feldip Hills
+
+Who is the leader of Oo'glog?
+Chief Tess
+
+Which Oo'glog spa grants unlimited run energy?
+Salt-water spring
+
+Which Oo'glog spa boosts the player's Hunter level by 10% and removes their scent while hunting?
+Mud bath
+
+Which Oo'glog spa fully restores prayer points and temporarily boosts them to 10% over maximum?
+Sulphur spring
+
+Which Oo'glog spa marks players as a follower of Bandos for one hour?
+Bandos pool
+
+Which Oo'glog spa heals the player, cures poison, and grants poison immunity?
+Thermal bath
+
+What type of creatures inhabit Oo'glog?
+Ogresses
+
+What item allows players to carry six doses of Oo'glog spa water to use elsewhere?
+Ogre flask
+
+What Mining level is required to mine the red sandstone rock just north of Oo'glog?
+81
+
+Which type of tree, found only in Oo'glog, is unique to that location in all of RuneScape?
+Eucalyptus
+
+In which region is Al Kharid located?
+Kharidian Desert
+
+Which Al Kharid shop sells scimitars from bronze up to adamant?
+Zeke's Superior Scimitars
+
+Which members-only minigame is found in the south-east of Al Kharid?
+Sorceress's Garden
+
+Who is the spymaster of Al Kharid, found just outside the palace?
+Osman
+
+How much does a kebab cost at Karim's kebab shop in Al Kharid?
+1 coin
+
+What are the primary ore types found in the Al Kharid mine?
+Silver and gold rocks
+
+In which kingdom is Port Sarim located?
+Asgarnia
+
+Which destination can all players sail to from the west dock of Port Sarim for 30 coins?
+Karamja
+
+What is the name of the inn in Port Sarim?
+The Rusty Anchor
+
+Which Port Sarim shop sells runes, eyes of newt, and wizard hats?
+Betty's Magic Emporium
+
+Which quest is started by talking to Redbeard Frank in Port Sarim?
+Pirate's Treasure
+
+Which island can members travel to from the north dock of Port Sarim, but no weapons or armour are allowed?
+Entrana
+
+Which destination can members reach from the centre dock of Port Sarim by talking to a squire?
+Void Knights' Outpost
+
+Wendlewick is the largest settlement in which new region?
+Havenhythe
+
+Which quest must be started to first access Wendlewick?
+Visions of Havenhythe
+
+From which city does Captain Lorris sail players to Wendlewick?
+Port Sarim
+
+Which three leaders guide the people of Wendlewick?
+Adam, Esther and Zeke
+
+What unique Fishing feature is located on the docks west of Wendlewick?
+Wendlewick fish farm
+
+Which four fish can be cultivated at the Wendlewick fish farm?
+Lobsters, swordfish, sharks and giant crayfish
+
+What Woodcutting level is required to cut creeping ivy in Wendlewick?
+35
+
+What is the name of the tavern in Wendlewick?
+Burnt Lobster Tavern
+
+What instrument must players craft for Dalia the lumberjack in Wendlewick to unlock her tree plots?
+Lute
+
+What material, made from cooked meat, is used to string the lute for Dalia?
+Sinew
+
+What is the name of the candle shop in Wendlewick?
+Wendle's Wicks
+
+Which boss found in Havenhythe is named after a king?
+Ivar, King of Bones
+
+What is the name of the Havenhythe boss described as a Dreadhog?
+Silverquill, the Dreadhog
+
+On which coast of Havenhythe is Wendlewick located?
+West coast
