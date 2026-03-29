@@ -625,3 +625,74 @@ Ice Strykewyrm
 How many different Raptor key parts do you need for a full key?
 4.
 
+Which quest requires 30,000 Vessel souls?
+Alpha vs Omega
+
+Which quest gives the highest quest point reward of 10?
+Recipe for Disaster
+
+Which animal is Experiment No.2?
+A mutated mouse
+
+What is the name of the Goblin that ran the Squeel of Fortune?
+Yelps
+
+What god do the goblins belong to?
+Bandos
+
+What do you need to start a fight against Giant Mimic?
+A mimic kill token
+
+Which boss drops a (..) tongue cape?
+The Gaint Mimic
+
+What is the name of the item you get when you roll on the Hazelmere's signet ring table, but don't have tier 4 luck active?
+Cheese+tom batta
+
+What is the highest level of Necromancy memento?
+Powerful memento
+
+What is the name of the bowstring of the Bow of the Last Guardian?
+Divine bowstring
+
+Which hilt can not be obtained from Godwars dungeon 1?
+Ancient Hilt
+
+Which combat styles don't have a weapon that is dropped by Nex?
+Necromancy and melee
+
+Does the Ancient artefact unlock Vitalis or Bombi pet?
+Bombi
+
+Which creature with fiend in the name can be bound into a binding contract?
+Waterfiend
+
+Which skill came out after Divination, but before Archaeology?
+Invention
+
+Which skill came out after Summoning, but before Divination?
+Dungeoneering
+
+Does Anachronia have a rune shop?
+Yes
+
+How much extra XP do the XP relics (Inspire Love, Effort, Genius and Awe) give?
+2%
+
+Where does Evil bob the evil cat live?
+ScapeRune
+
+Which type of unfinished potion is used to create a Goblin potion?
+Toadflax potion (unfinished)
+
+Which skills are required to be level 80 in order to unlock the Invention skill?
+Divination, Smithing and Crafting
+
+Which colour is the rarest type of reward from Prawn balls?
+Golden (Golden mystery egg and Golden prawn cracker, both at 1/200)
+
+
+
+
+
+

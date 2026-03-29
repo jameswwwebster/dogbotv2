@@ -30,7 +30,10 @@ GOLD     = "#f0b232"
 
 def load_commands():
     if not os.path.exists(COMMANDS_FILE): return {}
-    with open(COMMANDS_FILE) as f: return json.load(f)
+    with open(COMMANDS_FILE) as f: data = json.load(f)
+    # Migrate old plain-string format {"cmd": "response"} → {"cmd": {"response": ..., "mod_only": false}}
+    return {cmd: (val if isinstance(val, dict) else {"response": val, "mod_only": False})
+            for cmd, val in data.items()}
 
 def save_commands(d):
     with open(COMMANDS_FILE, "w") as f: json.dump(d, f, indent=4)
@@ -128,7 +131,7 @@ def field_row(parent, labels, weights):
 class ManagerApp(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("Discord Bot — Manager")
+        self.title("🐾 DogBot — Dashboard")
         self.resizable(False, False)
         self.configure(bg=BG)
         self._build_ui()
@@ -145,13 +148,13 @@ class ManagerApp(tk.Tk):
         nb.pack(fill="both", expand=True, padx=12, pady=12)
 
         for name, builder in [
-            ("Commands",     self._build_commands_tab),
-            ("Reminders",    self._build_reminders_tab),
-            ("Questions",    self._build_questions_tab),
-            ("Push Message", self._build_push_tab),
-            ("Fun Features", self._build_features_tab),
-            ("Giveaway",     self._build_giveaway_tab),
-            ("Utility",      self._build_utility_tab),
+            ("💬 Commands",     self._build_commands_tab),
+            ("⏰ Reminders",    self._build_reminders_tab),
+            ("❓ Questions",    self._build_questions_tab),
+            ("📢 Push Message", self._build_push_tab),
+            ("🎮 Fun Features", self._build_features_tab),
+            ("🎉 Giveaway",     self._build_giveaway_tab),
+            ("🔧 Utility",      self._build_utility_tab),
         ]:
             f = tk.Frame(nb, bg=BG)
             nb.add(f, text=name)
@@ -167,7 +170,7 @@ class ManagerApp(tk.Tk):
     def _build_commands_tab(self, p):
         section(p, "Custom Commands", "Add a command and the bot's response.")
 
-        lf, self._cmd_lb = scrolled_lb(p, 52, 10)
+        lf, self._cmd_lb = scrolled_lb(p, 52, 9)
         lf.pack(padx=20, fill="x")
         self._cmd_lb.bind("<<ListboxSelect>>", self._on_cmd_sel)
 
@@ -177,8 +180,16 @@ class ManagerApp(tk.Tk):
         inp(row, self._cmd_var ).grid(row=1, column=0, padx=(0, 4), sticky="ew")
         inp(row, self._resp_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
 
+        mf = tk.Frame(p, bg=BG)
+        mf.pack(padx=20, pady=(4, 0), fill="x")
+        self._mod_only_var = tk.BooleanVar()
+        tk.Checkbutton(mf, text="Mod only", variable=self._mod_only_var,
+                       bg=BG, fg=FG_DIM, selectcolor=BG_INPUT,
+                       activebackground=BG, font=("Segoe UI", 9)
+                       ).pack(side="left")
+
         bf = tk.Frame(p, bg=BG)
-        bf.pack(padx=20, pady=8, fill="x")
+        bf.pack(padx=20, pady=(4, 8), fill="x")
         btn(bf, "Add / Update", ACCENT, self._add_cmd ).pack(side="left", expand=True, fill="x", padx=(0, 4))
         btn(bf, "Delete",       RED,   self._del_cmd ).pack(side="left", expand=True, fill="x", padx=(4, 4))
         btn(bf, "Clear",        GREY,  self._clear_cmd).pack(side="left", expand=True, fill="x", padx=(4, 0))
@@ -188,15 +199,18 @@ class ManagerApp(tk.Tk):
     def _refresh_cmds(self):
         self._cmd_lb.delete(0, "end")
         self.__cmds = load_commands()
-        for cmd, resp in self.__cmds.items():
-            self._cmd_lb.insert("end", f"!{cmd:<18} {resp}")
+        for cmd, entry in self.__cmds.items():
+            tag = "[mod]" if entry.get("mod_only") else "[pub]"
+            self._cmd_lb.insert("end", f"!{cmd:<18} {tag}  {entry['response']}")
 
     def _on_cmd_sel(self, _=None):
         sel = self._cmd_lb.curselection()
         if not sel: return
-        cmd = list(self.__cmds.keys())[sel[0]]
+        cmd   = list(self.__cmds.keys())[sel[0]]
+        entry = self.__cmds[cmd]
         self._cmd_var.set(cmd)
-        self._resp_var.set(self.__cmds[cmd])
+        self._resp_var.set(entry["response"])
+        self._mod_only_var.set(entry.get("mod_only", False))
 
     def _add_cmd(self):
         cmd  = self._cmd_var.get().strip().lstrip("!").lower()
@@ -204,7 +218,9 @@ class ManagerApp(tk.Tk):
         if not cmd or not resp:
             messagebox.showwarning("Missing input", "Fill in both fields.")
             return
-        d = load_commands(); d[cmd] = resp; save_commands(d)
+        d = load_commands()
+        d[cmd] = {"response": resp, "mod_only": self._mod_only_var.get()}
+        save_commands(d)
         self._refresh_cmds(); self._clear_cmd()
         self.set_status(f'Saved "!{cmd}"')
 
@@ -222,6 +238,7 @@ class ManagerApp(tk.Tk):
 
     def _clear_cmd(self):
         self._cmd_var.set(""); self._resp_var.set("")
+        self._mod_only_var.set(False)
         self._cmd_lb.selection_clear(0, "end")
 
     # ── Reminders ─────────────────────────────────────────────────────────────
@@ -346,7 +363,7 @@ class ManagerApp(tk.Tk):
         self._q_cmd_var.trace_add("write", self._save_q_cmd)
         inp(p, self._q_cmd_var).pack(padx=20, pady=(2, 8), fill="x")
 
-        lf, self._q_lb = scrolled_lb(p, 55, 7)
+        lf, self._q_lb = scrolled_lb(p, 55, 5)
         lf.pack(padx=20, fill="x")
         self._q_lb.bind("<<ListboxSelect>>", self._on_q_sel)
 
@@ -363,6 +380,55 @@ class ManagerApp(tk.Tk):
         btn(bf, "Clear",        GREY,  self._clear_q).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         self._refresh_qs()
+
+        # ── Auto-post ─────────────────────────────────────────────────────────
+        tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(4, 8))
+
+        feats = load_features()
+        self._dq_enabled_var = tk.BooleanVar(value=feats.get("daily_question_enabled", False))
+        self._dq_time_var    = tk.StringVar(value=feats.get("daily_question_time", "10:00"))
+        self._dq_ch_var      = tk.StringVar(value=str(feats.get("daily_question_channel", 472851820448972800)))
+        self._dq_time_var.trace_add("write", self._save_daily_q)
+        self._dq_ch_var.trace_add("write",   self._save_daily_q)
+
+        card = tk.Frame(p, bg=BG_CARD)
+        card.pack(padx=20, fill="x")
+
+        info = tk.Frame(card, bg=BG_CARD)
+        info.pack(side="left", padx=12, pady=8, fill="x", expand=True)
+        tk.Label(info, text="Auto-post a random question daily", bg=BG_CARD, fg=FG,
+                 font=("Segoe UI", 10, "bold")).pack(anchor="w")
+
+        row = tk.Frame(info, bg=BG_CARD)
+        row.pack(anchor="w", pady=(4, 0))
+        tk.Label(row, text="Time:", bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9)).pack(side="left")
+        inp(row, self._dq_time_var, width=6).pack(side="left", padx=(4, 14))
+        tk.Label(row, text="Channel:", bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9)).pack(side="left")
+        inp(row, self._dq_ch_var, width=19).pack(side="left", padx=(4, 6))
+        tk.Button(row, text="General Chat", bg=BG_INPUT, fg=FG_DIM,
+                  font=("Segoe UI", 9), relief="flat", cursor="hand2",
+                  command=lambda: self._dq_ch_var.set("472851820448972800")
+                  ).pack(side="left")
+
+        tk.Checkbutton(card, variable=self._dq_enabled_var, bg=BG_CARD,
+                       activebackground=BG_CARD, command=self._save_daily_q
+                       ).pack(side="right", padx=12)
+
+    def _save_daily_q(self, *_):
+        d = load_features()
+        d["daily_question_enabled"] = self._dq_enabled_var.get()
+        try:
+            h, m = map(int, self._dq_time_var.get().strip().split(":"))
+            assert 0 <= h <= 23 and 0 <= m <= 59
+            d["daily_question_time"] = self._dq_time_var.get().strip()
+        except Exception:
+            pass
+        try:
+            d["daily_question_channel"] = int(self._dq_ch_var.get().strip())
+        except ValueError:
+            pass
+        save_features(d)
+        self.set_status("Saved. Deploy to apply.")
 
     def _save_q_cmd(self, *_):
         d = load_questions(); d["command"] = self._q_cmd_var.get().strip().lstrip("!")
@@ -485,9 +551,10 @@ class ManagerApp(tk.Tk):
         section(p, "Fun Features", "Toggle extra bot commands. Deploy to apply.")
 
         feats = load_features()
-        self._rng_var   = tk.BooleanVar(value=feats.get("rng_enabled",   False))
-        self._hug_var   = tk.BooleanVar(value=feats.get("hug_enabled",   False))
-        self._spank_var = tk.BooleanVar(value=feats.get("spank_enabled", False))
+        self._rng_var            = tk.BooleanVar(value=feats.get("rng_enabled",            False))
+        self._hug_var            = tk.BooleanVar(value=feats.get("hug_enabled",            False))
+        self._spank_var          = tk.BooleanVar(value=feats.get("spank_enabled",          False))
+        self._pickgroupboss_var  = tk.BooleanVar(value=feats.get("pickgroupboss_enabled",  False))
 
         for var, title, desc in [
             (self._rng_var,   "!RNG",
@@ -496,6 +563,8 @@ class ManagerApp(tk.Tk):
              "Give someone a hug.\nResponds: \"[sender] hugs [target]! 🤗\""),
             (self._spank_var, "!spank @user",
              "Give someone a spank. 🥵🥵\nResponds: \"[sender] spanks [target]!\""),
+            (self._pickgroupboss_var, "!pickgroupboss",
+             "Picks a random group boss to do together.\nResponds: \"⚔️ Tonight's group boss: [boss]!\""),
         ]:
             card = tk.Frame(p, bg=BG_CARD)
             card.pack(padx=20, pady=4, fill="x")
@@ -513,9 +582,10 @@ class ManagerApp(tk.Tk):
 
     def _save_features(self):
         d = load_features()
-        d["rng_enabled"]   = self._rng_var.get()
-        d["hug_enabled"]   = self._hug_var.get()
-        d["spank_enabled"] = self._spank_var.get()
+        d["rng_enabled"]           = self._rng_var.get()
+        d["hug_enabled"]           = self._hug_var.get()
+        d["spank_enabled"]         = self._spank_var.get()
+        d["pickgroupboss_enabled"] = self._pickgroupboss_var.get()
         save_features(d)
         self.set_status("Saved. Deploy to apply.")
 
@@ -660,9 +730,11 @@ class ManagerApp(tk.Tk):
         gs = load_giveaways()
         gs.append({"channel_id": ch_id, "prize": prize, "end_at": end_at, "message_id": None})
         save_giveaways(gs)
-        self._refresh_gw_list()
         self.set_status("Giveaway queued. Deploying...")
         self.deploy()
+        # Clear locally so the next deploy (e.g. a push message) doesn't re-trigger this giveaway
+        save_giveaways([])
+        self._refresh_gw_list()
 
     def _del_giveaway(self):
         sel = self._gw_lb.curselection()

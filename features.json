@@ -6,5 +6,6 @@
     "clear_enabled": true,
     "remindme_enabled": true,
     "spank_enabled": true,
-    "mod_role": "Moderators"
+    "mod_role": "Moderators",
+    "pickgroupboss_enabled": true
 }

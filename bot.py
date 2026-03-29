@@ -29,11 +29,19 @@ def load_custom_commands():
     if not os.path.exists(COMMANDS_FILE):
         return {}
     with open(COMMANDS_FILE, "r") as f:
-        return json.load(f)
+        data = json.load(f)
+    # Migrate old plain-string format → {"response": ..., "mod_only": false}
+    return {cmd: (val if isinstance(val, dict) else {"response": val, "mod_only": False})
+            for cmd, val in data.items()}
 
 
 def load_features():
-    defaults = {"gmt_offset": 0, "rng_enabled": False}
+    defaults = {
+        "gmt_offset": 0, "rng_enabled": False,
+        "daily_question_enabled": False,
+        "daily_question_time": "10:00",
+        "daily_question_channel": 472851820448972800,
+    }
     if not os.path.exists(FEATURES_FILE):
         return defaults
     with open(FEATURES_FILE, "r") as f:
@@ -239,6 +247,21 @@ async def check_reminders():
     if _reminders_sent.get("_minute") != current_minute:
         _reminders_sent = {"_minute": current_minute}
 
+    # Daily question auto-post
+    if features.get("daily_question_enabled"):
+        try:
+            dq_h, dq_m = map(int, features.get("daily_question_time", "10:00").split(":"))
+        except Exception:
+            dq_h, dq_m = 10, 0
+        if now.hour == dq_h and now.minute == dq_m and "daily_q" not in _reminders_sent:
+            _reminders_sent["daily_q"] = True
+            channel = bot.get_channel(int(features.get("daily_question_channel", 472851820448972800)))
+            if channel:
+                questions = load_questions().get("questions", [])
+                if questions:
+                    q = random.choice(questions)
+                    await channel.send(f"❓ **{q['question']}**\n||{q['answer']}||")
+
     for i, reminder in enumerate(load_reminders()):
         h, m = map(int, reminder["time"].split(":"))
         if now.weekday() == reminder["day"] and now.hour == h and now.minute == m:
@@ -324,7 +347,10 @@ async def on_message(message):
         # Custom commands
         custom_cmds = load_custom_commands()
         if trigger in custom_cmds:
-            text = resolve_text(custom_cmds[trigger], message.guild)
+            entry = custom_cmds[trigger]
+            if entry.get("mod_only") and not has_mod_role(message.author):
+                return
+            text = resolve_text(entry["response"], message.guild)
             await message.channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
             return
 
@@ -365,6 +391,30 @@ async def commands_list(ctx):
         lines.extend(util)
 
     await ctx.send("\n".join(lines))
+
+
+_GROUP_BOSSES = [
+    "Amascut, the Devourer",
+    "The Ambassador",
+    "The Barrows: Rise of the Six",
+    "Black Stone Dragon",
+    "Kalphite King",
+    "Nakatra, Devourer Eternal",
+    "Nex",
+    "Nex: Angel of Death",
+    "Seiryu, the Azure Serpent",
+    "Solak, Guardian of the Grove",
+    "Vorago",
+    "Zamorak, Lord of Chaos",
+]
+
+
+@bot.command(name="pickgroupboss")
+async def pickgroupboss_cmd(ctx):
+    if not load_features().get("pickgroupboss_enabled"):
+        return
+    boss = random.choice(_GROUP_BOSSES)
+    await ctx.send(f"⚔️ Tonight's group boss: **{boss}**!")
 
 
 @bot.command(name="hug")
