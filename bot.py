@@ -435,6 +435,70 @@ async def pickgroupboss_cmd(ctx):
     await ctx.send(f"⚔️ Tonight's group boss: **{boss}**!")
 
 
+_FLIRTS = [
+    # ── Bad / Funny ────────────────────────────────────────────────────────────
+    "{sender} tried to flirt with {target}, it failed horribly.",
+    "{sender} tried to flirt with {target}, nice try but a bit pathetic.",
+    "{sender} tried to flirt with {target}, they got friendzoned instantly.",
+    "{sender} tried to flirt with {target}, even the bot felt second-hand embarrassment.",
+    "{sender} tried to flirt with {target}, and somehow made it weird.",
+    "{sender} tried to flirt with {target}, the silence was deafening.",
+    "{sender} tried to flirt with {target}, they've been blocked.",
+    "{sender} tried to flirt with {target}, please never do that again.",
+    "{sender} tried to flirt with {target}, their parents would be disappointed.",
+    "{sender} tried to flirt with {target}, but {target} already has a duo partner.",
+    # ── Smooth / Funny ─────────────────────────────────────────────────────────
+    "{sender} slid into {target}'s DMs like a pro.",
+    "{sender} shot their shot with {target}, respect the confidence.",
+    "{sender} asked {target} to Netflix and chill. Bold move.",
+    # ── RuneScape Themed ───────────────────────────────────────────────────────
+    "{sender} tried to flirt with {target}, but got a 'not interested' faster than a Jad pray flick.",
+    "{sender} tried to flirt with {target}, they have 99 Strength but 1 Charisma.",
+    '{sender} tried to flirt with {target}. "Are you a daily? Because I\'d do you every day."',
+    '{sender} tried to flirt with {target}. "Want to duo Solak sometime? 👀"',
+    '{sender} tried to flirt with {target}. "I\'d spend all my bank on you and still think it was worth it."',
+    '{sender} tried to flirt with {target}. "You\'re rarer than a Hazelmere\'s signet ring drop."',
+    '{sender} tried to flirt with {target}. "Are you a loot beam? Because you light up my world."',
+    '{sender} tried to flirt with {target}. "I\'d give up my max cape for you."',
+    '{sender} tried to flirt with {target}. "You must be a Trim comp cape, because you\'re the whole package."',
+    '{sender} tried to flirt with {target}. "I\'d camp Nex for a week just to impress you."',
+    '{sender} tried to flirt with {target}. "Are you a bank preset? Because I\'d save you."',
+    '{sender} tried to flirt with {target}. "I\'d put you on my friends list any day."',
+    '{sender} tried to flirt with {target}. "You\'re the only boss I\'d skip a reaper task for."',
+    '{sender} tried to flirt with {target}. "I\'d use my last deathtouched dart on you. That\'s love."',
+    '{sender} tried to flirt with {target}. "You\'re not just a 10/10, you\'re a 120/120."',
+    '{sender} tried to flirt with {target}. "I\'d follow you into the Wilderness without insurance."',
+    '{sender} tried to flirt with {target}. "Are you a boss pet? Because the odds of finding someone like you are astronomical."',
+    '{sender} tried to flirt with {target}. "You\'re the only grind I actually enjoy."',
+    '{sender} tried to flirt with {target}. "I\'d logout at Lumbridge just to walk you home."',
+    '{sender} tried to flirt with {target}. "Are you a Slayer task? Because I\'d cancel everyone else for you."',
+    '{sender} tried to flirt with {target}. "You\'re the only thing I\'d AFK for hours."',
+    '{sender} tried to flirt with {target}. "I\'d trade my entire bank for one date with you."',
+    '{sender} tried to flirt with {target}. "You hit harder than a Raksha shadow pool."',
+    '{sender} tried to flirt with {target}. "Are you Vorago? Because you\'re out of my league but I keep trying anyway."',
+    '{sender} tried to flirt with {target}. "I\'d do 1000 Telos kills just to get your attention."',
+    '{sender} tried to flirt with {target}. "You\'re better than any drop I\'ve ever gotten."',
+    '{sender} tried to flirt with {target}. "I\'d turn off my loot beam so nobody else notices you."',
+    '{sender} tried to flirt with {target}. "You must be a Zamorak solo, because you\'re worth every wipe."',
+    '{sender} tried to flirt with {target}. "I\'ve got 99 Farming but I still couldn\'t grow anything as beautiful as you."',
+    '{sender} tried to flirt with {target}. "Are you the GE? Because everyone wants a piece of you."',
+    '{sender} tried to flirt with {target}. "I\'d walk from Lumbridge to Prif just to see you online."',
+    '{sender} tried to flirt with {target}. "You\'re the reason I log in every day."',
+    '{sender} tried to flirt with {target}. "I\'d lend you my best gear with no timer."',
+]
+
+
+@bot.command(name="flirt")
+async def flirt_cmd(ctx, target: discord.Member = None):
+    if not load_features().get("flirt_enabled"):
+        return
+    if not target:
+        await ctx.send("Usage: `!flirt @user`")
+        return
+    flirt = random.choice(_FLIRTS)
+    await ctx.send(flirt.format(sender=ctx.author.mention, target=target.mention))
+
+
 @bot.command(name="hug")
 async def hug_cmd(ctx, target: discord.Member = None):
     if not load_features().get("hug_enabled"):

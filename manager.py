@@ -554,6 +554,7 @@ class ManagerApp(tk.Tk):
         self._rng_var            = tk.BooleanVar(value=feats.get("rng_enabled",            False))
         self._hug_var            = tk.BooleanVar(value=feats.get("hug_enabled",            False))
         self._spank_var          = tk.BooleanVar(value=feats.get("spank_enabled",          False))
+        self._flirt_var          = tk.BooleanVar(value=feats.get("flirt_enabled",          False))
         self._pickgroupboss_var  = tk.BooleanVar(value=feats.get("pickgroupboss_enabled",  False))
 
         for var, title, desc in [
@@ -563,6 +564,8 @@ class ManagerApp(tk.Tk):
              "Give someone a hug.\nResponds: \"[sender] hugs [target]! 🤗\""),
             (self._spank_var, "!spank @user",
              "Give someone a spank. 🥵🥵\nResponds: \"[sender] spanks [target]!\""),
+            (self._flirt_var, "!flirt @user",
+             "Send a random flirt at someone.\nPicks from bad/funny, smooth, and RS-themed lines."),
             (self._pickgroupboss_var, "!pickgroupboss",
              "Picks a random group boss to do together.\nResponds: \"⚔️ Tonight's group boss: [boss]!\""),
         ]:
@@ -585,6 +588,7 @@ class ManagerApp(tk.Tk):
         d["rng_enabled"]           = self._rng_var.get()
         d["hug_enabled"]           = self._hug_var.get()
         d["spank_enabled"]         = self._spank_var.get()
+        d["flirt_enabled"]         = self._flirt_var.get()
         d["pickgroupboss_enabled"] = self._pickgroupboss_var.get()
         save_features(d)
         self.set_status("Saved. Deploy to apply.")
@@ -659,7 +663,18 @@ class ManagerApp(tk.Tk):
         inp(time_col, self._gw_time, width=7).pack()
 
         btn(p, "Queue & Deploy", ACCENT, self._queue_giveaway).pack(
-            padx=20, pady=(0, 6), fill="x")
+            padx=20, pady=(0, 10), fill="x")
+
+        tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(0, 8))
+        lbl(p, "Reroll a giveaway", dim=False).pack(fill="x", padx=20)
+        tk.Label(p,
+                 text="If a giveaway got interrupted, use this command in the giveaway channel:\n"
+                      "!rerollgiveaway <message_id>\n\n"
+                      "Right-click the giveaway message → Copy Message ID to get the ID.\n"
+                      "(Requires Developer Mode on in Discord settings.)",
+                 bg=BG, fg=FG_DIM, font=("Segoe UI", 9),
+                 justify="left", anchor="w"
+                 ).pack(fill="x", padx=20)
 
     def _get_gw_offset(self):
         try:
