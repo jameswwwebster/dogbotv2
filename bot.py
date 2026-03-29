@@ -104,14 +104,26 @@ def resolve_text(text, guild):
     return text
 
 
-@tasks.loop(minutes=1)
+_reminders_sent = {}  # tracks which reminders fired this minute to avoid duplicates
+
+@tasks.loop(seconds=30)
 async def check_reminders():
+    global _reminders_sent
     features = load_features()
     offset = features.get("gmt_offset", 0)
     now = datetime.now(timezone.utc) + timedelta(hours=offset)
-    for reminder in load_reminders():
+
+    # Reset sent log at the start of each new minute
+    current_minute = (now.weekday(), now.hour, now.minute)
+    if _reminders_sent.get("_minute") != current_minute:
+        _reminders_sent = {"_minute": current_minute}
+
+    for i, reminder in enumerate(load_reminders()):
         h, m = map(int, reminder["time"].split(":"))
         if now.weekday() == reminder["day"] and now.hour == h and now.minute == m:
+            if i in _reminders_sent:
+                continue  # already sent this minute
+            _reminders_sent[i] = True
             channel = bot.get_channel(reminder["channel_id"])
             if channel:
                 text = resolve_text(reminder["message"], channel.guild)
