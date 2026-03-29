@@ -465,8 +465,15 @@ async def rerollgiveaway_cmd(ctx, message_id: int = None):
     if not entrants:
         await ctx.send("🎉 No valid entries found on that message.")
         return
+    # Extract prize from the original giveaway message
+    prize = None
+    for line in msg.content.splitlines():
+        if line.startswith("**Prize:**"):
+            prize = line.replace("**Prize:**", "").strip()
+            break
     winner = random.choice(entrants)
-    await ctx.send(f"🎉 Reroll! The new winner is {winner.mention}! Congratulations!")
+    prize_text = f" You won **{prize}**!" if prize else ""
+    await ctx.send(f"🎉 Reroll! Congratulations {winner.mention}!{prize_text}")
 
 
 @bot.command(name="clear")
