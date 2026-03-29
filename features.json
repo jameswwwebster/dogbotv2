@@ -10,5 +10,6 @@
     "pickgroupboss_enabled": true,
     "daily_question_enabled": true,
     "daily_question_time": "10:00",
-    "daily_question_channel": 472851820448972800
+    "daily_question_channel": 472851820448972800,
+    "flirt_enabled": true
 }
