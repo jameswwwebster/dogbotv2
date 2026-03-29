@@ -616,6 +616,842 @@
         {
             "question": "On which coast of Havenhythe is Wendlewick located?",
             "answer": "West coast"
+        },
+        {
+            "question": "What location does fairy ring code AIP teleport you to?",
+            "answer": "Zanaris"
+        },
+        {
+            "question": "What location does fairy ring code AJR teleport you to?",
+            "answer": "Kandarin: Slayer cave south-east of Rellekka (Fremennik Slayer Dungeon)"
+        },
+        {
+            "question": "What location does fairy ring code AKQ teleport you to?",
+            "answer": "Kandarin: Piscatoris Hunter area"
+        },
+        {
+            "question": "What location does fairy ring code AKS teleport you to?",
+            "answer": "Feldip Hills: Jungle Hunter area"
+        },
+        {
+            "question": "What location does fairy ring code ALQ teleport you to?",
+            "answer": "Morytania: Haunted Woods east of Canifis"
+        },
+        {
+            "question": "What Firemaking level is required to burn Achey logs?",
+            "answer": "1"
+        },
+        {
+            "question": "What Firemaking level is required to burn Maple logs?",
+            "answer": "45"
+        },
+        {
+            "question": "What Firemaking level is required to burn Yew logs?",
+            "answer": "60"
+        },
+        {
+            "question": "What Firemaking level is required to burn Elder logs?",
+            "answer": "90"
+        },
+        {
+            "question": "How many variants of the dragonfire shield exist?",
+            "answer": "4"
+        },
+        {
+            "question": "Do waterfiends have an elite Slayer variant?",
+            "answer": "Yes"
+        },
+        {
+            "question": "Do harpie bug swarms have an elite Slayer variant?",
+            "answer": "Yes"
+        },
+        {
+            "question": "Do Cyclipses have an elite Slayer variant?",
+            "answer": "Yes"
+        },
+        {
+            "question": "Do goblins have an elite Slayer variant?",
+            "answer": "No"
+        },
+        {
+            "question": "What is the primary currency used in The Arc?",
+            "answer": "Chimes"
+        },
+        {
+            "question": "What is the first island players arrive at in The Arc?",
+            "answer": "Waiko"
+        },
+        {
+            "question": "Who assigns Slayer contracts on Aminishi in The Arc?",
+            "answer": "Ling"
+        },
+        {
+            "question": "Which quest unlocks access to The Arc?",
+            "answer": "Impressing the Locals"
+        },
+        {
+            "question": "From which port do players sail to The Arc?",
+            "answer": "Port Sarim"
+        },
+        {
+            "question": "What Woodcutting level is required to cut bamboo in The Arc?",
+            "answer": "90"
+        },
+        {
+            "question": "What title is awarded for fully completing The Arc?",
+            "answer": "Salty"
+        },
+        {
+            "question": "Which island is the furthest east in The Arc?",
+            "answer": "Goshima"
+        },
+        {
+            "question": "What reward is given for finding a castaway in The Arc?",
+            "answer": "Taijitu"
+        },
+        {
+            "question": "What is Menaphos also known as?",
+            "answer": "The Golden City"
+        },
+        {
+            "question": "Which quest is required to access Menaphos?",
+            "answer": "The Jack of Spades"
+        },
+        {
+            "question": "How many districts does Menaphos have?",
+            "answer": "4"
+        },
+        {
+            "question": "In which region is Menaphos located?",
+            "answer": "Kharidian Desert"
+        },
+        {
+            "question": "What title is awarded for completing most content in Menaphos?",
+            "answer": "Sandy"
+        },
+        {
+            "question": "What minigame is found in each district of Menaphos?",
+            "answer": "Shifting Tombs"
+        },
+        {
+            "question": "In which city does The Jack of Spades quest begin?",
+            "answer": "Al Kharid"
+        },
+        {
+            "question": "What Hunter creature requires level 73 Hunter to catch in Menaphos?",
+            "answer": "Plover bird"
+        },
+        {
+            "question": "Which god controls the Pharaoh of Menaphos?",
+            "answer": "Amascut"
+        },
+        {
+            "question": "Which city is connected to Menaphos via a bridge?",
+            "answer": "Sophanem"
+        },
+        {
+            "question": "Which district of Menaphos contains acadia trees and the Golden Palace?",
+            "answer": "Imperial"
+        },
+        {
+            "question": "What Woodcutting level is required to cut acadia trees in Menaphos?",
+            "answer": "50"
+        },
+        {
+            "question": "Who is the ruler of Lumbridge?",
+            "answer": "Duke Horacio"
+        },
+        {
+            "question": "Which kingdom is Lumbridge part of?",
+            "answer": "Misthalin"
+        },
+        {
+            "question": "Which river runs through Lumbridge?",
+            "answer": "River Lum"
+        },
+        {
+            "question": "What is the name of the quest given by the Lumbridge cook?",
+            "answer": "Cook's Assistant"
+        },
+        {
+            "question": "Which shop in Lumbridge repairs Barrows armour?",
+            "answer": "Bob's Brilliant Axes"
+        },
+        {
+            "question": "Which god is worshipped in the Lumbridge church?",
+            "answer": "Saradomin"
+        },
+        {
+            "question": "Which guild is accessed via a trapdoor above the Lumbridge furnace?",
+            "answer": "Thieves' Guild"
+        },
+        {
+            "question": "Which underground city is accessed from the Lumbridge castle basement?",
+            "answer": "Dorgesh-Kaan"
+        },
+        {
+            "question": "Who is the owner of the Thieves' Guild in Lumbridge?",
+            "answer": "Darren Lightfinger"
+        },
+        {
+            "question": "Who owns the farm north of Lumbridge castle?",
+            "answer": "Fred the Farmer"
+        },
+        {
+            "question": "Which two gods fought in the Battle of Lumbridge?",
+            "answer": "Zamorak and Saradomin"
+        },
+        {
+            "question": "Who is the ruler of Varrock?",
+            "answer": "King Roald"
+        },
+        {
+            "question": "Where is the Grand Exchange located relative to Varrock?",
+            "answer": "North-west of Varrock"
+        },
+        {
+            "question": "Which kingdom is Varrock part of?",
+            "answer": "Misthalin"
+        },
+        {
+            "question": "Which two guilds are located just outside Varrock's walls?",
+            "answer": "Cooks' Guild and Champions' Guild"
+        },
+        {
+            "question": "What is the name of the dungeon beneath Varrock containing moss giants and deadly red spiders?",
+            "answer": "Varrock Sewers"
+        },
+        {
+            "question": "What was Varrock's original name?",
+            "answer": "Avarrocka"
+        },
+        {
+            "question": "Which tavern in Varrock is home to Dr. Harlow?",
+            "answer": "Blue Moon Inn"
+        },
+        {
+            "question": "Which shop in Varrock teleports players to the Rune Essence mine?",
+            "answer": "Aubury's Rune Shop"
+        },
+        {
+            "question": "Which quest involving King Roald grants access to Morytania?",
+            "answer": "Priest in Peril"
+        },
+        {
+            "question": "Which kingdom is Ardougne part of?",
+            "answer": "Kandarin"
+        },
+        {
+            "question": "Which river is Ardougne named after?",
+            "answer": "River Dougne"
+        },
+        {
+            "question": "Which quest unlocks the Ardougne Teleport spell?",
+            "answer": "Plague City"
+        },
+        {
+            "question": "What are the two sections of Ardougne called?",
+            "answer": "West Ardougne and East Ardougne"
+        },
+        {
+            "question": "Which city can players sail to from Ardougne, and how much does it cost?",
+            "answer": "Brimhaven for 30 coins"
+        },
+        {
+            "question": "Which two sons divided Ardougne between them?",
+            "answer": "Tyras and Lathas"
+        },
+        {
+            "question": "What is the name of the zoo in Ardougne?",
+            "answer": "Ardougne Zoo"
+        },
+        {
+            "question": "Which exclusive guild is located in Yanille?",
+            "answer": "Wizards' Guild"
+        },
+        {
+            "question": "What Magic level is required to enter the Wizards' Guild in Yanille?",
+            "answer": "66"
+        },
+        {
+            "question": "Which creatures beset Yanille from the south and west?",
+            "answer": "Ogres"
+        },
+        {
+            "question": "Which quest is started just outside the north-west wall of Yanille?",
+            "answer": "Watchtower"
+        },
+        {
+            "question": "What Construction level is required to move your player-owned house to Yanille?",
+            "answer": "50"
+        },
+        {
+            "question": "What is the name of the tavern in Yanille?",
+            "answer": "Dragon Inn"
+        },
+        {
+            "question": "Which city lies to the south of Yanille?",
+            "answer": "Ardougne"
+        },
+        {
+            "question": "Which ogre city lies to the south of Yanille?",
+            "answer": "Gu'Tanoth"
+        },
+        {
+            "question": "Which kingdom is Falador the capital of?",
+            "answer": "Asgarnia"
+        },
+        {
+            "question": "Which guild is located in the south-eastern section of Falador, close to the east bank?",
+            "answer": "Mining Guild"
+        },
+        {
+            "question": "Who rules Falador in place of the ailing King Vallance?",
+            "answer": "Sir Amik Varze"
+        },
+        {
+            "question": "What is the name of the only bar in Falador?",
+            "answer": "Rising Sun Inn"
+        },
+        {
+            "question": "Which boss can be found beneath Falador Park?",
+            "answer": "Giant mole"
+        },
+        {
+            "question": "What is at the centre of Falador, serving as the home of the White Knights?",
+            "answer": "White Knights' Castle"
+        },
+        {
+            "question": "Which Falador location serves as a hub for training Smithing and earning respect?",
+            "answer": "Artisans' Workshop"
+        },
+        {
+            "question": "Which quest must be completed to access Prifddinas?",
+            "answer": "Plague's End"
+        },
+        {
+            "question": "Prifddinas is the capital city of which region?",
+            "answer": "Tirannwn"
+        },
+        {
+            "question": "How many elven clan districts does Prifddinas have?",
+            "answer": "8"
+        },
+        {
+            "question": "What is the name of the central hub structure in Prifddinas?",
+            "answer": "Tower of Voices"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Farming and Woodcutting?",
+            "answer": "Crwys"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Mining and Smithing?",
+            "answer": "Trahaearn"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Melee and Slayer?",
+            "answer": "Iorwerth"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Agility and Prayer?",
+            "answer": "Hefin"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Magic and Ranged?",
+            "answer": "Cadarn"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Summoning and Divination?",
+            "answer": "Amlodd"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Crafting and Construction?",
+            "answer": "Ithell"
+        },
+        {
+            "question": "Which Prifddinas clan district is associated with Dungeoneering and Herblore?",
+            "answer": "Meilyr"
+        },
+        {
+            "question": "What is the name of the feature that boosts two Prifddinas districts at a time, changing every hour?",
+            "answer": "Voice of Seren"
+        },
+        {
+            "question": "Which Slayer master is found in the Iorwerth district, requiring 85 Slayer and combat level 120?",
+            "answer": "Morvran"
+        },
+        {
+            "question": "Which exclusive guild is located in the Cadarn district of Prifddinas?",
+            "answer": "Max Guild"
+        },
+        {
+            "question": "What material is produced by playing the harps in the Ithell district?",
+            "answer": "Harmonic dust"
+        },
+        {
+            "question": "Which agility course in Prifddinas is considered one of the best in the game?",
+            "answer": "Hefin Agility Course"
+        },
+        {
+            "question": "What is the name of the AFK Agility training method in the Hefin district?",
+            "answer": "Serenity posts"
+        },
+        {
+            "question": "What Mining training method in the Trahaearn district works similarly to ivy, requiring level 89?",
+            "answer": "Seren Stones"
+        },
+        {
+            "question": "What fairy ring code teleports players to the Amlodd district of Prifddinas?",
+            "answer": "DJS"
+        },
+        {
+            "question": "What are the special farming patches in the Meilyr district called?",
+            "answer": "Harmony pillars"
+        },
+        {
+            "question": "In which age was Prifddinas originally created?",
+            "answer": "First Age"
+        },
+        {
+            "question": "What is the name of the weekly D&D in the Iorwerth district?",
+            "answer": "Rush of Blood"
+        },
+        {
+            "question": "What items do Hefin monks sell that are used to cleanse the Corrupted Seren Stone?",
+            "answer": "Cleansing crystals"
+        },
+        {
+            "question": "What material do the Seren Stones in the Trahaearn district produce when mined?",
+            "answer": "Corrupted ore"
+        },
+        {
+            "question": "What is Prifddinas also commonly known as?",
+            "answer": "Crystal City"
+        },
+        {
+            "question": "Which clan leader in Prifddinas can upgrade dragon tools into crystal tools for 4,000 harmonic dust each?",
+            "answer": "Lady Ithell"
+        },
+        {
+            "question": "Which NPC in the Amlodd district rewards players for catching one of each impling?",
+            "answer": "Daffyd"
+        },
+        {
+            "question": "Which elven clan leader waits at the gate of Prifddinas to greet the player upon their first visit?",
+            "answer": "Arianwyn"
+        },
+        {
+            "question": "What item is crafted from Ithell crystal sandstone using the robust glassmaking machine?",
+            "answer": "Crystal flask"
+        },
+        {
+            "question": "Which god reshaped Prifddinas entirely from crystals?",
+            "answer": "Seren"
+        },
+        {
+            "question": "From which homeworld did the elves travel to Gielinor before founding Prifddinas?",
+            "answer": "Tarddiad"
+        },
+        {
+            "question": "What plant grows on Harmony pillars in the Meilyr district and is used to make perfect juju potions?",
+            "answer": "Harmony moss"
+        },
+        {
+            "question": "Due to which conflict was Prifddinas reverted to crystal seed form before being restored in Plague's End?",
+            "answer": "Elven Civil War"
+        },
+        {
+            "question": "What is the actual name of Barbarian Village, as learned during the Gunnar's Ground quest?",
+            "answer": "Gunnarsgrunn"
+        },
+        {
+            "question": "Who is the current leader of Barbarian Village?",
+            "answer": "Chieftain Gunthor"
+        },
+        {
+            "question": "Which dungeon can be accessed through a hole in the mining area of Barbarian Village?",
+            "answer": "Stronghold of Security"
+        },
+        {
+            "question": "Which quest must be completed to unlock the spas and shops in Oo'glog?",
+            "answer": "As a First Resort"
+        },
+        {
+            "question": "In which region is Oo'glog located?",
+            "answer": "Feldip Hills"
+        },
+        {
+            "question": "Who is the leader of Oo'glog?",
+            "answer": "Chief Tess"
+        },
+        {
+            "question": "Which Oo'glog spa grants unlimited run energy?",
+            "answer": "Salt-water spring"
+        },
+        {
+            "question": "Which Oo'glog spa boosts the player's Hunter level by 10% and removes their scent while hunting?",
+            "answer": "Mud bath"
+        },
+        {
+            "question": "Which Oo'glog spa fully restores prayer points and temporarily boosts them to 10% over maximum?",
+            "answer": "Sulphur spring"
+        },
+        {
+            "question": "Which Oo'glog spa marks players as a follower of Bandos for one hour?",
+            "answer": "Bandos pool"
+        },
+        {
+            "question": "Which Oo'glog spa heals the player, cures poison, and grants poison immunity?",
+            "answer": "Thermal bath"
+        },
+        {
+            "question": "What type of creatures inhabit Oo'glog?",
+            "answer": "Ogresses"
+        },
+        {
+            "question": "What item allows players to carry six doses of Oo'glog spa water to use elsewhere?",
+            "answer": "Ogre flask"
+        },
+        {
+            "question": "What Mining level is required to mine the red sandstone rock just north of Oo'glog?",
+            "answer": "81"
+        },
+        {
+            "question": "Which type of tree, found only in Oo'glog, is unique to that location in all of RuneScape?",
+            "answer": "Eucalyptus"
+        },
+        {
+            "question": "In which region is Al Kharid located?",
+            "answer": "Kharidian Desert"
+        },
+        {
+            "question": "Which Al Kharid shop sells scimitars from bronze up to adamant?",
+            "answer": "Zeke's Superior Scimitars"
+        },
+        {
+            "question": "Which members-only minigame is found in the south-east of Al Kharid?",
+            "answer": "Sorceress's Garden"
+        },
+        {
+            "question": "Who is the spymaster of Al Kharid, found just outside the palace?",
+            "answer": "Osman"
+        },
+        {
+            "question": "How much does a kebab cost at Karim's kebab shop in Al Kharid?",
+            "answer": "1 coin"
+        },
+        {
+            "question": "What are the primary ore types found in the Al Kharid mine?",
+            "answer": "Silver and gold rocks"
+        },
+        {
+            "question": "In which kingdom is Port Sarim located?",
+            "answer": "Asgarnia"
+        },
+        {
+            "question": "Which destination can all players sail to from the west dock of Port Sarim for 30 coins?",
+            "answer": "Karamja"
+        },
+        {
+            "question": "What is the name of the inn in Port Sarim?",
+            "answer": "The Rusty Anchor"
+        },
+        {
+            "question": "Which Port Sarim shop sells runes, eyes of newt, and wizard hats?",
+            "answer": "Betty's Magic Emporium"
+        },
+        {
+            "question": "Which quest is started by talking to Redbeard Frank in Port Sarim?",
+            "answer": "Pirate's Treasure"
+        },
+        {
+            "question": "Which island can members travel to from the north dock of Port Sarim, but no weapons or armour are allowed?",
+            "answer": "Entrana"
+        },
+        {
+            "question": "Which destination can members reach from the centre dock of Port Sarim by talking to a squire?",
+            "answer": "Void Knights' Outpost"
+        },
+        {
+            "question": "Wendlewick is the largest settlement in which new region?",
+            "answer": "Havenhythe"
+        },
+        {
+            "question": "Which quest must be started to first access Wendlewick?",
+            "answer": "Visions of Havenhythe"
+        },
+        {
+            "question": "From which city does Captain Lorris sail players to Wendlewick?",
+            "answer": "Port Sarim"
+        },
+        {
+            "question": "Which three leaders guide the people of Wendlewick?",
+            "answer": "Adam, Esther and Zeke"
+        },
+        {
+            "question": "What unique Fishing feature is located on the docks west of Wendlewick?",
+            "answer": "Wendlewick fish farm"
+        },
+        {
+            "question": "Which four fish can be cultivated at the Wendlewick fish farm?",
+            "answer": "Lobsters, swordfish, sharks and giant crayfish"
+        },
+        {
+            "question": "What Woodcutting level is required to cut creeping ivy in Wendlewick?",
+            "answer": "35"
+        },
+        {
+            "question": "What is the name of the tavern in Wendlewick?",
+            "answer": "Burnt Lobster Tavern"
+        },
+        {
+            "question": "What instrument must players craft for Dalia the lumberjack in Wendlewick to unlock her tree plots?",
+            "answer": "Lute"
+        },
+        {
+            "question": "What material, made from cooked meat, is used to string the lute for Dalia?",
+            "answer": "Sinew"
+        },
+        {
+            "question": "What is the name of the candle shop in Wendlewick?",
+            "answer": "Wendle's Wicks"
+        },
+        {
+            "question": "Which boss found in Havenhythe is named after a king?",
+            "answer": "Ivar, King of Bones"
+        },
+        {
+            "question": "What is the name of the Havenhythe boss described as a Dreadhog?",
+            "answer": "Silverquill, the Dreadhog"
+        },
+        {
+            "question": "On which coast of Havenhythe is Wendlewick located?",
+            "answer": "West coast"
+        },
+        {
+            "question": "Which dangerous area borders Edgeville?",
+            "answer": "The Wilderness"
+        },
+        {
+            "question": "What kingdom is Edgeville located in?",
+            "answer": "Misthalin"
+        },
+        {
+            "question": "What was Edgeville originally called during early development?",
+            "answer": "Ghost Town"
+        },
+        {
+            "question": "What major trading hub is located east of Edgeville?",
+            "answer": "Grand Exchange"
+        },
+        {
+            "question": "What type of tree can be found south of the Edgeville bank?",
+            "answer": "Yew tree"
+        },
+        {
+            "question": "What is located in the center of Edgeville that players frequently use?",
+            "answer": "Furnace"
+        },
+        {
+            "question": "Why is the Edgeville bank popular for Runecrafting?",
+            "answer": "Because it is close to the Abyss"
+        },
+        {
+            "question": "Which NPC can teleport players to the Abyss near Edgeville?",
+            "answer": "Mage of Zamorak"
+        },
+        {
+            "question": "Which Slayer Master was historically located in the Edgeville Dungeon?",
+            "answer": "Vannaka"
+        },
+        {
+            "question": "What minigame portal can be found near Edgeville?",
+            "answer": "Soul Wars portal"
+        },
+        {
+            "question": "What type of environment is Karamja known for?",
+            "answer": "Tropical island"
+        },
+        {
+            "question": "What is the name of the main free-to-play area on Karamja?",
+            "answer": "Musa Point"
+        },
+        {
+            "question": "How much does it cost to travel to Karamja from Port Sarim (normally)?",
+            "answer": "30 coins"
+        },
+        {
+            "question": "What item are players not allowed to take off Karamja due to customs rules?",
+            "answer": "Karamjan rum"
+        },
+        {
+            "question": "What resource does Musa Point commonly export to Asgarnia?",
+            "answer": "Bananas"
+        },
+        {
+            "question": "What city is located underneath the Karamja volcano?",
+            "answer": "TzHaar City"
+        },
+        {
+            "question": "What Runecrafting altar is located on Karamja?",
+            "answer": "Nature altar"
+        },
+        {
+            "question": "Which quest is required to access Shilo Village?",
+            "answer": "Shilo Village"
+        },
+        {
+            "question": "Which town lies directly south of Burthorpe?",
+            "answer": "Taverley"
+        },
+        {
+            "question": "What dangerous region lies north of Burthorpe?",
+            "answer": "Troll Stronghold"
+        },
+        {
+            "question": "What guild located in Burthorpe focuses on melee combat?",
+            "answer": "Warriors' Guild"
+        },
+        {
+            "question": "What distraction and diversion takes place near Burthorpe?",
+            "answer": "Troll Invasion"
+        },
+        {
+            "question": "Which major city lies southeast of Taverley?",
+            "answer": "Falador"
+        },
+        {
+            "question": "What type of village is Catherby known as (based on its main activity)?",
+            "answer": "Fishing village"
+        },
+        {
+            "question": "What dangerous area lies to the east of Catherby?",
+            "answer": "White Wolf Mountain"
+        },
+        {
+            "question": "What patch types can be found north of Catherby?",
+            "answer": "Allotment patches"
+        },
+        {
+            "question": "What type of trees are found to the west of Catherby?",
+            "answer": "Maple trees"
+        },
+        {
+            "question": "Which race lives in the Tree Gnome Stronghold?",
+            "answer": "Gnomes"
+        },
+        {
+            "question": "Who is the leader of the Tree Gnome Stronghold?",
+            "answer": "King Narnode Shareen"
+        },
+        {
+            "question": "What significant structure is at the center of the Tree Gnome Stronghold?",
+            "answer": "The Grand Tree"
+        },
+        {
+            "question": "What sporting field can be found in the Tree Gnome Stronghold?",
+            "answer": "Gnome Ball field"
+        },
+        {
+            "question": "Which two farming patches are found in the stronghold?",
+            "answer": "Tree patch and fruit tree patch"
+        },
+        {
+            "question": "Which monster(s) drops Light mystic hat?",
+            "answer": "Wall beast and Basilisk"
+        },
+        {
+            "question": "Which monster(s) drops Brine sabre?",
+            "answer": "Brine rat"
+        },
+        {
+            "question": "Which monster(s) drops Circular hide?",
+            "answer": "Dagannoth (Ranged)"
+        },
+        {
+            "question": "Which monster(s) drops Dark bow?",
+            "answer": "Dark beast"
+        },
+        {
+            "question": "Which monster(s) drops Kaigi's journal pages?",
+            "answer": "Airut"
+        },
+        {
+            "question": "Which monster(s) drops Gemstone hauberk?",
+            "answer": "Hydrix dragon"
+        },
+        {
+            "question": "How many Explosive components do you get from disassembling a Hand cannon?",
+            "answer": "7 (28 if level 9)"
+        },
+        {
+            "question": "How many Ilujankan components do you get from disassembling a Zaros Godsword?",
+            "answer": "2 (8 if level 9)"
+        },
+        {
+            "question": "Which monster(s) drops components for the Penny pet?",
+            "answer": "Shadow creature"
+        },
+        {
+            "question": "Which monster(s) drops components for the Upgraded bone blowpipe?",
+            "answer": "Dinosaur"
+        },
+        {
+            "question": "Which monster(s) drops Laceration boots?",
+            "answer": "Dinosaur"
+        },
+        {
+            "question": "Which monster(s) drop Blast diffusion boots?",
+            "answer": "Vile bloom"
+        },
+        {
+            "question": "Which monster(s) drop the Steadfast, Glaiven and Ragefire boots?",
+            "answer": "Glacor"
+        },
+        {
+            "question": "How many different codices can be made with Vital sparks?",
+            "answer": "3"
+        },
+        {
+            "question": "How many different abilities can be bought from the Shattered worlds shop?",
+            "answer": "4"
+        },
+        {
+            "question": "What is a Corrupted gem used for?",
+            "answer": "It may be used together with 1,000 Slayer points to upgrade a mighty slayer helmet to a corrupted slayer helmet."
+        },
+        {
+            "question": "Can you get a Dragon mattock from Triskelion Treasures?",
+            "answer": "No"
+        },
+        {
+            "question": "Can you get an Onyx from Triskelion Treasures?",
+            "answer": "Yes"
+        },
+        {
+            "question": "Which monster(s) drops the Static, Pneumatic and Tracking gloves?",
+            "answer": "Automaton"
+        },
+        {
+            "question": "Which monster(s) drops the Amulet of Ranging?",
+            "answer": "Aquanite"
+        },
+        {
+            "question": "Which Strykewyrm drops the Hexcrest?",
+            "answer": "Jungle Strykewyrm"
+        },
+        {
+            "question": "Which Strykewyrm drops the Focus sight?",
+            "answer": "Desert Strykewyrm"
+        },
+        {
+            "question": "Which Strykewyrm drops the Staff of Light?",
+            "answer": "Ice Strykewyrm"
+        },
+        {
+            "question": "How many different Raptor key parts do you need for a full key?",
+            "answer": "4."
         }
     ]
 }

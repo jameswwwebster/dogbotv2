@@ -456,3 +456,172 @@ Silverquill, the Dreadhog
 
 On which coast of Havenhythe is Wendlewick located?
 West coast
+
+Which dangerous area borders Edgeville?
+The Wilderness
+
+What kingdom is Edgeville located in?
+Misthalin
+
+What was Edgeville originally called during early development?
+Ghost Town
+
+What major trading hub is located east of Edgeville?
+Grand Exchange
+
+What type of tree can be found south of the Edgeville bank?
+Yew tree
+
+What is located in the center of Edgeville that players frequently use?
+Furnace
+
+Why is the Edgeville bank popular for Runecrafting?
+Because it is close to the Abyss
+
+Which NPC can teleport players to the Abyss near Edgeville?
+Mage of Zamorak
+
+Which Slayer Master was historically located in the Edgeville Dungeon?
+Vannaka
+
+What minigame portal can be found near Edgeville?
+Soul Wars portal
+
+What type of environment is Karamja known for?
+Tropical island
+
+What is the name of the main free-to-play area on Karamja?
+Musa Point
+
+How much does it cost to travel to Karamja from Port Sarim (normally)?
+30 coins
+
+What item are players not allowed to take off Karamja due to customs rules?
+Karamjan rum
+
+What resource does Musa Point commonly export to Asgarnia?
+Bananas
+
+What city is located underneath the Karamja volcano?
+TzHaar City
+
+What Runecrafting altar is located on Karamja?
+Nature altar
+
+Which quest is required to access Shilo Village?
+Shilo Village
+
+Which town lies directly south of Burthorpe?
+Taverley
+
+What dangerous region lies north of Burthorpe?
+Troll Stronghold
+
+What guild located in Burthorpe focuses on melee combat?
+Warriors' Guild
+
+What distraction and diversion takes place near Burthorpe?
+Troll Invasion
+
+Which major city lies southeast of Taverley?
+Falador
+
+What type of village is Catherby known as (based on its main activity)?
+Fishing village
+
+What dangerous area lies to the east of Catherby?
+White Wolf Mountain
+
+What patch types can be found north of Catherby?
+Allotment patches
+
+What type of trees are found to the west of Catherby?
+Maple trees
+
+Which race lives in the Tree Gnome Stronghold?
+Gnomes
+
+Who is the leader of the Tree Gnome Stronghold?
+King Narnode Shareen
+
+What significant structure is at the center of the Tree Gnome Stronghold?
+The Grand Tree
+
+What sporting field can be found in the Tree Gnome Stronghold?
+Gnome Ball field
+
+Which two farming patches are found in the stronghold?
+Tree patch and fruit tree patch
+
+Which monster(s) drops Light mystic hat?
+Wall beast and Basilisk
+
+Which monster(s) drops Brine sabre?
+Brine rat
+
+Which monster(s) drops Circular hide?
+Dagannoth (Ranged)
+
+Which monster(s) drops Dark bow?
+Dark beast
+
+Which monster(s) drops Kaigi's journal pages?
+Airut
+
+Which monster(s) drops Gemstone hauberk?
+Hydrix dragon
+
+How many Explosive components do you get from disassembling a Hand cannon?
+7 (28 if level 9)
+
+How many Ilujankan components do you get from disassembling a Zaros Godsword?
+2 (8 if level 9)
+
+Which monster(s) drops components for the Penny pet?
+Shadow creature
+
+Which monster(s) drops components for the Upgraded bone blowpipe?
+Dinosaur
+
+Which monster(s) drops Laceration boots?
+Dinosaur
+
+Which monster(s) drop Blast diffusion boots?
+Vile bloom
+
+Which monster(s) drop the Steadfast, Glaiven and Ragefire boots?
+Glacor
+
+How many different codices can be made with Vital sparks?
+3
+
+How many different abilities can be bought from the Shattered worlds shop?
+4
+
+What is a Corrupted gem used for?
+It may be used together with 1,000 Slayer points to upgrade a mighty slayer helmet to a corrupted slayer helmet.
+
+Can you get a Dragon mattock from Triskelion Treasures?
+No
+
+Can you get an Onyx from Triskelion Treasures?
+Yes
+
+Which monster(s) drops the Static, Pneumatic and Tracking gloves?
+Automaton
+
+Which monster(s) drops the Amulet of Ranging?
+Aquanite
+
+Which Strykewyrm drops the Hexcrest?
+Jungle Strykewyrm
+
+Which Strykewyrm drops the Focus sight?
+Desert Strykewyrm
+
+Which Strykewyrm drops the Staff of Light?
+Ice Strykewyrm
+
+How many different Raptor key parts do you need for a full key?
+4.
+
