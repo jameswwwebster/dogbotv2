@@ -1,3 +1,4 @@
+import asyncio
 import discord
 import json
 import os
@@ -175,14 +176,93 @@ async def on_message(message):
     await bot.process_commands(message)
 
 
-@bot.command(name="help")
-async def help_command(ctx):
-    custom_cmds = load_custom_commands()
-    if not custom_cmds:
-        await ctx.send("No custom commands yet.")
+@bot.command(name="commands")
+async def commands_list(ctx):
+    features  = load_features()
+    custom    = load_custom_commands()
+    q_data    = load_questions()
+    lines     = ["**Bot Commands**"]
+
+    if custom:
+        lines.append("\n**Custom:**")
+        for cmd, resp in custom.items():
+            short = resp[:60] + "…" if len(resp) > 60 else resp
+            lines.append(f"`!{cmd}` — {short}")
+
+    fun = []
+    if features.get("rng_enabled"):
+        fun.append("`!rng` — Rolls a random number between 1–100")
+    if features.get("hug_enabled"):
+        fun.append("`!hug @user` — Give someone a hug")
+    if q_data.get("command"):
+        fun.append(f"`!{q_data['command']}` — Random trivia question with spoiler answer")
+    if fun:
+        lines.append("\n**Fun:**")
+        lines.extend(fun)
+
+    util = []
+    if features.get("clear_enabled"):
+        util.append("`!clear <amount>` — Delete the last X messages (max 100)")
+    if features.get("remindme_enabled"):
+        util.append("`!remindme <minutes> <message>` — Get a personal reminder")
+    if util:
+        lines.append("\n**Utility:**")
+        lines.extend(util)
+
+    await ctx.send("\n".join(lines))
+
+
+@bot.command(name="hug")
+async def hug_cmd(ctx, target: discord.Member = None):
+    if not load_features().get("hug_enabled"):
         return
-    lines = [f"`!{cmd}` — {resp}" for cmd, resp in custom_cmds.items()]
-    await ctx.send("**Available commands:**\n" + "\n".join(lines))
+    if not target:
+        await ctx.send("Mention someone to hug! e.g. `!hug @user`")
+        return
+    await ctx.send(f"{ctx.author.mention} hugs {target.mention}! 🤗")
+
+
+@bot.command(name="clear")
+@commands.has_permissions(manage_messages=True)
+async def clear_cmd(ctx, amount: int = None):
+    if not load_features().get("clear_enabled"):
+        return
+    if not amount or amount < 1:
+        await ctx.send("Usage: `!clear <amount>`")
+        return
+    if amount > 100:
+        await ctx.send("Maximum is 100 messages at a time.")
+        return
+    deleted = await ctx.channel.purge(limit=amount + 1)
+    msg = await ctx.send(f"Deleted {len(deleted) - 1} message(s).")
+    await asyncio.sleep(3)
+    await msg.delete()
+
+
+@bot.command(name="remindme")
+async def remindme_cmd(ctx, minutes: int = None, *, reminder: str = None):
+    if not load_features().get("remindme_enabled"):
+        return
+    if not minutes or not reminder:
+        await ctx.send("Usage: `!remindme <minutes> <message>`")
+        return
+    if minutes < 1 or minutes > 1440:
+        await ctx.send("Minutes must be between 1 and 1440.")
+        return
+    s = "s" if minutes != 1 else ""
+    await ctx.send(f"⏰ Got it! I'll remind you in {minutes} minute{s}.")
+    await asyncio.sleep(minutes * 60)
+    await ctx.send(f"⏰ {ctx.author.mention} {reminder}")
+
+
+@bot.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingPermissions):
+        await ctx.send("You don't have permission to use that command.")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("Invalid argument — check the command usage with `!commands`.")
+    elif isinstance(error, commands.MemberNotFound):
+        await ctx.send("User not found. Make sure you @mention them.")
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))

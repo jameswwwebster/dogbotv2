@@ -142,6 +142,7 @@ class ManagerApp(tk.Tk):
             ("Questions",    self._build_questions_tab),
             ("Push Message", self._build_push_tab),
             ("Fun Features", self._build_features_tab),
+            ("Utility",      self._build_utility_tab),
         ]:
             f = tk.Frame(nb, bg=BG)
             nb.add(f, text=name)
@@ -476,26 +477,71 @@ class ManagerApp(tk.Tk):
 
         feats = load_features()
         self._rng_var = tk.BooleanVar(value=feats.get("rng_enabled", False))
+        self._hug_var = tk.BooleanVar(value=feats.get("hug_enabled", False))
 
-        card = tk.Frame(p, bg=BG_CARD)
-        card.pack(padx=20, pady=4, fill="x")
-
-        info = tk.Frame(card, bg=BG_CARD)
-        info.pack(side="left", padx=12, pady=10, fill="x", expand=True)
-        tk.Label(info, text="!RNG", bg=BG_CARD, fg=FG,
-                 font=("Segoe UI", 11, "bold")).pack(anchor="center")
-        tk.Label(info, text='Picks a random number 1–100.\nResponds: "DogBot rolled a X!"',
-                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
-                 anchor="center", justify="center").pack(anchor="center")
-
-        tk.Checkbutton(card, variable=self._rng_var, bg=BG_CARD,
-                       activebackground=BG_CARD, command=self._save_features
-                       ).pack(side="right", padx=12)
+        for var, title, desc in [
+            (self._rng_var, "!RNG",
+             'Picks a random number 1–100.\nResponds: "DogBot rolled a X!"'),
+            (self._hug_var, "!hug @user",
+             "Give someone a hug.\nResponds: \"[sender] hugs [target]! 🤗\""),
+        ]:
+            card = tk.Frame(p, bg=BG_CARD)
+            card.pack(padx=20, pady=4, fill="x")
+            info = tk.Frame(card, bg=BG_CARD)
+            info.pack(side="left", padx=12, pady=10, fill="x", expand=True)
+            tk.Label(info, text=title, bg=BG_CARD, fg=FG,
+                     font=("Segoe UI", 11, "bold")).pack(anchor="center")
+            tk.Label(info, text=desc, bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
+                     anchor="center", justify="center").pack(anchor="center")
+            tk.Checkbutton(card, variable=var, bg=BG_CARD,
+                           activebackground=BG_CARD, command=self._save_features
+                           ).pack(side="right", padx=12)
 
         btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=16, fill="x")
 
     def _save_features(self):
-        d = load_features(); d["rng_enabled"] = self._rng_var.get(); save_features(d)
+        d = load_features()
+        d["rng_enabled"] = self._rng_var.get()
+        d["hug_enabled"] = self._hug_var.get()
+        save_features(d)
+        self.set_status("Saved. Deploy to apply.")
+
+    # ── Utility ───────────────────────────────────────────────────────────────
+
+    def _build_utility_tab(self, p):
+        section(p, "Utility", "Helper and moderation commands. Deploy to apply.")
+
+        feats = load_features()
+        self._clear_var    = tk.BooleanVar(value=feats.get("clear_enabled",    False))
+        self._remindme_var = tk.BooleanVar(value=feats.get("remindme_enabled", False))
+
+        for var, title, desc in [
+            (self._clear_var,
+             "!clear <amount>",
+             "Deletes the last X messages (max 100).\nRequires 'Manage Messages' permission."),
+            (self._remindme_var,
+             "!remindme <minutes> <message>",
+             "Sets a personal reminder.\nThe bot pings you after the given number of minutes."),
+        ]:
+            card = tk.Frame(p, bg=BG_CARD)
+            card.pack(padx=20, pady=4, fill="x")
+            info = tk.Frame(card, bg=BG_CARD)
+            info.pack(side="left", padx=12, pady=10, fill="x", expand=True)
+            tk.Label(info, text=title, bg=BG_CARD, fg=FG,
+                     font=("Segoe UI", 11, "bold")).pack(anchor="center")
+            tk.Label(info, text=desc, bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
+                     anchor="center", justify="center").pack(anchor="center")
+            tk.Checkbutton(card, variable=var, bg=BG_CARD,
+                           activebackground=BG_CARD, command=self._save_utility
+                           ).pack(side="right", padx=12)
+
+        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=16, fill="x")
+
+    def _save_utility(self):
+        d = load_features()
+        d["clear_enabled"]    = self._clear_var.get()
+        d["remindme_enabled"] = self._remindme_var.get()
+        save_features(d)
         self.set_status("Saved. Deploy to apply.")
 
     # ── Deploy ────────────────────────────────────────────────────────────────
