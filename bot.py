@@ -235,7 +235,6 @@ async def hug_cmd(ctx, target: discord.Member = None):
 
 
 @bot.command(name="clear")
-@commands.has_permissions(manage_messages=True)
 async def clear_cmd(ctx, amount: int = None):
     if not load_features().get("clear_enabled"):
         return
@@ -245,8 +244,12 @@ async def clear_cmd(ctx, amount: int = None):
     if amount > 100:
         await ctx.send("Maximum is 100 messages at a time.")
         return
-    deleted = await ctx.channel.purge(limit=amount + 1)
-    msg = await ctx.send(f"Deleted {len(deleted) - 1} message(s).")
+    if not ctx.channel.permissions_for(ctx.guild.me).manage_messages:
+        await ctx.send("I don't have permission to delete messages in this channel.")
+        return
+    await ctx.message.delete()
+    deleted = await ctx.channel.purge(limit=amount)
+    msg = await ctx.send(f"Deleted {len(deleted)} message(s).")
     await asyncio.sleep(3)
     await msg.delete()
 
@@ -269,12 +272,12 @@ async def remindme_cmd(ctx, minutes: int = None, *, reminder: str = None):
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingPermissions):
-        await ctx.send("You don't have permission to use that command.")
-    elif isinstance(error, commands.BadArgument):
+    if isinstance(error, commands.BadArgument):
         await ctx.send("Invalid argument — check the command usage with `!commands`.")
     elif isinstance(error, commands.MemberNotFound):
         await ctx.send("User not found. Make sure you @mention them.")
+    elif isinstance(error, commands.CommandInvokeError):
+        await ctx.send(f"Something went wrong: {error.original}")
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))
