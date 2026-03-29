@@ -10,6 +10,7 @@ load_dotenv()
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
@@ -25,18 +26,21 @@ def load_custom_commands():
 
 
 def resolve_mentions(text, guild):
-    """Replace @RoleName and @everyone/@here with proper Discord mention syntax."""
+    """Replace @Name with proper Discord mention syntax for roles or members."""
     if guild is None:
         return text
 
-    def replace_role(match):
+    def replace_mention(match):
         name = match.group(1).lower()
         for role in guild.roles:
             if role.name.lower() == name:
                 return role.mention
-        return match.group(0)  # leave unchanged if not found
+        for member in guild.members:
+            if member.name.lower() == name or member.display_name.lower() == name:
+                return member.mention
+        return match.group(0)
 
-    return re.sub(r'@([^\s<>@#&!]+)', replace_role, text)
+    return re.sub(r'@([^\s<>@#&!]+)', replace_mention, text)
 
 
 def load_reminders():
@@ -55,7 +59,7 @@ async def check_reminders():
             channel = bot.get_channel(reminder["channel_id"])
             if channel:
                 text = resolve_mentions(reminder["message"], channel.guild)
-                await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True))
+                await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
 
 
 @bot.event
@@ -74,7 +78,7 @@ async def on_message(message):
         custom_cmds = load_custom_commands()
         if trigger in custom_cmds:
             text = resolve_mentions(custom_cmds[trigger], message.guild)
-            await message.channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True))
+            await message.channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
             return
 
     await bot.process_commands(message)
