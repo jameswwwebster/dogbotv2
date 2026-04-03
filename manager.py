@@ -630,6 +630,7 @@ class ManagerApp(tk.Tk):
         self._kill_var           = tk.BooleanVar(value=feats.get("kill_enabled",           False))
         self._rps_var            = tk.BooleanVar(value=feats.get("rps_enabled",            False))
         self._pickgroupboss_var  = tk.BooleanVar(value=feats.get("pickgroupboss_enabled",  False))
+        self._eightball_var      = tk.BooleanVar(value=feats.get("eightball_enabled",      False))
 
         for var, title, desc in [
             (self._rng_var,          "!rng",           "Picks a random number 1–100"),
@@ -639,6 +640,7 @@ class ManagerApp(tk.Tk):
             (self._kill_var,         "!kill @user",    "Attempt to kill someone — 3 random outcomes"),
             (self._rps_var,          "!rps <choice>",  "Rock paper scissors against DogBot 🪨📄✂️"),
             (self._pickgroupboss_var,"!pickgroupboss", "Pick a random group boss ⚔️"),
+            (self._eightball_var,    "!8ball <q>",     "DogBot answers your yes/no question 🎱"),
         ]:
             row = tk.Frame(p, bg=BG_CARD)
             row.pack(padx=20, pady=2, fill="x")
@@ -663,6 +665,7 @@ class ManagerApp(tk.Tk):
         d["kill_enabled"]          = self._kill_var.get()
         d["rps_enabled"]           = self._rps_var.get()
         d["pickgroupboss_enabled"] = self._pickgroupboss_var.get()
+        d["eightball_enabled"]     = self._eightball_var.get()
         save_features(d)
         self.set_status("Saved. Deploy to apply.")
 

@@ -41,6 +41,7 @@ def load_features():
         "daily_question_enabled": False,
         "daily_question_time": "10:00",
         "daily_question_channel": 472851820448972800,
+        "eightball_enabled": False,
     }
     if not os.path.exists(FEATURES_FILE):
         return defaults
@@ -571,6 +572,66 @@ async def spank_cmd(ctx, target: discord.Member = None):
         await ctx.send("Mention someone to spank! e.g. `!spank @user`")
         return
     await ctx.send(f"🥵🥵 {ctx.author.mention} spanks {target.mention}! 🥵🥵")
+
+
+_8BALL_INTROS = [
+    "DogBot thinks about your question and answers with",
+    "DogBot gazes into the void and concludes",
+    "DogBot consults the ancient scrolls and declares",
+    "DogBot ponders deeply and has decided",
+    "DogBot has thought long and hard, and the answer is",
+    "DogBot shakes its head and says",
+    "DogBot closes its eyes and whispers",
+    "DogBot has spoken:",
+    "After much deliberation, DogBot announces",
+    "DogBot stares into your soul and responds",
+]
+
+_8BALL_ANSWERS = [
+    # ── Yes (~50) ──────────────────────────────────────────────────────────────
+    "Yes!", "Absolutely!", "Without a doubt.", "Signs point to yes.",
+    "It is certain.", "You may rely on it.", "Most likely.", "Outlook good.",
+    "100% yes.", "Obviously.", "Of course!", "Definitely!", "Affirmative.",
+    "Yep.", "For sure!", "No doubt about it.", "The stars align — yes.",
+    "All signs point to yes.", "Undoubtedly.", "A resounding yes!",
+    "Positively!", "Confirmed.", "You bet!", "Indeed!", "Oh yeah!", "Totally!",
+    "Very likely.", "Almost certainly.", "Big yes energy.", "That's a yes, chief.",
+    "The vibes say yes.", "The universe agrees.", "My sources say yes.",
+    "Bold of you to ask — yes.", "Fo sho.", "Yessir!", "In every way, yes.",
+    "The odds are in your favor.", "I'd bet on yes.", "That's a big yes.",
+    "Yeah, no doubt.", "Concentrate and ask again… just kidding, yes.",
+    "Certified yes.", "The 8-ball smiles upon you.", "Strongly yes.",
+    "Trust the process — yes.", "Bet.", "Aye.", "Heck yes.", "You already know it's yes.",
+    # ── No (~45) ───────────────────────────────────────────────────────────────
+    "No.", "Absolutely not.", "Don't count on it.", "My reply is no.",
+    "My sources say no.", "Outlook not so good.", "Very doubtful.", "Nope.",
+    "Nah.", "Not a chance.", "Definitely not.", "No way.", "Not likely.",
+    "Hard no.", "Negative.", "Forget about it.", "I wouldn't count on it.",
+    "Looks bleak.", "The stars say no.", "Not in this lifetime.", "Doubt it.",
+    "That would be a no.", "The universe disagrees.", "Not today.",
+    "DogBot weeps — no.", "No, and that's final.", "Signs point to no.",
+    "Regrettably, no.", "Unfortunately not.", "Not even close.",
+    "Don't hold your breath.", "Nah fam.", "No chance.",
+    "My senses say no.", "Negative, ghost rider.", "The vibes say no.",
+    "Not happening.", "Slim to none.", "I see darkness — no.", "Certified no.",
+    "DogBot laughs at you — no.", "Nada.", "Not in your favor.",
+    "Doubt it heavily.", "Yikes, no.",
+    # ── Uncertain (~5) ────────────────────────────────────────────────────────
+    "Ask again later.", "Cannot predict now.", "Better not tell you now.",
+    "Reply hazy, try again.", "DogBot is undecided.",
+]
+
+
+@bot.command(name="8ball")
+async def eightball_cmd(ctx, *, question: str = None):
+    if not load_features().get("eightball_enabled"):
+        return
+    if not question:
+        await ctx.send("Usage: `!8ball <your question>`")
+        return
+    intro = random.choice(_8BALL_INTROS)
+    answer = random.choice(_8BALL_ANSWERS)
+    await ctx.send(f'🎱 {intro} **"{answer}"**')
 
 
 @bot.command(name="rerollgiveaway")
