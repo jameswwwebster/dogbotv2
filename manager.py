@@ -584,10 +584,9 @@ class ManagerApp(tk.Tk):
 
         bf = tk.Frame(p, bg=BG)
         bf.pack(padx=20, pady=8, fill="x")
-        btn(bf, "Queue & Deploy", ACCENT, self._queue_push).pack(
-            side="left", expand=True, fill="x", padx=(0, 4))
-        btn(bf, "Clear Queue", RED, self._clear_push_queue).pack(
-            side="left", expand=True, fill="x", padx=(4, 0))
+        btn(bf, "Queue & Deploy",       ACCENT, self._queue_push          ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "❓ Random Question",   GOLD,   self._queue_random_question).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        btn(bf, "Clear Queue",          RED,    self._clear_push_queue     ).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
     def _refresh_push_label(self):
         msgs = load_push_messages()
@@ -619,6 +618,25 @@ class ManagerApp(tk.Tk):
         save_push_messages([])
         self._refresh_push_label()
         self.set_status("Queue cleared.")
+
+    def _queue_random_question(self):
+        import random as _random
+        ch = self._push_ch.get().strip()
+        if not ch:
+            messagebox.showwarning("Missing channel", "Enter a channel ID first."); return
+        try:    ch_id = int(ch)
+        except: messagebox.showwarning("Invalid channel", "Channel ID must be a number."); return
+        questions = load_questions().get("questions", [])
+        if not questions:
+            messagebox.showwarning("No questions", "No questions found in questions.json."); return
+        q = _random.choice(questions)
+        msg = f"❓ **{q['question']}**\n||{q['answer']}||"
+        msgs = load_push_messages()
+        msgs.append({"channel_id": ch_id, "message": msg, "is_question": True})
+        save_push_messages(msgs)
+        self._refresh_push_label()
+        self.set_status("Random question queued. Deploying...")
+        self.deploy(clear_push_after=True)
 
     # ── Push editor helpers ────────────────────────────────────────────────────
 

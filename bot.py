@@ -384,8 +384,21 @@ async def on_ready():
         for entry in pending:
             channel = bot.get_channel(entry["channel_id"])
             if channel:
-                text = resolve_text(entry["message"], channel.guild)
-                await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
+                if entry.get("is_question"):
+                    # Extract question/answer from the formatted message and use _post_question
+                    # so reactions are added and score tracking is registered
+                    q_data = load_questions()
+                    text   = resolve_text(entry["message"], channel.guild)
+                    # Find matching question object for tracking
+                    q_obj  = next((q for q in q_data.get("questions", [])
+                                   if q["question"] in text), None)
+                    if q_obj:
+                        await _post_question(channel, q_obj)
+                    else:
+                        await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
+                else:
+                    text = resolve_text(entry["message"], channel.guild)
+                    await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
             else:
                 print(f"[Push] Channel {entry['channel_id']} not found.")
         save_push_messages([])
