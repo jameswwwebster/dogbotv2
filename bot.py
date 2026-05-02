@@ -880,12 +880,20 @@ async def remindme_cmd(ctx, minutes: int = None, *, reminder: str = None):
 
 @bot.event
 async def on_command_error(ctx, error):
+    # Unknown !-prefix commands are normal user noise — swallow without a stderr trace.
+    if isinstance(error, commands.CommandNotFound):
+        return
     if isinstance(error, commands.BadArgument):
         await ctx.send("Invalid argument — check the command usage with `!commands`.")
     elif isinstance(error, commands.MemberNotFound):
         await ctx.send("User not found. Make sure you @mention them.")
     elif isinstance(error, commands.CommandInvokeError):
         await ctx.send(f"Something went wrong: {error.original}")
+
+
+# RS3 slash commands (/stats, /profile, /price, /next) live in their own cog.
+# Slash commands are auto-synced by py-cord on connect.
+bot.load_extension("cogs.rs3")
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))
