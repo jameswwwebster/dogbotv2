@@ -896,3 +896,5 @@ async def webster(ctx: discord.ApplicationContext):
 
 
 bot.run(os.getenv("DISCORD_TOKEN"))
+
+# deploy test: trivial no-op change to verify Render auto-deploy on push to master (2026-06-17)
