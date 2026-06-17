@@ -550,7 +550,7 @@ The Grand Tree
 What sporting field can be found in the Tree Gnome Stronghold?
 Gnome Ball field
 
-Which two farming patches are found in the stronghold?
+Which two farming patches are found in the gnome stronghold?
 Tree patch and fruit tree patch
 
 Which monster(s) drops Light mystic hat?
@@ -959,3 +959,70 @@ How much does a Cape of Accomplishment cost when wearing an activated ring of ch
 
 What level is required to buy a Master Cape of Accomplishment?
 Level 120
+
+During which age did the God Wars take place?
+The Third Age
+
+Who initiated the God Wars?
+Zamorak
+
+What did the Edicts of Guthix prevent?
+Major gods from setting foot on Gielinor
+
+Which race was completely wiped out on Gielinor during the God Wars?
+The Aviansie
+
+Who was the Zarosian champion imprisoned in the Jaldraocht Pyramid?
+Azzanadra
+
+Which city did vampyres and werewolves conquer, turning the Hallowland into Morytania?
+Hallowvale
+
+Which Elder God enslaved Kerapac?
+Jas
+
+What two weapons does Kerapac bring with him into battle?
+The Staff of Armadyl and the Needle
+
+What title do you earn by obtaining all of Kerapac's unique drops?
+Timeweaver [Name]
+
+How many players can fight Kerapac at once?
+1 to 3
+
+Which Slayer masters assign Kerapac as a task?
+Morvran and Laniakea
+
+What does TzKal-Zuk's name mean?
+Zuk, Champion of the Fire
+
+What was Zuk before he became a demigod?
+A human warrior
+
+Which god freed Zuk from Bandos' chains?
+Ful
+
+How many waves must players complete before fighting TzKal-Zuk?
+17
+
+What item is guaranteed if you complete the entire encounter without using a checkpoint?
+An igneous stone
+
+What is the special attack of the Zaros godsword called?
+Blackhole
+
+What special attack does the Saradomin godsword have, and what does it do?
+Healing Blade - deals melee damage and heals you for 50% of the damage dealt
+
+What does the Eldritch crossbow's special attack do?
+Converts Soul Split healing into damage dealt to the target for 15 seconds
+
+What ring reduces the adrenaline cost of special attacks by 10%?
+The ring of vigour
+
+What does the Noxious scythe's special attack summon?
+A mirrorback spider
+
+Can special attacks be automatically activated by Revolution?
+No
+
