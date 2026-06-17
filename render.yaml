@@ -1,0 +1,25 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# DogBot v2 is a py-cord Discord bot. It has no HTTP server, so it runs as a
+# background worker rather than a web service.
+#
+# NOTE ON STATE: the bot writes JSON files (giveaways.json, pending_reminders.json,
+# question_tracking.json, push_messages.json, questions.json) into its working
+# directory. Render's filesystem is ephemeral, so anything written at runtime is
+# lost on each deploy/restart. To persist it you'd need a disk AND a code change
+# to point those files at the mounted path (e.g. /data). Not configured here.
+services:
+  - type: worker
+    name: dogbotv2
+    runtime: python
+    plan: starter                      # background workers aren't available on the free tier
+    branch: master
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: DISCORD_TOKEN             # required — set the value in the Render dashboard
+        sync: false
+      - key: GITHUB_TOKEN              # optional — only used by the score push-to-git feature
+        sync: false
