@@ -967,7 +967,7 @@ class ManagerApp(tk.Tk):
             if clear_push_after:
                 save_push_messages([])
                 self._refresh_push_label()
-            self.set_status("Deployed to GitHub!")
+            self.set_status("Deployed to GitHub!  ✓")
         except subprocess.CalledProcessError as e:
             messagebox.showerror("Deploy failed", str(e))
 
