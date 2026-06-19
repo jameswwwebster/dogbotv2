@@ -564,6 +564,7 @@ async def commands_list(ctx):
         fun.append("`!8ball <question>` — DogBot answers your question 🎱")
     if q_data.get("command"):
         fun.append(f"`!{q_data['command']}` — Random RS trivia question ❓")
+    fun.append("`!newquestion` — Random question from the last 30 added ❓")
     if fun:
         lines.append("\n**🎮 Fun:**")
         lines.extend(fun)
@@ -793,6 +794,16 @@ async def eightball_cmd(ctx, *, question: str = None):
     intro = random.choice(_8BALL_INTROS)
     answer = random.choice(_8BALL_ANSWERS)
     await ctx.send(f'🎱 {intro} **"{answer}"**')
+
+
+@bot.command(name="newquestion")
+async def newquestion_cmd(ctx):
+    questions = load_questions().get("questions", [])
+    if not questions:
+        await ctx.send("No questions available yet.")
+        return
+    pool = questions[-30:] if len(questions) >= 30 else questions
+    await _post_question(ctx.channel, random.choice(pool))
 
 
 @bot.command(name="rerollgiveaway")
