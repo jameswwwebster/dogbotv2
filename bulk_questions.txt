@@ -139,9 +139,6 @@ Zamorak and Saradomin
 Who is the ruler of Varrock?
 King Roald
 
-Where is the Grand Exchange located relative to Varrock?
-North-west of Varrock
-
 Which kingdom is Varrock part of?
 Misthalin
 
@@ -219,9 +216,6 @@ Sir Amik Varze
 
 What is the name of the only bar in Falador?
 Rising Sun Inn
-
-Which boss can be found beneath Falador Park?
-Giant mole
 
 What is at the centre of Falador, serving as the home of the White Knights?
 White Knights' Castle
@@ -968,7 +962,7 @@ Zamorak
 
 What did the Edicts of Guthix prevent?
 Major gods from setting foot on Gielinor
-
+4
 Which race was completely wiped out on Gielinor during the God Wars?
 The Aviansie
 
@@ -1025,4 +1019,71 @@ A mirrorback spider
 
 Can special attacks be automatically activated by Revolution?
 No
+
+What is the only type of giant that got a boss version of it?
+Hill Giant
+
+How many different variants of partyhats are there ingame?
+8 (White, blue, green, yellow, red, purple, black, gold)
+
+Which iconic food item could be obtained from the 2001 Halloween event?
+Pumpkin
+
+Which iconic food item could be obtained from the 2002 Easter event?
+Easter egg
+
+What is the most common ore rock in the Ancient Cavern?
+Mithril ore rock
+
+Which item has the highest chance to get Clockwork components?
+Dwarf multicannon (40% chance to get 4!)
+
+Nuludion's Multicannon Shop sells 3 items: Dwarf multicannon, Instruction manual and... ?
+Ammo mould
+
+What item do you combine with a Kwuarm potion (unf) to create a Weapon Poison potion?
+Dragon scale dust
+
+Besides Har-Aken, which monster has the most common drop rate to drop an Onyx?
+TzKal-Zuk (Common)
+
+How many titles are available from a Deathmatch title scroll?
+Twenty titles
+
+Is it possible to buy a Death rune from Aubury's Rune Shop in Varrock?
+Yes
+
+Is it possible to buy an Astral rune from Aubury's Rune Shop in Varrock?
+Nope
+
+What item unlocks the Squoggoth pet?
+Shadowy egg
+
+How many different skillshards do you need to create the Combatant's cape?
+Nine
+
+How many times can you upgrade a Spring Cleaner until it's the Spring Cleaner 9001? (Unlocking the base version doesn't count as an upgrade.)
+Five times (Base -> 2000 -> 3000 -> 5000 -> 9000 -> 9001)
+
+Which type of runes are required to upgrade your Death Guard from tier 70 to tier 80?
+Miasma runes
+
+Who looks after the roses and cabbages in the Edgeville Monastery, west of Edgeville?
+Brother Althric
+
+Who is the key figure in The Hand in the Sand quest?
+Bert
+
+If you use Coinshare and get a drop, into how many shards does it divide itself?
+120
+
+Besides level 70 Magic, what skill level do you need to wear a Crystal wand?
+50 Agility (and the Roving Elves quest)
+
+When obtaining a Soul Devourer slayer assignment, which master gives you the highest task amount?
+Sumona
+
+How many different team capes are obtainable ingame?
+50
+
 
