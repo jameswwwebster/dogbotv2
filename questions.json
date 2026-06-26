@@ -2600,6 +2600,122 @@
         {
             "question": "Can special attacks be automatically activated by Revolution?",
             "answer": "No"
+        },
+        {
+            "question": "Who do you ask to make and wax a Sled?",
+            "answer": "Dustan"
+        },
+        {
+            "question": "Which mountain do you go down off using a sled?",
+            "answer": "Trollweiss Mountain"
+        },
+        {
+            "question": "During the quest 'Violet if Blue', you make a snowman For that, you need: Coal, carrot, top hat and....?",
+            "answer": "2 branches"
+        },
+        {
+            "question": "How many different brawling gloves are obtainable in-game?",
+            "answer": "13"
+        },
+        {
+            "question": "In runespan, which runes does siphoning a Nebula give?",
+            "answer": "Astral and Cosmic rune"
+        },
+        {
+            "question": "How many magical thread do you need to upgrade a large rune pouch to a grasping rune pouch?",
+            "answer": "15"
+        },
+        {
+            "question": "How many ancient bones do you need to craft a Superior energy-gathering scrimshaw?",
+            "answer": "2"
+        },
+        {
+            "question": "How many ancient bones do you need to craft a Superior scrimshaw of vampirism?",
+            "answer": "10"
+        },
+        {
+            "question": "What is the name of the wand rewarded on completing the Demon Slayer quest?",
+            "answer": "Avernic wand"
+        },
+        {
+            "question": "The salesman upstairs in the fishing shop in Shilo Village named Seraval only has one item in stock. What is this item?",
+            "answer": "Ship ticket"
+        },
+        {
+            "question": "What is a soul urn?",
+            "answer": "Soul urn is an item given to you by Kili during Kili's tasks. You fill them by killing certain monsters or by performing rituals."
+        },
+        {
+            "question": "To create a Shade mystic air staff, you need two items. A mystic air staff and....?",
+            "answer": "Shade skull"
+        },
+        {
+            "question": "How many 'steel studs' do you get per steel bar?",
+            "answer": "One."
+        },
+        {
+            "question": "How many different cacti patches can be found in-game?",
+            "answer": "Four (Het's Oasis, Al Kharid, Menaphos and Anachronia)"
+        },
+        {
+            "question": "How do you complete the Nex, Angel of Death achievement 'Poppin' Pillars'?",
+            "answer": "Defeat Nex, Angel of Death in a team of 7 or fewer after defeating all four pillars within 15 seconds."
+        },
+        {
+            "question": "By growing a Nasturtium, you protect which crops in adjecant allotment patches? (Swampletics)",
+            "answer": "Watermelons"
+        },
+        {
+            "question": "What is the name of the wolf/dog at the Moonrise digsite?",
+            "answer": "Utu"
+        },
+        {
+            "question": "What is the name of the collector associated with Guthix artifacts?",
+            "answer": "Artiefax"
+        },
+        {
+            "question": "Which item is most commonly abbreviated with \"DFS\"?",
+            "answer": "Dragonfire shield"
+        },
+        {
+            "question": "Can mining Platinum rocks trigger rockertunities?",
+            "answer": "No."
+        },
+        {
+            "question": "Can mining Primal rocks trigger rockertunities?",
+            "answer": "Yes"
+        },
+        {
+            "question": "Which spell do you have to unlock before being able to use Weapon Special Attacks of the god staves?",
+            "answer": "Divine Storm"
+        },
+        {
+            "question": "What is the name of the second boss in the Temple of Aminishi?",
+            "answer": "Masuta the Ascended"
+        },
+        {
+            "question": "What is the name of the second boss in the Dragonkin Laboratory?",
+            "answer": "Verak Lith"
+        },
+        {
+            "question": "What is the name of the second boss in the Shadow Reef?",
+            "answer": "Teraket the Necromancer"
+        },
+        {
+            "question": "If you level up a Zamorak Godsword to level 9 and disassemble it. How many Zamorak components do you get?",
+            "answer": "Four"
+        },
+        {
+            "question": "Which colour is a Fremennik hat, bought from Yrsa's Accoutrements?",
+            "answer": "Green"
+        },
+        {
+            "question": "What do you get when you combine a grenwall spike with an Orange feather?",
+            "answer": "A headless arrow"
+        },
+        {
+            "question": "During which quest do you obtain a crab amulet?",
+            "answer": "Hermit Permits"
         }
     ]
 }

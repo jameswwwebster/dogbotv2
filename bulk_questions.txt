@@ -1086,4 +1086,91 @@ Sumona
 How many different team capes are obtainable ingame?
 50
 
+Who do you ask to make and wax a Sled?
+Dustan
+
+Which mountain do you go down off using a sled?
+Trollweiss Mountain
+
+During the quest 'Violet if Blue', you make a snowman For that, you need: Coal, carrot, top hat and....?
+2 branches
+
+How many different brawling gloves are obtainable in-game?
+13
+
+In runespan, which runes does siphoning a Nebula give?
+Astral and Cosmic rune
+
+How many magical thread do you need to upgrade a large rune pouch to a grasping rune pouch?
+15
+
+How many ancient bones do you need to craft a Superior energy-gathering scrimshaw?
+2
+
+How many ancient bones do you need to craft a Superior scrimshaw of vampirism?
+10
+
+What is the name of the wand rewarded on completing the Demon Slayer quest?
+Avernic wand
+
+The salesman upstairs in the fishing shop in Shilo Village named Seraval only has one item in stock. What is this item?
+Ship ticket
+
+What is a soul urn?
+Soul urn is an item given to you by Kili during Kili's tasks. You fill them by killing certain monsters or by performing rituals.
+
+To create a Shade mystic air staff, you need two items. A mystic air staff and....?
+Shade skull
+
+How many 'steel studs' do you get per steel bar?
+One.
+
+How many different cacti patches can be found in-game?
+Four (Het's Oasis, Al Kharid, Menaphos and Anachronia)
+
+How do you complete the Nex, Angel of Death achievement 'Poppin' Pillars'?
+Defeat Nex, Angel of Death in a team of 7 or fewer after defeating all four pillars within 15 seconds.
+
+By growing a Nasturtium, you protect which crops in adjecant allotment patches? (Swampletics)
+Watermelons
+
+What is the name of the wolf/dog at the Moonrise digsite?
+Utu
+
+What is the name of the collector associated with Guthix artifacts?
+Artiefax
+
+Which item is most commonly abbreviated with "DFS"?
+Dragonfire shield
+
+Can mining Platinum rocks trigger rockertunities?
+No.
+
+Can mining Primal rocks trigger rockertunities?
+Yes
+
+Which spell do you have to unlock before being able to use Weapon Special Attacks of the god staves?
+Divine Storm
+
+What is the name of the second boss in the Temple of Aminishi?
+Masuta the Ascended
+
+What is the name of the second boss in the Dragonkin Laboratory?
+Verak Lith
+
+What is the name of the second boss in the Shadow Reef?
+Teraket the Necromancer
+
+If you level up a Zamorak Godsword to level 9 and disassemble it. How many Zamorak components do you get?
+Four
+
+Which colour is a Fremennik hat, bought from Yrsa's Accoutrements?
+Green
+
+What do you get when you combine a grenwall spike with an Orange feather?
+A headless arrow
+
+During which quest do you obtain a crab amulet?
+Hermit Permits
+
 
