@@ -2716,6 +2716,106 @@
         {
             "question": "During which quest do you obtain a crab amulet?",
             "answer": "Hermit Permits"
+        },
+        {
+            "question": "Which quest is required to unlock Sumona as a Slayer master?",
+            "answer": "Smoking Kills"
+        },
+        {
+            "question": "What special component, dropped by cave horrors, is needed to craft a slayer helmet?",
+            "answer": "Black mask"
+        },
+        {
+            "question": "Which quest unlocks the ability to craft bane ammunition?",
+            "answer": "Ritual of the Mahjarrat"
+        },
+        {
+            "question": "What does completing the Smoking Kills quest allow a player to craft, besides slayer helmets?",
+            "answer": "Ensouled spectral lens"
+        },
+        {
+            "question": "Which item is best-in-slot glove for poisonable Slayer monsters?",
+            "answer": "Cinderbane gloves"
+        },
+        {
+            "question": "How many Slayer points does it cost to block an assigned monster at a Slayer Master?",
+            "answer": "100"
+        },
+        {
+            "question": "For every how many quest points does a player gain the ability to prefer or block an additional Slayer task?",
+            "answer": "50"
+        },
+        {
+            "question": "Which quest unlocks access to the Glacor Cave?",
+            "answer": "Ritual of the Mahjarrat"
+        },
+        {
+            "question": "How many upgrades does a Full slayer helmet have, purchasable with Slayer points?",
+            "answer": "4"
+        },
+        {
+            "question": "What does the demon horn necklace restore when burying certain bones?",
+            "answer": "Prayer points"
+        },
+        {
+            "question": "Which activity is required to access Kuradal as a Slayer master?",
+            "answer": "Barbarian Firemaking"
+        },
+        {
+            "question": "Which item, best-in-slot for the neck slot when fighting bone-dropping monsters, works alongside a bonecrusher?",
+            "answer": "Demon horn necklace"
+        },
+        {
+            "question": "Besides earning a Wilderness slayer chest, what does the player also receive for completing a Mandrith assignment without dying, killing outside the Wilderness, or skipping the task?",
+            "answer": "A Reaper point"
+        },
+        {
+            "question": "Which two-handed weapon type is particularly effective for melee due to its AoE capabilities?",
+            "answer": "Halberd"
+        },
+        {
+            "question": "What does completing \"The Jack of Spades\" quest allow players with 99 Slayer to access?",
+            "answer": "Sunken Pyramid personal slayer dungeon"
+        },
+        {
+            "question": "Which quest partially unlocks access to Suqahs as a Slayer assignment?",
+            "answer": "Lunar Diplomacy"
+        },
+        {
+            "question": "Which quest is required to unlock access to Nihil and Muspah as Slayer assignments?",
+            "answer": "Fate of the Gods"
+        },
+        {
+            "question": "Where do you start the quest \"There's No Place Like Home...\"?",
+            "answer": "Rimmington"
+        },
+        {
+            "question": "What is the name of the mason NPC who starts the \"There's No Place Like Home...\" quest?",
+            "answer": "Alfred Stonemason"
+        },
+        {
+            "question": "At what Construction level can players first access a house portal in Prifddinas?",
+            "answer": "75"
+        },
+        {
+            "question": "What is required to reach Otot as a player-owned house portal location?",
+            "answer": "60 Construction and level 7 reputation with the Goebies"
+        },
+        {
+            "question": "How many chapel burners must be lit at a Gilded Altar (with 75 Prayer) to receive the maximum 350% experience bonus?",
+            "answer": "2"
+        },
+        {
+            "question": "Which player-owned house feature lets you see the general landing area of a Shooting Star?",
+            "answer": "Telescope"
+        },
+        {
+            "question": "Which furniture allows you to make magic teleport tablets?",
+            "answer": "Lectern"
+        },
+        {
+            "question": "How many players can have a plot in one homestead?",
+            "answer": "5"
         }
     ]
 }

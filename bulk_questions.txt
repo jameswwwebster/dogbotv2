@@ -1174,3 +1174,79 @@ During which quest do you obtain a crab amulet?
 Hermit Permits
 
 
+
+Which quest is required to unlock Sumona as a Slayer master?
+Smoking Kills
+
+What special component, dropped by cave horrors, is needed to craft a slayer helmet?
+Black mask
+
+Which quest unlocks the ability to craft bane ammunition?
+Ritual of the Mahjarrat
+
+What does completing the Smoking Kills quest allow a player to craft, besides slayer helmets?
+Ensouled spectral lens
+
+Which item is best-in-slot glove for poisonable Slayer monsters?
+Cinderbane gloves
+
+How many Slayer points does it cost to block an assigned monster at a Slayer Master?
+100
+
+For every how many quest points does a player gain the ability to prefer or block an additional Slayer task?
+50
+
+Which quest unlocks access to the Glacor Cave?
+Ritual of the Mahjarrat
+
+How many upgrades does a Full slayer helmet have, purchasable with Slayer points?
+4
+
+What does the demon horn necklace restore when burying certain bones?
+Prayer points
+
+Which activity is required to access Kuradal as a Slayer master?
+Barbarian Firemaking
+
+Which item, best-in-slot for the neck slot when fighting bone-dropping monsters, works alongside a bonecrusher?
+Demon horn necklace
+
+Besides earning a Wilderness slayer chest, what does the player also receive for completing a Mandrith assignment without dying, killing outside the Wilderness, or skipping the task?
+A Reaper point
+
+Which two-handed weapon type is particularly effective for melee due to its AoE capabilities?
+Halberd
+
+What does completing "The Jack of Spades" quest allow players with 99 Slayer to access?
+Sunken Pyramid personal slayer dungeon
+
+Which quest partially unlocks access to Suqahs as a Slayer assignment?
+Lunar Diplomacy
+
+Which quest is required to unlock access to Nihil and Muspah as Slayer assignments?
+Fate of the Gods
+
+Where do you start the quest "There's No Place Like Home..."?
+Rimmington
+
+What is the name of the mason NPC who starts the "There's No Place Like Home..." quest?
+Alfred Stonemason
+
+At what Construction level can players first access a house portal in Prifddinas?
+75
+
+What is required to reach Otot as a player-owned house portal location?
+60 Construction and level 7 reputation with the Goebies
+
+How many chapel burners must be lit at a Gilded Altar (with 75 Prayer) to receive the maximum 350% experience bonus?
+2
+
+Which player-owned house feature lets you see the general landing area of a Shooting Star?
+Telescope
+
+Which furniture allows you to make magic teleport tablets?
+Lectern
+
+How many players can have a plot in one homestead?
+5
+
