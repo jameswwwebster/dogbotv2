@@ -114,6 +114,13 @@ async def _post_question(channel, entry):
         "expires_at": time.time() + QUESTION_REACTION_WINDOW,
     }
     save_question_tracking(tracking)
+    # Record when this question was last shown (used by the daily cooldown filter)
+    data = load_questions()
+    for q in data["questions"]:
+        if q["question"] == entry["question"]:
+            q["last_shown"] = time.time()
+            save_questions(data)
+            break
 
 
 def load_pending_reminders():
@@ -373,7 +380,9 @@ async def check_reminders():
             if channel:
                 questions = load_questions().get("questions", [])
                 if questions:
-                    q = random.choice(questions)
+                    cutoff = time.time() - 180 * 86400
+                    eligible = [q for q in questions if not q.get("last_shown") or q["last_shown"] < cutoff]
+                    q = random.choice(eligible if eligible else questions)
                     await _post_question(channel, q)
 
     # Hourly score push back to GitHub
