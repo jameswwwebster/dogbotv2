@@ -1007,10 +1007,15 @@ class ManagerApp(tk.Tk):
 
         bf2 = tk.Frame(p, bg=BG)
         bf2.pack(padx=20, pady=(0, 6), fill="x")
-        btn(bf2, "💾 Save & Deploy", GREEN, self.deploy).pack(side="left", expand=True, fill="x", padx=(0, 4))
-        btn(bf2, "🔄 Sync Roles Message", ACCENT, self.deploy).pack(side="left", expand=True, fill="x", padx=(4, 0))
+        btn(bf2, "💾 Save & Deploy",       GREEN, self.deploy          ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf2, "🔄 Sync Roles Message",  ACCENT, self.deploy         ).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        btn(bf2, "😀 Re-add Reactions",    GOLD,  self._rr_readd_emotes).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         self._refresh_rr()
+
+    def _rr_readd_emotes(self):
+        self.set_status("Deploying — bot will re-add all reactions on restart...")
+        self.deploy()
 
     def _rr_pull_refresh(self):
         repo = os.path.dirname(os.path.realpath(__file__))

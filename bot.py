@@ -685,6 +685,11 @@ async def on_raw_reaction_add(payload):
         try:
             await member.add_roles(role)
             print(f"[ReactionRoles] Added '{role_name}' to {member.display_name}.")
+            display = _rr_display_name(rr_entry) if rr_entry else role_name
+            try:
+                await member.send(f"✅ You've been given the **{role_name}** role! You'll get pinged when **{display}** is being hosted.")
+            except discord.Forbidden:
+                pass
         except discord.Forbidden:
             print(f"[ReactionRoles] Forbidden adding '{role_name}' — check bot role hierarchy.")
             ch = bot.get_channel(rr.get("channel_id"))
