@@ -452,7 +452,8 @@ async def check_reminders():
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
-    check_reminders.start()
+    if not check_reminders.is_running():
+        check_reminders.start()
     _cleanup_question_tracking()
 
     # Restore any !remindme timers that survived a redeploy
@@ -694,6 +695,10 @@ async def commands_list(ctx):
         lines.append("\n**🔧 Utility:**")
         lines.extend(util)
 
+    if has_mod_role(ctx.author):
+        lines.append("\n**🎭 Reaction Roles (mod only):**")
+        lines.append("`!addreaction <emote> <role>` — Add a reaction role mapping")
+
     await ctx.send("\n".join(lines))
 
 
@@ -921,10 +926,15 @@ async def newquestion_cmd(ctx):
     await _post_question(ctx.channel, random.choice(pool))
 
 
+_addreaction_seen = {}  # message_id -> timestamp, deduplicates across overlapping instances
+
 @bot.command(name="addreaction")
 async def addreaction_cmd(ctx, emote: str = None, *, role_name: str = None):
     if not has_mod_role(ctx.author):
         return
+    if time.time() - _addreaction_seen.get(ctx.message.id, 0) < 5:
+        return  # already handled by another instance
+    _addreaction_seen[ctx.message.id] = time.time()
     if not emote or not role_name:
         await ctx.send("Usage: `!addreaction <emote> <role name>`")
         return
