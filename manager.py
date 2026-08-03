@@ -145,6 +145,8 @@ class ManagerApp(tk.Tk):
         self.title("🐾 DogBot — Dashboard")
         self.resizable(False, False)
         self.configure(bg=BG)
+        repo = os.path.dirname(os.path.realpath(__file__))
+        subprocess.run(["git", "pull", "--rebase"], cwd=repo, capture_output=True, timeout=15)
         self._build_ui()
 
     def _build_ui(self):
