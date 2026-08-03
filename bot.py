@@ -601,11 +601,6 @@ async def on_raw_reaction_add(payload):
                     member = None
                 if role and member:
                     await member.add_roles(role)
-                    try:
-                        dm = await member.create_dm()
-                        await dm.send(f"You wanted the **{role_name}** role to be added, so I did it!")
-                    except Exception as e:
-                        print(f"[ReactionRoles] DM failed for add ({member}): {e}")
                 elif not role:
                     print(f"[ReactionRoles] Role '{role_name}' not found in guild.")
 
@@ -639,11 +634,6 @@ async def on_raw_reaction_remove(payload):
                     member = None
                 if role and member:
                     await member.remove_roles(role)
-                    try:
-                        dm = await member.create_dm()
-                        await dm.send(f"So you are done with this activity? I'll remove the **{role_name}** role.")
-                    except Exception as e:
-                        print(f"[ReactionRoles] DM failed for remove ({member}): {e}")
 
 
 @bot.command(name="commands")
