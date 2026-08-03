@@ -998,6 +998,25 @@ async def newquestion_cmd(ctx):
     await _post_question(ctx.channel, random.choice(pool))
 
 
+@bot.command(name="rrdebug")
+async def rrdebug_cmd(ctx):
+    if not has_mod_role(ctx.author):
+        return
+    rr = load_reaction_roles()
+    guild = ctx.guild
+    lines = ["**🔍 Reaction Roles Debug**"]
+    lines.append(f"Watching message ID: `{rr.get('message_id')}`")
+    lines.append(f"Channel ID: `{rr.get('channel_id')}`")
+    lines.append("")
+    lines.append("**Role mappings:**")
+    for emote, entry in rr["roles"].items():
+        role_name = _rr_role_name(entry)
+        guild_role = discord.utils.get(guild.roles, name=role_name)
+        status = "✅" if guild_role else "❌ NOT FOUND"
+        lines.append(f"{emote} → `{role_name}` {status}")
+    await ctx.send("\n".join(lines))
+
+
 _addreaction_seen = {}  # message_id -> timestamp, deduplicates across overlapping instances
 
 @bot.command(name="addreaction")
