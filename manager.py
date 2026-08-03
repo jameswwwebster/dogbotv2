@@ -78,7 +78,8 @@ def save_giveaways(d):
     with open(GIVEAWAYS_FILE, "w") as f: json.dump(d, f, indent=4)
 
 def load_reaction_roles():
-    defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948, "roles": {}}
+    defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948,
+                "info_message_id": None, "roles": {}}
     if not os.path.exists(REACTION_ROLES_FILE): return defaults
     with open(REACTION_ROLES_FILE) as f: data = json.load(f)
     for k, v in defaults.items(): data.setdefault(k, v)
@@ -993,7 +994,10 @@ class ManagerApp(tk.Tk):
         btn(bf, "Delete",       RED,    self._del_rr  ).pack(side="left", expand=True, fill="x", padx=(4, 4))
         btn(bf, "Clear",        GREY,   self._clear_rr).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
-        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=(4, 6), fill="x")
+        bf2 = tk.Frame(p, bg=BG)
+        bf2.pack(padx=20, pady=(0, 6), fill="x")
+        btn(bf2, "💾 Save & Deploy", GREEN, self.deploy).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf2, "🔄 Sync Roles Message", ACCENT, self.deploy).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         self._refresh_rr()
 

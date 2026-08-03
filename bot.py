@@ -230,7 +230,8 @@ async def _run_giveaway(entry):
 
 
 def load_reaction_roles():
-    defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948, "roles": {}}
+    defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948,
+                "info_message_id": None, "roles": {}}
     if not os.path.exists(REACTION_ROLES_FILE):
         return defaults
     with open(REACTION_ROLES_FILE, "r") as f:
@@ -449,6 +450,37 @@ async def check_reminders():
                 print(f"[Reminders] Channel {reminder['channel_id']} not found.")
 
 
+async def _sync_roles_message():
+    rr = load_reaction_roles()
+    channel = bot.get_channel(rr["channel_id"])
+    if not channel:
+        print("[ReactionRoles] Channel not found for sync.")
+        return
+    lines = ["📋 **Active reaction roles:**\n"]
+    for emote, role in rr["roles"].items():
+        lines.append(f"{emote} — **{role}**")
+    content = "\n".join(lines)
+    # Try to edit existing info message
+    info_id = rr.get("info_message_id")
+    if info_id:
+        try:
+            msg = await channel.fetch_message(info_id)
+            await msg.edit(content=content)
+            print("[ReactionRoles] Info message updated.")
+            return
+        except discord.NotFound:
+            pass
+        except Exception as e:
+            print(f"[ReactionRoles] Could not edit info message: {e}")
+            return
+    # Send new message and save its ID
+    msg = await channel.send(content)
+    rr["info_message_id"] = msg.id
+    save_reaction_roles(rr)
+    await asyncio.get_event_loop().run_in_executor(None, _push_reaction_roles_to_github)
+    print(f"[ReactionRoles] New info message sent (ID: {msg.id}).")
+
+
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user} (ID: {bot.user.id})")
@@ -478,7 +510,8 @@ async def on_ready():
     for entry in load_giveaways():
         asyncio.create_task(_run_giveaway(entry))
 
-    # Add configured reaction role emotes to the reaction roles message
+    # Sync the roles info message and add emotes
+    await _sync_roles_message()
     rr = load_reaction_roles()
     if rr.get("message_id") and rr.get("channel_id") and rr["roles"]:
         rr_channel = bot.get_channel(rr["channel_id"])
