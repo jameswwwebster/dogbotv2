@@ -3,16 +3,53 @@
     "channel_id": 969324314983804948,
     "info_message_id": null,
     "roles": {
-        "<:NexAOD:969284343811952680>": {"role": "AOD", "name": "Nex Angel of Death"},
-        "<:Solak:969296727997837382>":   {"role": "Solak", "name": "Solak"},
-        "<:Vorago:969294108810154096>":  {"role": "Vorago", "name": "Vorago"},
-        "<:Kerapac:969319996192874537>": {"role": "Kerapac", "name": "Kerapac"},
-        "<:Rots:969321526811852850>":    {"role": "Rots", "name": "Rise of the Six"},
-        "<:KK:969572018515230830>":      {"role": "KK", "name": "Kalphite King"},
-        "<:ED4:991646616371081295>":     {"role": "Zamorak", "name": "Zamorak"},
-        "<:Croesus:969297288667205652>": {"role": "Croesus", "name": "Croesus"},
-        "<:Raids:969328700929769552>":   {"role": "Raids", "name": "Beastmaster / Yakamaru"},
-        "<:Vorkath:1213596979230412940>":{"role": "Vorkath", "name": "Vorkath"},
-        "<:SOR:1273968667272679435>":    {"role": "SOR", "name": "Sanctum of Rebirth"}
+        "<:NexAOD:969284343811952680>": {
+            "role": "AOD",
+            "name": "Nex Angel of Death"
+        },
+        "<:Solak:969296727997837382>": {
+            "role": "Solak",
+            "name": "Solak"
+        },
+        "<:Vorago:969294108810154096>": {
+            "role": "Vorago",
+            "name": "Vorago"
+        },
+        "<:Kerapac:969319996192874537>": {
+            "role": "Kerapac",
+            "name": "Kerapac"
+        },
+        "<:Rots:969321526811852850>": {
+            "role": "Rots",
+            "name": "Rise of the Six"
+        },
+        "<:KK:969572018515230830>": {
+            "role": "KK",
+            "name": "Kalphite King"
+        },
+        "<:ED4:991646616371081295>": {
+            "role": "Zamorak",
+            "name": "Zamorak"
+        },
+        "<:Croesus:969297288667205652>": {
+            "role": "Croesus",
+            "name": "Croesus"
+        },
+        "<:Raids:969328700929769552>": {
+            "role": "Raids",
+            "name": "Beastmaster / Yakamaru"
+        },
+        "<:Vorkath:1213596979230412940>": {
+            "role": "Vorkath",
+            "name": "Vorkath"
+        },
+        "<:SOR:1273968667272679435>": {
+            "role": "SOR",
+            "name": "Sanctum of Rebirth"
+        },
+        "<:Amascut:1400159270678564986>": {
+            "role": "@Amascut",
+            "name": "Amascut"
+        }
     }
 }
