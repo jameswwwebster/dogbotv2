@@ -601,7 +601,7 @@ async def on_raw_reaction_add(payload):
                 if role and member:
                     await member.add_roles(role)
                     try:
-                        await member.send(f"Added role: **{role_name}**")
+                        await member.send(f"You wanted the **{role_name}** role to be added, so I did it!")
                     except discord.Forbidden:
                         pass
                 elif not role:
@@ -637,6 +637,10 @@ async def on_raw_reaction_remove(payload):
                     member = None
                 if role and member:
                     await member.remove_roles(role)
+                    try:
+                        await member.send(f"So you are done with this activity? I'll remove the **{role_name}** role.")
+                    except discord.Forbidden:
+                        pass
 
 
 @bot.command(name="commands")
