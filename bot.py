@@ -592,14 +592,20 @@ async def on_raw_reaction_add(payload):
         if role_name:
             guild = bot.get_guild(payload.guild_id)
             if guild:
-                role   = discord.utils.get(guild.roles, name=role_name)
-                member = guild.get_member(payload.user_id)
+                role = discord.utils.get(guild.roles, name=role_name)
+                try:
+                    member = await guild.fetch_member(payload.user_id)
+                except Exception as e:
+                    print(f"[ReactionRoles] Could not fetch member {payload.user_id}: {e}")
+                    member = None
                 if role and member:
                     await member.add_roles(role)
                     try:
                         await member.send(f"Added role: **{role_name}**")
                     except discord.Forbidden:
                         pass
+                elif not role:
+                    print(f"[ReactionRoles] Role '{role_name}' not found in guild.")
 
 
 @bot.event
@@ -624,8 +630,11 @@ async def on_raw_reaction_remove(payload):
         if role_name:
             guild = bot.get_guild(payload.guild_id)
             if guild:
-                role   = discord.utils.get(guild.roles, name=role_name)
-                member = guild.get_member(payload.user_id)
+                role = discord.utils.get(guild.roles, name=role_name)
+                try:
+                    member = await guild.fetch_member(payload.user_id)
+                except Exception:
+                    member = None
                 if role and member:
                     await member.remove_roles(role)
 
