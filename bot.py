@@ -727,6 +727,11 @@ async def on_raw_reaction_remove(payload):
                     member = None
                 if role and member:
                     await member.remove_roles(role)
+                    display = _rr_display_name(rr_entry) if rr_entry else role_name
+                    try:
+                        await member.send(f"❌ The **{role_name}** role has been removed. You'll no longer get pinged for **{display}**.")
+                    except discord.Forbidden:
+                        pass
 
 
 @bot.command(name="commands")
