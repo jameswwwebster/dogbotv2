@@ -969,6 +969,14 @@ class ManagerApp(tk.Tk):
         section(p, "Reaction Roles",
                 "React to get a role. Uses message 969585509561172028.")
 
+        hdr = tk.Frame(p, bg=BG)
+        hdr.pack(padx=20, fill="x")
+        tk.Label(hdr, text="Mappings", bg=BG, fg=FG_DIM,
+                 font=("Segoe UI", 9)).pack(side="left")
+        tk.Button(hdr, text="↺ Pull & Refresh", bg=BG_INPUT, fg=FG_DIM,
+                  font=("Segoe UI", 9), relief="flat", cursor="hand2",
+                  command=self._rr_pull_refresh).pack(side="right")
+
         lf, self._rr_lb = scrolled_lb(p, 52, 10)
         lf.pack(padx=20, fill="x")
         self._rr_lb.bind("<<ListboxSelect>>", self._on_rr_sel)
@@ -988,6 +996,12 @@ class ManagerApp(tk.Tk):
         btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=(4, 6), fill="x")
 
         self._refresh_rr()
+
+    def _rr_pull_refresh(self):
+        repo = os.path.dirname(os.path.realpath(__file__))
+        subprocess.run(["git", "pull", "--rebase"], cwd=repo, capture_output=True, timeout=15)
+        self._refresh_rr()
+        self.set_status("Pulled latest from GitHub.")
 
     def _refresh_rr(self):
         self._rr_lb.delete(0, "end")

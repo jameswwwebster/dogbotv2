@@ -336,27 +336,29 @@ def _push_reaction_roles_to_github():
     token = os.getenv("GITHUB_TOKEN")
     if not token:
         print("[ReactionRoles] GITHUB_TOKEN not set — skipping push.")
-        return
+        return False
     try:
         remote = subprocess.run(
             ["git", "remote", "get-url", "origin"],
             capture_output=True, text=True, check=True
         ).stdout.strip()
         if not remote.startswith("https://"):
-            return
+            return False
         authed = remote.replace("https://", f"https://{token}@")
         subprocess.run(["git", "config", "user.email", "dogbot@railway.app"], check=True)
         subprocess.run(["git", "config", "user.name",  "DogBot"],             check=True)
         subprocess.run(["git", "pull", "--rebase", authed, "master"], capture_output=True)
         subprocess.run(["git", "add", REACTION_ROLES_FILE], check=True)
         if subprocess.run(["git", "diff", "--cached", "--quiet"]).returncode == 0:
-            return
+            return True
         ts = datetime.now().strftime("%Y-%m-%d %H:%M")
         subprocess.run(["git", "commit", "-m", f"Reaction roles update — {ts}"], check=True)
         subprocess.run(["git", "push", authed, "master"], check=True)
         print("[ReactionRoles] Pushed to GitHub.")
+        return True
     except Exception as e:
         print(f"[ReactionRoles] Push failed: {e}")
+        return False
 
 
 _scores_dirty     = False
@@ -923,7 +925,10 @@ async def addreaction_cmd(ctx, emote: str = None, *, role_name: str = None):
         except Exception:
             pass
     await ctx.send(f"✅ Reaction role added: {emote} → **{role_name}**")
-    await asyncio.get_event_loop().run_in_executor(None, _push_reaction_roles_to_github)
+    loop = asyncio.get_event_loop()
+    ok = await loop.run_in_executor(None, _push_reaction_roles_to_github)
+    if not ok:
+        await ctx.send("⚠️ Could not sync to GitHub — update the manager manually.")
 
 
 @bot.command(name="rerollgiveaway")
