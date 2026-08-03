@@ -601,7 +601,8 @@ async def on_raw_reaction_add(payload):
                 if role and member:
                     await member.add_roles(role)
                     try:
-                        await member.send(f"You wanted the **{role_name}** role to be added, so I did it!")
+                        dm = await member.create_dm()
+                        await dm.send(f"You wanted the **{role_name}** role to be added, so I did it!")
                     except Exception as e:
                         print(f"[ReactionRoles] DM failed for add ({member}): {e}")
                 elif not role:
@@ -638,7 +639,8 @@ async def on_raw_reaction_remove(payload):
                 if role and member:
                     await member.remove_roles(role)
                     try:
-                        await member.send(f"So you are done with this activity? I'll remove the **{role_name}** role.")
+                        dm = await member.create_dm()
+                        await dm.send(f"So you are done with this activity? I'll remove the **{role_name}** role.")
                     except Exception as e:
                         print(f"[ReactionRoles] DM failed for remove ({member}): {e}")
 
