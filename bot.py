@@ -682,8 +682,14 @@ async def on_raw_reaction_add(payload):
         except Exception as e:
             print(f"[ReactionRoles] Could not fetch member {payload.user_id}: {e}")
             return
-        await member.add_roles(role)
-        print(f"[ReactionRoles] Added '{role_name}' to {member.display_name}.")
+        try:
+            await member.add_roles(role)
+            print(f"[ReactionRoles] Added '{role_name}' to {member.display_name}.")
+        except discord.Forbidden:
+            print(f"[ReactionRoles] Forbidden adding '{role_name}' — check bot role hierarchy.")
+            ch = bot.get_channel(rr.get("channel_id"))
+            if ch:
+                await ch.send(f"⚠️ Can't assign **{role_name}** — move DogBot's role above it in Server Settings → Roles.", delete_after=30)
 
 
 @bot.event
@@ -1004,15 +1010,26 @@ async def rrdebug_cmd(ctx):
         return
     rr = load_reaction_roles()
     guild = ctx.guild
+    bot_member = guild.get_member(bot.user.id)
+    bot_top_role = bot_member.top_role if bot_member else None
+    has_manage = ctx.channel.permissions_for(bot_member).manage_roles if bot_member else False
+
     lines = ["**🔍 Reaction Roles Debug**"]
     lines.append(f"Watching message ID: `{rr.get('message_id')}`")
     lines.append(f"Channel ID: `{rr.get('channel_id')}`")
+    lines.append(f"Bot has Manage Roles: {'✅' if has_manage else '❌ MISSING'}")
+    lines.append(f"Bot top role: `{bot_top_role}` (position {bot_top_role.position if bot_top_role else '?'})")
     lines.append("")
-    lines.append("**Role mappings:**")
+    lines.append("**Role mappings (✅ = found & bot can assign):**")
     for emote, entry in rr["roles"].items():
         role_name = _rr_role_name(entry)
         guild_role = discord.utils.get(guild.roles, name=role_name)
-        status = "✅" if guild_role else "❌ NOT FOUND"
+        if not guild_role:
+            status = "❌ NOT FOUND"
+        elif bot_top_role and guild_role.position >= bot_top_role.position:
+            status = f"⚠️ found but bot role too low (pos {guild_role.position} ≥ {bot_top_role.position})"
+        else:
+            status = "✅"
         lines.append(f"{emote} → `{role_name}` {status}")
     await ctx.send("\n".join(lines))
 
