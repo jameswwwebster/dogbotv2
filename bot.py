@@ -456,7 +456,7 @@ async def _sync_roles_message():
     if not channel:
         print("[ReactionRoles] Channel not found for sync.")
         return
-    lines = ["📋 **Active reaction roles:**\n"]
+    lines = ["Please react to the appropriate emoji to activate notifications for when that activity is being hosted in ⁠📝│pvm-signup or ⁠🔪│pvm-chat\n"]
     for emote, role in rr["roles"].items():
         lines.append(f"{emote} — **{role}**")
     content = "\n".join(lines)
