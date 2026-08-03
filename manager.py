@@ -83,6 +83,10 @@ def load_reaction_roles():
     if not os.path.exists(REACTION_ROLES_FILE): return defaults
     with open(REACTION_ROLES_FILE) as f: data = json.load(f)
     for k, v in defaults.items(): data.setdefault(k, v)
+    # Migrate old plain-string format → {"role": ..., "name": ...}
+    for emote, val in data["roles"].items():
+        if isinstance(val, str):
+            data["roles"][emote] = {"role": val, "name": val}
     return data
 
 def save_reaction_roles(d):
@@ -982,11 +986,13 @@ class ManagerApp(tk.Tk):
         lf.pack(padx=20, fill="x")
         self._rr_lb.bind("<<ListboxSelect>>", self._on_rr_sel)
 
-        row = field_row(p, ["Emote", "Role name"], [1, 2])
+        row = field_row(p, ["Emote", "Role name", "Boss Name"], [1, 1, 2])
         self._rr_emote_var = tk.StringVar()
         self._rr_role_var  = tk.StringVar()
+        self._rr_name_var  = tk.StringVar()
         inp(row, self._rr_emote_var).grid(row=1, column=0, padx=(0, 4), sticky="ew")
-        inp(row, self._rr_role_var ).grid(row=1, column=1, padx=(4, 0), sticky="ew")
+        inp(row, self._rr_role_var ).grid(row=1, column=1, padx=(4, 4), sticky="ew")
+        inp(row, self._rr_name_var ).grid(row=1, column=2, padx=(4, 0), sticky="ew")
 
         bf = tk.Frame(p, bg=BG)
         bf.pack(padx=20, pady=(4, 8), fill="x")
@@ -1010,26 +1016,33 @@ class ManagerApp(tk.Tk):
     def _refresh_rr(self):
         self._rr_lb.delete(0, "end")
         self.__rr = load_reaction_roles()
-        for emote, role in self.__rr["roles"].items():
-            self._rr_lb.insert("end", f"{emote:<6}  →  {role}")
+        for emote, entry in self.__rr["roles"].items():
+            role = entry["role"] if isinstance(entry, dict) else entry
+            name = entry.get("name", role) if isinstance(entry, dict) else entry
+            self._rr_lb.insert("end", f"{emote}  →  {role:<12}  {name}")
 
     def _on_rr_sel(self, _=None):
         sel = self._rr_lb.curselection()
         if not sel: return
         emote = list(self.__rr["roles"].keys())[sel[0]]
+        entry = self.__rr["roles"][emote]
+        role  = entry["role"] if isinstance(entry, dict) else entry
+        name  = entry.get("name", role) if isinstance(entry, dict) else entry
         self._rr_emote_var.set(emote)
-        self._rr_role_var.set(self.__rr["roles"][emote])
+        self._rr_role_var.set(role)
+        self._rr_name_var.set(name)
 
     def _add_rr(self):
         emote = self._rr_emote_var.get().strip()
         role  = self._rr_role_var.get().strip()
-        if not emote or not role:
-            messagebox.showwarning("Missing input", "Fill in both fields."); return
+        name  = self._rr_name_var.get().strip()
+        if not emote or not role or not name:
+            messagebox.showwarning("Missing input", "Fill in all three fields."); return
         d = load_reaction_roles()
-        d["roles"][emote] = role
+        d["roles"][emote] = {"role": role, "name": name}
         save_reaction_roles(d)
         self._refresh_rr(); self._clear_rr()
-        self.set_status(f"Saved: {emote} → {role}")
+        self.set_status(f"Saved: {emote} → {role} ({name})")
 
     def _del_rr(self):
         sel = self._rr_lb.curselection()
@@ -1044,7 +1057,7 @@ class ManagerApp(tk.Tk):
         self.set_status(f"Deleted {emote}")
 
     def _clear_rr(self):
-        self._rr_emote_var.set(""); self._rr_role_var.set("")
+        self._rr_emote_var.set(""); self._rr_role_var.set(""); self._rr_name_var.set("")
         self._rr_lb.selection_clear(0, "end")
 
     # ── Deploy ────────────────────────────────────────────────────────────────

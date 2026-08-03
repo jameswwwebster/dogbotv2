@@ -238,7 +238,19 @@ def load_reaction_roles():
         data = json.load(f)
     for k, v in defaults.items():
         data.setdefault(k, v)
+    # Migrate old plain-string format {"emote": "role"} → {"emote": {"role": "role", "name": "role"}}
+    for emote, val in data["roles"].items():
+        if isinstance(val, str):
+            data["roles"][emote] = {"role": val, "name": val}
     return data
+
+
+def _rr_role_name(entry):
+    return entry["role"] if isinstance(entry, dict) else entry
+
+
+def _rr_display_name(entry):
+    return entry.get("name", entry["role"]) if isinstance(entry, dict) else entry
 
 
 def save_reaction_roles(data):
@@ -457,8 +469,12 @@ async def _sync_roles_message():
         print("[ReactionRoles] Channel not found for sync.")
         return
     lines = ["Please react to the appropriate emoji to activate notifications for when that activity is being hosted in ⁠📝│pvm-signup or ⁠🔪│pvm-chat\n"]
-    for emote, role in rr["roles"].items():
-        lines.append(f"{emote} — **{role}**")
+    for emote, entry in rr["roles"].items():
+        role_name    = _rr_role_name(entry)
+        display_name = _rr_display_name(entry)
+        guild_role   = discord.utils.get(channel.guild.roles, name=role_name)
+        role_mention = guild_role.mention if guild_role else f"@{role_name}"
+        lines.append(f"{emote} - {role_mention} - {display_name}")
     content = "\n".join(lines)
     # Try to edit existing info message
     info_id = rr.get("info_message_id")
@@ -622,7 +638,8 @@ async def on_raw_reaction_add(payload):
     # Reaction roles
     rr = load_reaction_roles()
     if payload.message_id == rr.get("message_id"):
-        role_name = rr["roles"].get(str(payload.emoji))
+        rr_entry  = rr["roles"].get(str(payload.emoji))
+        role_name = _rr_role_name(rr_entry) if rr_entry else None
         if role_name:
             guild = bot.get_guild(payload.guild_id)
             if guild:
@@ -656,7 +673,8 @@ async def on_raw_reaction_remove(payload):
     # Reaction roles
     rr = load_reaction_roles()
     if payload.message_id == rr.get("message_id"):
-        role_name = rr["roles"].get(str(payload.emoji))
+        rr_entry  = rr["roles"].get(str(payload.emoji))
+        role_name = _rr_role_name(rr_entry) if rr_entry else None
         if role_name:
             guild = bot.get_guild(payload.guild_id)
             if guild:
@@ -720,7 +738,7 @@ async def commands_list(ctx):
 
     if has_mod_role(ctx.author):
         lines.append("\n**🎭 Reaction Roles (mod only):**")
-        lines.append("`!addreaction <emote> <role>` — Add a reaction role mapping")
+        lines.append("`!addreaction <emote> <role> <boss name>` — Add a reaction role mapping")
 
     await ctx.send("\n".join(lines))
 
@@ -952,17 +970,17 @@ async def newquestion_cmd(ctx):
 _addreaction_seen = {}  # message_id -> timestamp, deduplicates across overlapping instances
 
 @bot.command(name="addreaction")
-async def addreaction_cmd(ctx, emote: str = None, *, role_name: str = None):
+async def addreaction_cmd(ctx, emote: str = None, role_name: str = None, *, boss_name: str = None):
     if not has_mod_role(ctx.author):
         return
     if time.time() - _addreaction_seen.get(ctx.message.id, 0) < 5:
         return  # already handled by another instance
     _addreaction_seen[ctx.message.id] = time.time()
-    if not emote or not role_name:
-        await ctx.send("Usage: `!addreaction <emote> <role name>`")
+    if not emote or not role_name or not boss_name:
+        await ctx.send("Usage: `!addreaction <emote> <role name> <boss name>`\nExample: `!addreaction <:Solak:123> Solak Solak`")
         return
     data = load_reaction_roles()
-    data["roles"][emote] = role_name
+    data["roles"][emote] = {"role": role_name, "name": boss_name}
     save_reaction_roles(data)
     # Add the reaction to the message immediately
     channel = bot.get_channel(data["channel_id"])
@@ -972,7 +990,7 @@ async def addreaction_cmd(ctx, emote: str = None, *, role_name: str = None):
             await msg.add_reaction(emote)
         except Exception:
             pass
-    await ctx.send(f"✅ Reaction role added: {emote} → **{role_name}**")
+    await ctx.send(f"✅ Reaction role added: {emote} → **{role_name}** ({boss_name})")
     loop = asyncio.get_event_loop()
     ok = await loop.run_in_executor(None, _push_reaction_roles_to_github)
     if not ok:
