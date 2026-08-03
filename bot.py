@@ -468,7 +468,17 @@ async def _sync_roles_message():
     if not channel:
         print("[ReactionRoles] Channel not found for sync.")
         return
-    lines = ["Please react to the appropriate emoji to activate notifications for when that activity is being hosted in ⁠📝│pvm-signup or ⁠🔪│pvm-chat\n"]
+
+    def channel_mention(name):
+        ch = discord.utils.get(channel.guild.channels, name=name)
+        if not ch:
+            ch = next((c for c in channel.guild.channels if name in c.name), None)
+        return ch.mention if ch else f"#{name}"
+
+    lines = [
+        f"Please react to the appropriate emoji to activate notifications for when that activity is being hosted in "
+        f"{channel_mention('pvm-signup')} or {channel_mention('pvm-chat')}\n"
+    ]
     for emote, entry in rr["roles"].items():
         role_name    = _rr_role_name(entry)
         display_name = _rr_display_name(entry)
@@ -476,21 +486,34 @@ async def _sync_roles_message():
         role_mention = guild_role.mention if guild_role else f"@{role_name}"
         lines.append(f"{emote} - {role_mention} - {display_name}")
     content = "\n".join(lines)
-    # Try to edit existing info message
+    no_ping = discord.AllowedMentions(roles=False)
+
+    # Try the saved message ID first
     info_id = rr.get("info_message_id")
     if info_id:
         try:
             msg = await channel.fetch_message(info_id)
-            await msg.edit(content=content)
+            await msg.edit(content=content, allowed_mentions=no_ping)
             print("[ReactionRoles] Info message updated.")
             return
         except discord.NotFound:
-            pass
+            rr["info_message_id"] = None
         except Exception as e:
             print(f"[ReactionRoles] Could not edit info message: {e}")
             return
-    # Send new message and save its ID
-    msg = await channel.send(content)
+
+    # Scan history for an existing bot message to reuse (avoids duplicate posts on redeploy)
+    async for m in channel.history(limit=50):
+        if m.author == bot.user and "react to the appropriate emoji" in m.content:
+            await m.edit(content=content, allowed_mentions=no_ping)
+            rr["info_message_id"] = m.id
+            save_reaction_roles(rr)
+            await asyncio.get_event_loop().run_in_executor(None, _push_reaction_roles_to_github)
+            print(f"[ReactionRoles] Reattached to existing message (ID: {m.id}).")
+            return
+
+    # Nothing found — send once and save the ID
+    msg = await channel.send(content, allowed_mentions=no_ping)
     rr["info_message_id"] = msg.id
     save_reaction_roles(rr)
     await asyncio.get_event_loop().run_in_executor(None, _push_reaction_roles_to_github)
