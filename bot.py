@@ -661,21 +661,29 @@ async def on_raw_reaction_add(payload):
     # Reaction roles
     rr = load_reaction_roles()
     if payload.message_id == rr.get("message_id"):
-        rr_entry  = rr["roles"].get(str(payload.emoji))
+        emoji_str = str(payload.emoji)
+        rr_entry  = rr["roles"].get(emoji_str)
         role_name = _rr_role_name(rr_entry) if rr_entry else None
-        if role_name:
-            guild = bot.get_guild(payload.guild_id)
-            if guild:
-                role = discord.utils.get(guild.roles, name=role_name)
-                try:
-                    member = await guild.fetch_member(payload.user_id)
-                except Exception as e:
-                    print(f"[ReactionRoles] Could not fetch member {payload.user_id}: {e}")
-                    member = None
-                if role and member:
-                    await member.add_roles(role)
-                elif not role:
-                    print(f"[ReactionRoles] Role '{role_name}' not found in guild.")
+        print(f"[ReactionRoles] ADD emoji={emoji_str!r} role_name={role_name!r}")
+        if not role_name:
+            print(f"[ReactionRoles] No mapping for that emoji. Known: {list(rr['roles'].keys())}")
+            return
+        guild = bot.get_guild(payload.guild_id)
+        if not guild:
+            print(f"[ReactionRoles] Guild {payload.guild_id} not found in cache.")
+            return
+        role = discord.utils.get(guild.roles, name=role_name)
+        if not role:
+            available = [r.name for r in guild.roles]
+            print(f"[ReactionRoles] Role '{role_name}' not found. Available: {available}")
+            return
+        try:
+            member = await guild.fetch_member(payload.user_id)
+        except Exception as e:
+            print(f"[ReactionRoles] Could not fetch member {payload.user_id}: {e}")
+            return
+        await member.add_roles(role)
+        print(f"[ReactionRoles] Added '{role_name}' to {member.display_name}.")
 
 
 @bot.event
