@@ -27,6 +27,7 @@ PUSH_MESSAGES_FILE     = "push_messages.json"
 PENDING_REMINDERS_FILE = "pending_reminders.json"
 GIVEAWAYS_FILE         = "giveaways.json"
 QUESTION_TRACKING_FILE = "question_tracking.json"
+REACTION_ROLES_FILE    = "reaction_roles.json"
 
 QUESTION_REACTION_WINDOW = 24 * 60 * 60  # seconds
 
@@ -226,6 +227,22 @@ async def _run_giveaway(entry):
             await channel.send(f"🎉 Congratulations to our {len(picked)} winners: {mentions}! You won **{entry['prize']}**!")
 
     _remove_giveaway_entry(entry)
+
+
+def load_reaction_roles():
+    defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948, "roles": {}}
+    if not os.path.exists(REACTION_ROLES_FILE):
+        return defaults
+    with open(REACTION_ROLES_FILE, "r") as f:
+        data = json.load(f)
+    for k, v in defaults.items():
+        data.setdefault(k, v)
+    return data
+
+
+def save_reaction_roles(data):
+    with open(REACTION_ROLES_FILE, "w") as f:
+        json.dump(data, f, indent=4)
 
 
 def load_reminders():
@@ -431,6 +448,21 @@ async def on_ready():
     for entry in load_giveaways():
         asyncio.create_task(_run_giveaway(entry))
 
+    # Add configured reaction role emotes to the reaction roles message
+    rr = load_reaction_roles()
+    if rr.get("message_id") and rr.get("channel_id") and rr["roles"]:
+        rr_channel = bot.get_channel(rr["channel_id"])
+        if rr_channel:
+            try:
+                rr_msg = await rr_channel.fetch_message(rr["message_id"])
+                for emote in rr["roles"]:
+                    try:
+                        await rr_msg.add_reaction(emote)
+                    except Exception:
+                        pass
+            except Exception as e:
+                print(f"[ReactionRoles] Could not fetch message: {e}")
+
     # Send and clear any queued push messages
     pending = load_push_messages()
     if pending:
@@ -513,30 +545,60 @@ def _update_question_score(question_text, correct_delta=0, incorrect_delta=0):
 async def on_raw_reaction_add(payload):
     if payload.user_id == bot.user.id:
         return
+
+    # Question score tracking
     tracking = load_question_tracking()
     entry = tracking.get(str(payload.message_id))
-    if not entry or time.time() > entry["expires_at"]:
-        return
-    emoji = str(payload.emoji)
-    if emoji == "✅":
-        _update_question_score(entry["question"], correct_delta=1)
-    elif emoji == "❌":
-        _update_question_score(entry["question"], incorrect_delta=1)
+    if entry and time.time() <= entry["expires_at"]:
+        emoji = str(payload.emoji)
+        if emoji == "✅":
+            _update_question_score(entry["question"], correct_delta=1)
+        elif emoji == "❌":
+            _update_question_score(entry["question"], incorrect_delta=1)
+
+    # Reaction roles
+    rr = load_reaction_roles()
+    if payload.message_id == rr.get("message_id"):
+        role_name = rr["roles"].get(str(payload.emoji))
+        if role_name:
+            guild = bot.get_guild(payload.guild_id)
+            if guild:
+                role   = discord.utils.get(guild.roles, name=role_name)
+                member = guild.get_member(payload.user_id)
+                if role and member:
+                    await member.add_roles(role)
+                    try:
+                        await member.send(f"Added role: **{role_name}**")
+                    except discord.Forbidden:
+                        pass
 
 
 @bot.event
 async def on_raw_reaction_remove(payload):
     if payload.user_id == bot.user.id:
         return
+
+    # Question score tracking
     tracking = load_question_tracking()
     entry = tracking.get(str(payload.message_id))
-    if not entry or time.time() > entry["expires_at"]:
-        return
-    emoji = str(payload.emoji)
-    if emoji == "✅":
-        _update_question_score(entry["question"], correct_delta=-1)
-    elif emoji == "❌":
-        _update_question_score(entry["question"], incorrect_delta=-1)
+    if entry and time.time() <= entry["expires_at"]:
+        emoji = str(payload.emoji)
+        if emoji == "✅":
+            _update_question_score(entry["question"], correct_delta=-1)
+        elif emoji == "❌":
+            _update_question_score(entry["question"], incorrect_delta=-1)
+
+    # Reaction roles
+    rr = load_reaction_roles()
+    if payload.message_id == rr.get("message_id"):
+        role_name = rr["roles"].get(str(payload.emoji))
+        if role_name:
+            guild = bot.get_guild(payload.guild_id)
+            if guild:
+                role   = discord.utils.get(guild.roles, name=role_name)
+                member = guild.get_member(payload.user_id)
+                if role and member:
+                    await member.remove_roles(role)
 
 
 @bot.command(name="commands")
@@ -813,6 +875,27 @@ async def newquestion_cmd(ctx):
         return
     pool = questions[-30:] if len(questions) >= 30 else questions
     await _post_question(ctx.channel, random.choice(pool))
+
+
+@bot.command(name="addreaction")
+async def addreaction_cmd(ctx, emote: str = None, *, role_name: str = None):
+    if not has_mod_role(ctx.author):
+        return
+    if not emote or not role_name:
+        await ctx.send("Usage: `!addreaction <emote> <role name>`")
+        return
+    data = load_reaction_roles()
+    data["roles"][emote] = role_name
+    save_reaction_roles(data)
+    # Add the reaction to the message immediately
+    channel = bot.get_channel(data["channel_id"])
+    if channel:
+        try:
+            msg = await channel.fetch_message(data["message_id"])
+            await msg.add_reaction(emote)
+        except Exception:
+            pass
+    await ctx.send(f"✅ Reaction role added: {emote} → **{role_name}**")
 
 
 @bot.command(name="rerollgiveaway")

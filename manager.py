@@ -5,12 +5,13 @@ import os
 import subprocess
 from datetime import datetime, timezone, timedelta
 
-COMMANDS_FILE      = os.path.join(os.path.dirname(__file__), "commands.json")
-REMINDERS_FILE     = os.path.join(os.path.dirname(__file__), "reminders.json")
-QUESTIONS_FILE     = os.path.join(os.path.dirname(__file__), "questions.json")
-FEATURES_FILE      = os.path.join(os.path.dirname(__file__), "features.json")
-PUSH_MESSAGES_FILE = os.path.join(os.path.dirname(__file__), "push_messages.json")
-GIVEAWAYS_FILE     = os.path.join(os.path.dirname(__file__), "giveaways.json")
+COMMANDS_FILE        = os.path.join(os.path.dirname(__file__), "commands.json")
+REMINDERS_FILE       = os.path.join(os.path.dirname(__file__), "reminders.json")
+QUESTIONS_FILE       = os.path.join(os.path.dirname(__file__), "questions.json")
+FEATURES_FILE        = os.path.join(os.path.dirname(__file__), "features.json")
+PUSH_MESSAGES_FILE   = os.path.join(os.path.dirname(__file__), "push_messages.json")
+GIVEAWAYS_FILE       = os.path.join(os.path.dirname(__file__), "giveaways.json")
+REACTION_ROLES_FILE  = os.path.join(os.path.dirname(__file__), "reaction_roles.json")
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -75,6 +76,16 @@ def load_giveaways():
 
 def save_giveaways(d):
     with open(GIVEAWAYS_FILE, "w") as f: json.dump(d, f, indent=4)
+
+def load_reaction_roles():
+    defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948, "roles": {}}
+    if not os.path.exists(REACTION_ROLES_FILE): return defaults
+    with open(REACTION_ROLES_FILE) as f: data = json.load(f)
+    for k, v in defaults.items(): data.setdefault(k, v)
+    return data
+
+def save_reaction_roles(d):
+    with open(REACTION_ROLES_FILE, "w") as f: json.dump(d, f, indent=4)
 
 
 # ── Widget helpers ─────────────────────────────────────────────────────────────
@@ -148,13 +159,14 @@ class ManagerApp(tk.Tk):
         nb.pack(fill="both", expand=True, padx=12, pady=12)
 
         for name, builder in [
-            ("💬 Commands",     self._build_commands_tab),
-            ("⏰ Reminders",    self._build_reminders_tab),
-            ("❓ Questions",    self._build_questions_tab),
-            ("📢 Push Message", self._build_push_tab),
-            ("🎮 Fun Features", self._build_features_tab),
-            ("🎉 Giveaway",     self._build_giveaway_tab),
-            ("🔧 Utility",      self._build_utility_tab),
+            ("💬 Commands",       self._build_commands_tab),
+            ("⏰ Reminders",      self._build_reminders_tab),
+            ("❓ Questions",      self._build_questions_tab),
+            ("📢 Push Message",   self._build_push_tab),
+            ("🎮 Fun Features",   self._build_features_tab),
+            ("🎉 Giveaway",       self._build_giveaway_tab),
+            ("🔧 Utility",        self._build_utility_tab),
+            ("🎭 Reaction Roles", self._build_reaction_roles_tab),
         ]:
             f = tk.Frame(nb, bg=BG)
             nb.add(f, text=name)
@@ -948,6 +960,72 @@ class ManagerApp(tk.Tk):
         d = load_features()
         d["mod_role"] = self._mod_role_var.get().strip()
         save_features(d)
+
+    # ── Reaction Roles ────────────────────────────────────────────────────────
+
+    def _build_reaction_roles_tab(self, p):
+        section(p, "Reaction Roles",
+                "React to get a role. Uses message 969585509561172028.")
+
+        lf, self._rr_lb = scrolled_lb(p, 52, 10)
+        lf.pack(padx=20, fill="x")
+        self._rr_lb.bind("<<ListboxSelect>>", self._on_rr_sel)
+
+        row = field_row(p, ["Emote", "Role name"], [1, 2])
+        self._rr_emote_var = tk.StringVar()
+        self._rr_role_var  = tk.StringVar()
+        inp(row, self._rr_emote_var).grid(row=1, column=0, padx=(0, 4), sticky="ew")
+        inp(row, self._rr_role_var ).grid(row=1, column=1, padx=(4, 0), sticky="ew")
+
+        bf = tk.Frame(p, bg=BG)
+        bf.pack(padx=20, pady=(4, 8), fill="x")
+        btn(bf, "Add / Update", ACCENT, self._add_rr  ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "Delete",       RED,    self._del_rr  ).pack(side="left", expand=True, fill="x", padx=(4, 4))
+        btn(bf, "Clear",        GREY,   self._clear_rr).pack(side="left", expand=True, fill="x", padx=(4, 0))
+
+        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=(4, 6), fill="x")
+
+        self._refresh_rr()
+
+    def _refresh_rr(self):
+        self._rr_lb.delete(0, "end")
+        self.__rr = load_reaction_roles()
+        for emote, role in self.__rr["roles"].items():
+            self._rr_lb.insert("end", f"{emote:<6}  →  {role}")
+
+    def _on_rr_sel(self, _=None):
+        sel = self._rr_lb.curselection()
+        if not sel: return
+        emote = list(self.__rr["roles"].keys())[sel[0]]
+        self._rr_emote_var.set(emote)
+        self._rr_role_var.set(self.__rr["roles"][emote])
+
+    def _add_rr(self):
+        emote = self._rr_emote_var.get().strip()
+        role  = self._rr_role_var.get().strip()
+        if not emote or not role:
+            messagebox.showwarning("Missing input", "Fill in both fields."); return
+        d = load_reaction_roles()
+        d["roles"][emote] = role
+        save_reaction_roles(d)
+        self._refresh_rr(); self._clear_rr()
+        self.set_status(f"Saved: {emote} → {role}")
+
+    def _del_rr(self):
+        sel = self._rr_lb.curselection()
+        if not sel:
+            messagebox.showwarning("No selection", "Select a mapping first."); return
+        emote = list(self.__rr["roles"].keys())[sel[0]]
+        if not messagebox.askyesno("Confirm", f'Delete reaction role for {emote}?'): return
+        d = load_reaction_roles()
+        d["roles"].pop(emote, None)
+        save_reaction_roles(d)
+        self._refresh_rr(); self._clear_rr()
+        self.set_status(f"Deleted {emote}")
+
+    def _clear_rr(self):
+        self._rr_emote_var.set(""); self._rr_role_var.set("")
+        self._rr_lb.selection_clear(0, "end")
 
     # ── Deploy ────────────────────────────────────────────────────────────────
 
