@@ -995,10 +995,15 @@ class ManagerApp(tk.Tk):
         inp(row, self._rr_name_var ).grid(row=1, column=2, padx=(4, 0), sticky="ew")
 
         bf = tk.Frame(p, bg=BG)
-        bf.pack(padx=20, pady=(4, 8), fill="x")
+        bf.pack(padx=20, pady=(4, 2), fill="x")
         btn(bf, "Add / Update", ACCENT, self._add_rr  ).pack(side="left", expand=True, fill="x", padx=(0, 4))
         btn(bf, "Delete",       RED,    self._del_rr  ).pack(side="left", expand=True, fill="x", padx=(4, 4))
         btn(bf, "Clear",        GREY,   self._clear_rr).pack(side="left", expand=True, fill="x", padx=(4, 0))
+
+        bf3 = tk.Frame(p, bg=BG)
+        bf3.pack(padx=20, pady=(2, 8), fill="x")
+        btn(bf3, "↑ Move Up",   GREY, self._rr_move_up  ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf3, "↓ Move Down", GREY, self._rr_move_down).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         bf2 = tk.Frame(p, bg=BG)
         bf2.pack(padx=20, pady=(0, 6), fill="x")
@@ -1043,6 +1048,34 @@ class ManagerApp(tk.Tk):
         save_reaction_roles(d)
         self._refresh_rr(); self._clear_rr()
         self.set_status(f"Saved: {emote} → {role} ({name})")
+
+    def _rr_move_up(self):
+        sel = self._rr_lb.curselection()
+        if not sel or sel[0] == 0:
+            return
+        idx = sel[0]
+        items = list(self.__rr["roles"].items())
+        items[idx - 1], items[idx] = items[idx], items[idx - 1]
+        d = load_reaction_roles()
+        d["roles"] = dict(items)
+        save_reaction_roles(d)
+        self._refresh_rr()
+        self._rr_lb.selection_set(idx - 1)
+        self._on_rr_sel()
+
+    def _rr_move_down(self):
+        sel = self._rr_lb.curselection()
+        if not sel or sel[0] == len(self.__rr["roles"]) - 1:
+            return
+        idx = sel[0]
+        items = list(self.__rr["roles"].items())
+        items[idx + 1], items[idx] = items[idx], items[idx + 1]
+        d = load_reaction_roles()
+        d["roles"] = dict(items)
+        save_reaction_roles(d)
+        self._refresh_rr()
+        self._rr_lb.selection_set(idx + 1)
+        self._on_rr_sel()
 
     def _del_rr(self):
         sel = self._rr_lb.curselection()
