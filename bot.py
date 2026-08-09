@@ -49,6 +49,9 @@ def load_features():
         "daily_question_time": "10:00",
         "daily_question_channel": 472851820448972800,
         "eightball_enabled": False,
+        "trivia_event_enabled": False,
+        "trivia_submit_channel": 1536070084005466243,
+        "trivia_output_channel": 1536070221876428941,
     }
     if not os.path.exists(FEATURES_FILE):
         return defaults
@@ -594,6 +597,34 @@ async def on_ready():
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
+        return
+
+    # Trivia event: collect Q: / A: submissions
+    _feats = load_features()
+    if (_feats.get("trivia_event_enabled") and
+            message.channel.id == int(_feats.get("trivia_submit_channel", 0))):
+        lines   = message.content.strip().splitlines()
+        q_line  = next((l for l in lines if l.strip().lower().startswith("q:")), None)
+        a_line  = next((l for l in lines if l.strip().lower().startswith("a:")), None)
+        await message.delete()
+        if q_line and a_line:
+            question = q_line.split(":", 1)[1].strip()
+            answer   = a_line.split(":", 1)[1].strip()
+            try:
+                await message.author.send("Your question has been successfully submitted!")
+            except discord.Forbidden:
+                pass
+            out_ch = bot.get_channel(int(_feats.get("trivia_output_channel", 0)))
+            if out_ch:
+                msg = await out_ch.send(f"❓ **{question}**\n||{answer}||")
+                await msg.add_reaction("👍")
+                await msg.add_reaction("⭐")
+        else:
+            try:
+                await message.author.send(
+                    "❌ Invalid format — please use:\n```\nQ: your question\nA: your answer\n```")
+            except discord.Forbidden:
+                pass
         return
 
     if message.content.startswith("!"):

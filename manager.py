@@ -1112,7 +1112,48 @@ class ManagerApp(tk.Tk):
     # ── Preset Events ─────────────────────────────────────────────────────────
 
     def _build_preset_events_tab(self, p):
-        section(p, "Preset Events", "Coming soon — fill details here.")
+        section(p, "Preset Events", "Toggle event modes and configure channels. Deploy to apply.")
+
+        feats = load_features()
+        self._trivia_enabled_var = tk.BooleanVar(value=feats.get("trivia_event_enabled", False))
+        self._trivia_submit_var  = tk.StringVar(value=str(feats.get("trivia_submit_channel", 1536070084005466243)))
+        self._trivia_output_var  = tk.StringVar(value=str(feats.get("trivia_output_channel", 1536070221876428941)))
+        self._trivia_submit_var.trace_add("write", self._save_trivia)
+        self._trivia_output_var.trace_add("write", self._save_trivia)
+
+        card = tk.Frame(p, bg=BG_CARD)
+        card.pack(padx=20, pady=6, fill="x")
+
+        header = tk.Frame(card, bg=BG_CARD)
+        header.pack(fill="x", padx=12, pady=(8, 4))
+        tk.Label(header, text="🎯 Trivia Event", bg=BG_CARD, fg=FG,
+                 font=("Segoe UI", 11, "bold")).pack(side="left")
+        tk.Checkbutton(header, variable=self._trivia_enabled_var, bg=BG_CARD,
+                       activebackground=BG_CARD, command=self._save_trivia).pack(side="right")
+
+        tk.Label(card,
+                 text="Members post Q: / A: in the submit channel.\n"
+                      "DogBot deletes the message, DMs confirmation, posts to the\n"
+                      "output channel with ||spoiler|| answer, and adds 👍 ⭐ reactions.",
+                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
+                 justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 8))
+
+        row = field_row(card, ["Submit Channel ID", "Output Channel ID"], [1, 1])
+        inp(row, self._trivia_submit_var).grid(row=1, column=0, padx=(0, 4), sticky="ew")
+        inp(row, self._trivia_output_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
+        tk.Frame(card, bg=BG_CARD, height=8).pack()
+
+        btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=(12, 6), fill="x")
+
+    def _save_trivia(self, *_):
+        d = load_features()
+        d["trivia_event_enabled"] = self._trivia_enabled_var.get()
+        try:    d["trivia_submit_channel"] = int(self._trivia_submit_var.get().strip())
+        except ValueError: pass
+        try:    d["trivia_output_channel"] = int(self._trivia_output_var.get().strip())
+        except ValueError: pass
+        save_features(d)
+        self.set_status("Saved. Deploy to apply.")
 
     # ── Deploy ────────────────────────────────────────────────────────────────
 
