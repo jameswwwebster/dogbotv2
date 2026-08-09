@@ -170,10 +170,10 @@ class ManagerApp(tk.Tk):
             ("⏰ Reminders",      self._build_reminders_tab),
             ("❓ Questions",      self._build_questions_tab),
             ("📢 Push Message",   self._build_push_tab),
-            ("🎮 Fun Features",   self._build_features_tab),
             ("🎉 Giveaway",       self._build_giveaway_tab),
             ("🔧 Utility",        self._build_utility_tab),
             ("🎭 Reaction Roles", self._build_reaction_roles_tab),
+            ("📅 Preset Events",  self._build_preset_events_tab),
         ]:
             f = tk.Frame(nb, bg=BG)
             nb.add(f, text=name)
@@ -187,6 +187,17 @@ class ManagerApp(tk.Tk):
     # ── Commands ──────────────────────────────────────────────────────────────
 
     def _build_commands_tab(self, p):
+        sub = ttk.Notebook(p)
+        sub.pack(fill="both", expand=True, padx=4, pady=4)
+        for name, builder in [
+            ("Custom Commands", self._build_custom_commands),
+            ("🎮 Fun Features", self._build_features_tab),
+        ]:
+            f = tk.Frame(sub, bg=BG)
+            sub.add(f, text=name)
+            builder(f)
+
+    def _build_custom_commands(self, p):
         section(p, "Custom Commands", "Add a command and the bot's response.")
 
         lf, self._cmd_lb = scrolled_lb(p, 52, 9)
@@ -1097,6 +1108,11 @@ class ManagerApp(tk.Tk):
     def _clear_rr(self):
         self._rr_emote_var.set(""); self._rr_role_var.set(""); self._rr_name_var.set("")
         self._rr_lb.selection_clear(0, "end")
+
+    # ── Preset Events ─────────────────────────────────────────────────────────
+
+    def _build_preset_events_tab(self, p):
+        section(p, "Preset Events", "Coming soon — fill details here.")
 
     # ── Deploy ────────────────────────────────────────────────────────────────
 
