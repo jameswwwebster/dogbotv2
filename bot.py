@@ -628,7 +628,7 @@ async def on_message(message):
                 pass
             out_ch = bot.get_channel(int(_feats.get("trivia_output_channel", 0)))
             if out_ch:
-                msg = await out_ch.send(f"❓ **{question}**\n||{answer}||")
+                msg = await out_ch.send(f"❓ **{question}**\n||{answer}||\n*Submitted by {message.author.mention}*")
                 await msg.add_reaction("👍")
                 await msg.add_reaction("⭐")
             else:
