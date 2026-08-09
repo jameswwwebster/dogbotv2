@@ -870,6 +870,31 @@ class ManagerApp(tk.Tk):
         btn(p, "Queue & Deploy", ACCENT, self._queue_giveaway).pack(
             padx=20, pady=(0, 10), fill="x")
 
+        tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(8, 8))
+
+        card = tk.Frame(p, bg=BG_CARD)
+        card.pack(padx=20, pady=(0, 8), fill="x")
+        header = tk.Frame(card, bg=BG_CARD)
+        header.pack(fill="x", padx=12, pady=(8, 4))
+        tk.Label(header, text="🚀 Booster Giveaway", bg=BG_CARD, fg=FG,
+                 font=("Segoe UI", 11, "bold")).pack(side="left")
+        feats = load_features()
+        self._booster_gw_on = tk.BooleanVar(value=feats.get("booster_giveaway_enabled", False))
+        status_text = "✅ Enabled" if self._booster_gw_on.get() else "❌ Disabled"
+        self._booster_gw_lbl = tk.Label(header, text=status_text, bg=BG_CARD, fg=FG_DIM,
+                                        font=("Segoe UI", 9))
+        self._booster_gw_lbl.pack(side="right")
+        tk.Label(card,
+                 text="Posts a Bond giveaway (boosters only) in the booster channel.\n"
+                      "Recurs on the 1st of Oct · Dec · Feb · Apr · Jun · Aug.\n"
+                      "Clicking Enable posts one immediately and activates the schedule.",
+                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
+                 justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 8))
+        bf = tk.Frame(card, bg=BG_CARD)
+        bf.pack(padx=12, pady=(0, 12), fill="x")
+        btn(bf, "✅ Enable",  GREEN, self._enable_booster_gw ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf, "❌ Disable", RED,   self._disable_booster_gw).pack(side="left", expand=True, fill="x", padx=(4, 0))
+
         tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(0, 8))
         lbl(p, "Reroll a giveaway", dim=False).pack(fill="x", padx=20)
         tk.Label(p,
@@ -880,6 +905,24 @@ class ManagerApp(tk.Tk):
                  bg=BG, fg=FG_DIM, font=("Segoe UI", 9),
                  justify="left", anchor="w"
                  ).pack(fill="x", padx=20)
+
+    def _enable_booster_gw(self):
+        d = load_features()
+        d["booster_giveaway_enabled"] = True
+        save_features(d)
+        self._booster_gw_on.set(True)
+        self._booster_gw_lbl.config(text="✅ Enabled")
+        self.set_status("Booster giveaway enabled — deploying (will post instantly)...")
+        self.deploy()
+
+    def _disable_booster_gw(self):
+        d = load_features()
+        d["booster_giveaway_enabled"] = False
+        save_features(d)
+        self._booster_gw_on.set(False)
+        self._booster_gw_lbl.config(text="❌ Disabled")
+        self.set_status("Booster giveaway disabled.")
+        self.deploy()
 
     def _get_gw_offset(self):
         try:

@@ -49,6 +49,8 @@ def load_features():
         "daily_question_time": "10:00",
         "daily_question_channel": 472851820448972800,
         "eightball_enabled": False,
+        "booster_giveaway_enabled": False,
+        "booster_giveaway_channel": 1536081045345149069,
         "trivia_event_enabled": False,
         "trivia_submit_channel": 1536070084005466243,
         "trivia_output_channel": 1536070221876428941,
@@ -195,13 +197,19 @@ async def _run_giveaway(entry):
             _update_giveaway_entry(entry)
         else:
             winner_line = f"**Winners:** {winners}\n" if winners > 1 else ""
-            msg = await channel.send(
-                f"🎉 **GIVEAWAY** 🎉\n"
-                f"**Prize:** {entry['prize']}\n"
-                f"{winner_line}"
-                f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
-                f"React with 🎉 to enter!"
-            )
+            if entry.get("booster_only"):
+                body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
+                        f"**Prize:** {entry['prize']}\n"
+                        f"{winner_line}"
+                        f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
+                        f"🚀 Server Boosters only! React with 🎉 to enter!")
+            else:
+                body = (f"🎉 **GIVEAWAY** 🎉\n"
+                        f"**Prize:** {entry['prize']}\n"
+                        f"{winner_line}"
+                        f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
+                        f"React with 🎉 to enter!")
+            msg = await channel.send(body)
             await msg.add_reaction("🎉")
             entry["message_id"] = msg.id
             _update_giveaway_entry(entry)
@@ -218,8 +226,12 @@ async def _run_giveaway(entry):
 
     reaction = discord.utils.get(msg.reactions, emoji="🎉")
     entrants = [u async for u in reaction.users() if not u.bot] if reaction else []
+    if entry.get("booster_only"):
+        entrants = [u for u in entrants
+                    if (channel.guild.get_member(u.id) or None) and
+                       channel.guild.get_member(u.id).premium_since]
     if not entrants:
-        await channel.send(f"🎉 The giveaway for **{entry['prize']}** ended with no entries!")
+        await channel.send(f"🎉 The giveaway for **{entry['prize']}** ended with no eligible entries!")
     else:
         winners  = int(entry.get("winners", 1))
         picked   = random.sample(entrants, min(winners, len(entrants)))
@@ -230,6 +242,21 @@ async def _run_giveaway(entry):
             await channel.send(f"🎉 Congratulations to our {len(picked)} winners: {mentions}! You won **{entry['prize']}**!")
 
     _remove_giveaway_entry(entry)
+
+
+def _start_booster_giveaway():
+    feats  = load_features()
+    ch_id  = int(feats.get("booster_giveaway_channel", 1536081045345149069))
+    end_at = datetime.now(timezone.utc).timestamp() + 7 * 86400  # 7-day giveaway
+    entry  = {
+        "channel_id": ch_id, "prize": "Bond",
+        "end_at": end_at, "winners": 1,
+        "message_id": None, "booster_only": True,
+    }
+    gs = load_giveaways()
+    gs.append(entry)
+    save_giveaways(gs)
+    asyncio.create_task(_run_giveaway(entry))
 
 
 def load_reaction_roles():
@@ -447,6 +474,19 @@ async def check_reminders():
                     q = random.choice(eligible if eligible else questions)
                     await _post_question(channel, q)
 
+    # Booster giveaway: post on 1st of Oct/Dec/Feb/Apr/Jun/Aug at noon
+    _BOOSTER_MONTHS = {10, 12, 2, 4, 6, 8}
+    if (features.get("booster_giveaway_enabled") and
+            now.day == 1 and now.hour == 12 and now.minute == 0 and
+            now.month in _BOOSTER_MONTHS and
+            "booster_gw" not in _reminders_sent):
+        _reminders_sent["booster_gw"] = True
+        now_ts = time.time()
+        active = any(g.get("booster_only") and g.get("end_at", 0) > now_ts
+                     for g in load_giveaways())
+        if not active:
+            _start_booster_giveaway()
+
     # Hourly score push back to GitHub
     if _scores_dirty and time.time() - _last_score_push > SCORE_PUSH_INTERVAL:
         await asyncio.get_event_loop().run_in_executor(None, _push_scores_to_github)
@@ -551,6 +591,14 @@ async def on_ready():
     # Start any queued giveaways
     for entry in load_giveaways():
         asyncio.create_task(_run_giveaway(entry))
+
+    # Booster giveaway: post immediately if enabled and none currently running
+    if load_features().get("booster_giveaway_enabled"):
+        now_ts = datetime.now(timezone.utc).timestamp()
+        active = any(g.get("booster_only") and g.get("end_at", 0) > now_ts
+                     for g in load_giveaways())
+        if not active:
+            _start_booster_giveaway()
 
     # Sync the roles info message and add emotes
     await _sync_roles_message()
