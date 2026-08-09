@@ -617,7 +617,10 @@ async def on_message(message):
             if m:
                 question = m.group(1).strip()
                 answer   = m.group(2).strip()
-        await message.delete()
+        try:
+            await message.delete()
+        except discord.Forbidden:
+            print(f"[Trivia] Missing Manage Messages permission in channel {message.channel.id}")
         if question and answer:
             try:
                 await message.author.send("Your question has been successfully submitted!")
@@ -628,6 +631,8 @@ async def on_message(message):
                 msg = await out_ch.send(f"❓ **{question}**\n||{answer}||")
                 await msg.add_reaction("👍")
                 await msg.add_reaction("⭐")
+            else:
+                print(f"[Trivia] Output channel {_feats.get('trivia_output_channel')} not found.")
         else:
             try:
                 await message.author.send(
