@@ -17,5 +17,6 @@
     "eightball_enabled": true,
     "trivia_event_enabled": true,
     "trivia_submit_channel": 1536070084005466243,
-    "trivia_output_channel": 1536070221876428941
+    "trivia_output_channel": 1536070221876428941,
+    "booster_giveaway_enabled": true
 }
