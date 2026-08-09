@@ -649,8 +649,9 @@ class ManagerApp(tk.Tk):
         try:    ch_id = int(ch)
         except: messagebox.showwarning("Invalid channel", "Channel ID must be a number."); return
 
+        import time as _time
         msgs = load_push_messages()
-        msgs.append({"channel_id": ch_id, "message": msg})
+        msgs.append({"channel_id": ch_id, "message": msg, "queued_at": _time.time()})
         save_push_messages(msgs)
         self._push_text.delete("1.0", "end")
         self._refresh_push_label()
@@ -676,7 +677,8 @@ class ManagerApp(tk.Tk):
         q = _random.choice(questions)
         msg = f"❓ **{q['question']}**\n||{q['answer']}||"
         msgs = load_push_messages()
-        msgs.append({"channel_id": ch_id, "message": msg, "is_question": True})
+        import time as _time
+        msgs.append({"channel_id": ch_id, "message": msg, "is_question": True, "queued_at": _time.time()})
         save_push_messages(msgs)
         self._refresh_push_label()
         self.set_status("Random question queued. Deploying...")

@@ -648,7 +648,12 @@ async def on_ready():
     # Send and clear any queued push messages
     pending = load_push_messages()
     if pending:
+        now_ts = datetime.now(timezone.utc).timestamp()
+        save_push_messages([])  # clear immediately so redeploys never resend
         for entry in pending:
+            # Skip messages queued more than 10 minutes ago (stale from a previous deploy)
+            if entry.get("queued_at") and now_ts - entry["queued_at"] > 600:
+                continue
             channel = bot.get_channel(entry["channel_id"])
             if channel:
                 if entry.get("is_question"):
