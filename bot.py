@@ -603,13 +603,22 @@ async def on_message(message):
     _feats = load_features()
     if (_feats.get("trivia_event_enabled") and
             message.channel.id == int(_feats.get("trivia_submit_channel", 0))):
-        lines   = message.content.strip().splitlines()
+        content = message.content.strip()
+        lines   = content.splitlines()
         q_line  = next((l for l in lines if l.strip().lower().startswith("q:")), None)
         a_line  = next((l for l in lines if l.strip().lower().startswith("a:")), None)
-        await message.delete()
+        # Also handle single-line format: "Q: question A: answer"
+        question = answer = None
         if q_line and a_line:
             question = q_line.split(":", 1)[1].strip()
             answer   = a_line.split(":", 1)[1].strip()
+        else:
+            m = re.search(r'(?i)q:\s*(.+?)\s+a:\s*(.+)', content)
+            if m:
+                question = m.group(1).strip()
+                answer   = m.group(2).strip()
+        await message.delete()
+        if question and answer:
             try:
                 await message.author.send("Your question has been successfully submitted!")
             except discord.Forbidden:
