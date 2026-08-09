@@ -1059,6 +1059,31 @@ async def newquestion_cmd(ctx):
     await _post_question(ctx.channel, random.choice(pool))
 
 
+@bot.command(name="triviadebug")
+async def triviadebug_cmd(ctx):
+    if not has_mod_role(ctx.author):
+        return
+    feats = load_features()
+    enabled  = feats.get("trivia_event_enabled", False)
+    sub_id   = int(feats.get("trivia_submit_channel", 0))
+    out_id   = int(feats.get("trivia_output_channel", 0))
+    sub_ch   = bot.get_channel(sub_id)
+    out_ch   = bot.get_channel(out_id)
+    bot_mem  = ctx.guild.get_member(bot.user.id)
+    sub_perms = sub_ch.permissions_for(bot_mem) if sub_ch and bot_mem else None
+    out_perms = out_ch.permissions_for(bot_mem) if out_ch and bot_mem else None
+    lines = ["**🎯 Trivia Event Debug**"]
+    lines.append(f"Enabled: {'✅' if enabled else '❌ OFF — toggle in manager Preset Events tab'}")
+    lines.append(f"Submit channel: {sub_ch.mention if sub_ch else f'❌ `{sub_id}` not found'}")
+    if sub_perms:
+        lines.append(f"  • Read messages: {'✅' if sub_perms.read_messages else '❌'}")
+        lines.append(f"  • Manage messages (delete): {'✅' if sub_perms.manage_messages else '❌'}")
+    lines.append(f"Output channel: {out_ch.mention if out_ch else f'❌ `{out_id}` not found'}")
+    if out_perms:
+        lines.append(f"  • Send messages: {'✅' if out_perms.send_messages else '❌'}")
+    await ctx.send("\n".join(lines))
+
+
 @bot.command(name="rrdebug")
 async def rrdebug_cmd(ctx):
     if not has_mod_role(ctx.author):
