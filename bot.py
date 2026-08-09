@@ -259,6 +259,39 @@ def _start_booster_giveaway():
     asyncio.create_task(_run_giveaway(entry))
 
 
+async def _reattach_or_start_booster_giveaway():
+    feats   = load_features()
+    ch_id   = int(feats.get("booster_giveaway_channel", 1536081045345149069))
+    channel = bot.get_channel(ch_id)
+    if not channel:
+        print(f"[BoosterGiveaway] Channel {ch_id} not found.")
+        return
+    now_ts = datetime.now(timezone.utc).timestamp()
+    # Scan channel history for an active bot-posted booster giveaway
+    async for m in channel.history(limit=50):
+        if m.author != bot.user or "BOOSTER GIVEAWAY" not in m.content:
+            continue
+        match = re.search(r'<t:(\d+):F>', m.content)
+        if not match:
+            continue
+        end_at = float(match.group(1))
+        if end_at <= now_ts:
+            continue  # already expired
+        # Found one — reattach
+        entry = {"channel_id": ch_id, "prize": "Bond", "end_at": end_at,
+                 "winners": 1, "message_id": m.id, "booster_only": True}
+        gs = load_giveaways()
+        if not any(g.get("booster_only") and g.get("message_id") == m.id for g in gs):
+            gs.append(entry)
+            save_giveaways(gs)
+        asyncio.create_task(_run_giveaway(entry))
+        print(f"[BoosterGiveaway] Reattached to existing message (ID: {m.id}).")
+        return
+    # Nothing active — post a new one
+    print("[BoosterGiveaway] No active giveaway found — posting new one.")
+    _start_booster_giveaway()
+
+
 def load_reaction_roles():
     defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948,
                 "info_message_id": None, "roles": {}}
@@ -592,13 +625,9 @@ async def on_ready():
     for entry in load_giveaways():
         asyncio.create_task(_run_giveaway(entry))
 
-    # Booster giveaway: post immediately if enabled and none currently running
+    # Booster giveaway: reattach to existing message or post a new one
     if load_features().get("booster_giveaway_enabled"):
-        now_ts = datetime.now(timezone.utc).timestamp()
-        active = any(g.get("booster_only") and g.get("end_at", 0) > now_ts
-                     for g in load_giveaways())
-        if not active:
-            _start_booster_giveaway()
+        await _reattach_or_start_booster_giveaway()
 
     # Sync the roles info message and add emotes
     await _sync_roles_message()
