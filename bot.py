@@ -696,6 +696,8 @@ async def on_message(message):
                 answer   = m.group(2).strip()
         try:
             await message.delete()
+        except discord.NotFound:
+            return  # another instance already handled this message
         except discord.Forbidden:
             print(f"[Trivia] Missing Manage Messages permission in channel {message.channel.id}")
         if question and answer:
