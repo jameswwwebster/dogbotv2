@@ -897,8 +897,8 @@ class ManagerApp(tk.Tk):
         self._booster_gw_lbl.pack(side="right")
         tk.Label(card,
                  text="Posts a Bond giveaway (boosters only) in the booster channel.\n"
-                      "Recurs on the 1st of Oct · Dec · Feb · Apr · Jun · Aug.\n"
-                      "Clicking Enable posts one immediately and activates the schedule.",
+                      "Recurs on the 1st of Oct · Dec · Feb · Apr · Jun · Aug at noon.\n"
+                      "Enable activates the schedule — next giveaway posts on the next scheduled date.",
                  bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
                  justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 8))
         bf = tk.Frame(card, bg=BG_CARD)

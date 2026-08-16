@@ -291,9 +291,8 @@ async def _reattach_or_start_booster_giveaway():
         asyncio.create_task(_run_giveaway(entry))
         print(f"[BoosterGiveaway] Reattached to existing message (ID: {m.id}).")
         return
-    # Nothing active — post a new one
-    print("[BoosterGiveaway] No active giveaway found — posting new one.")
-    _start_booster_giveaway()
+    # Nothing active — wait for the scheduler to post on the correct date
+    print("[BoosterGiveaway] No active giveaway found — will post on next scheduled date.")
 
 
 def load_reaction_roles():
