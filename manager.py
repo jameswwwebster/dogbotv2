@@ -12,6 +12,7 @@ FEATURES_FILE        = os.path.join(os.path.dirname(__file__), "features.json")
 PUSH_MESSAGES_FILE   = os.path.join(os.path.dirname(__file__), "push_messages.json")
 GIVEAWAYS_FILE       = os.path.join(os.path.dirname(__file__), "giveaways.json")
 REACTION_ROLES_FILE  = os.path.join(os.path.dirname(__file__), "reaction_roles.json")
+BATTLE_PETS_FILE     = os.path.join(os.path.dirname(__file__), "battle_pets.json")
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -91,6 +92,14 @@ def load_reaction_roles():
 
 def save_reaction_roles(d):
     with open(REACTION_ROLES_FILE, "w") as f: json.dump(d, f, indent=4)
+
+def load_battle_pets():
+    if not os.path.exists(BATTLE_PETS_FILE): return None
+    with open(BATTLE_PETS_FILE) as f: data = json.load(f)
+    return data if data else None
+
+def save_battle_pets(d):
+    with open(BATTLE_PETS_FILE, "w") as f: json.dump(d or {}, f, indent=4)
 
 
 # ── Widget helpers ─────────────────────────────────────────────────────────────
@@ -1188,6 +1197,46 @@ class ManagerApp(tk.Tk):
         inp(row, self._trivia_output_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
         tk.Frame(card, bg=BG_CARD, height=8).pack()
 
+        tk.Frame(card, bg=BG_CARD, height=8).pack()
+
+        # ── Battle of the Pets ────────────────────────────────────────────────
+        tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(12, 6))
+
+        bp = load_battle_pets()
+        card2 = tk.Frame(p, bg=BG_CARD)
+        card2.pack(padx=20, pady=6, fill="x")
+
+        hdr2 = tk.Frame(card2, bg=BG_CARD)
+        hdr2.pack(fill="x", padx=12, pady=(8, 4))
+        tk.Label(hdr2, text="⚔️ Battle of the Pets", bg=BG_CARD, fg=FG,
+                 font=("Segoe UI", 11, "bold")).pack(side="left")
+        if bp and bp.get("end_at"):
+            bp_status = f"🟢 Active — ends {datetime.fromtimestamp(bp['end_at']).strftime('%Y-%m-%d %H:%M')}"
+        else:
+            bp_status = "⚫ No active battle"
+        self._bp_status_lbl = tk.Label(hdr2, text=bp_status, bg=BG_CARD, fg=FG_DIM,
+                                       font=("Segoe UI", 9))
+        self._bp_status_lbl.pack(side="right")
+
+        tk.Label(card2,
+                 text="Three camps: 🐱 Cat · 🐶 Dog · 🐸 Frog.\n"
+                      "At the deadline a winning camp is picked at random (equal weight, not by size).\n"
+                      "All members of the winning camp are tagged.",
+                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
+                 justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 6))
+
+        row2 = field_row(card2, ["Channel ID", "Duration  (e.g. 7d · 2h30m · 2026-09-01 18:00)"], [1, 2])
+        self._bp_ch_var  = tk.StringVar()
+        self._bp_dur_var = tk.StringVar(value="7d")
+        inp(row2, self._bp_ch_var ).grid(row=1, column=0, padx=(0, 4), sticky="ew")
+        inp(row2, self._bp_dur_var).grid(row=1, column=1, padx=(4, 0), sticky="ew")
+        tk.Frame(card2, bg=BG_CARD, height=8).pack()
+
+        bf2 = tk.Frame(card2, bg=BG_CARD)
+        bf2.pack(padx=12, pady=(0, 12), fill="x")
+        btn(bf2, "▶ Start Battle", GREEN, self._start_battle_pets ).pack(side="left", expand=True, fill="x", padx=(0, 4))
+        btn(bf2, "✖ Cancel Battle", RED,  self._cancel_battle_pets).pack(side="left", expand=True, fill="x", padx=(4, 0))
+
         btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=(12, 6), fill="x")
 
     def _save_trivia(self, *_):
@@ -1199,6 +1248,61 @@ class ManagerApp(tk.Tk):
         except ValueError: pass
         save_features(d)
         self.set_status("Saved. Deploy to apply.")
+
+    # ── Battle of the Pets ────────────────────────────────────────────────────
+
+    def _parse_bp_deadline(self, text):
+        import re as _re, time as _time
+        now = _time.time()
+        m = _re.fullmatch(r'(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?', text.strip(), _re.IGNORECASE)
+        if m and any(m.group(i) for i in (1, 2, 3)):
+            delta = (int(m.group(1) or 0) * 86400 +
+                     int(m.group(2) or 0) * 3600 +
+                     int(m.group(3) or 0) * 60)
+            if delta > 0:
+                return now + delta
+        for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%d'):
+            try:
+                dt = datetime.strptime(text.strip(), fmt)
+                return dt.timestamp()
+            except ValueError:
+                pass
+        return None
+
+    def _start_battle_pets(self):
+        ch  = self._bp_ch_var.get().strip()
+        dur = self._bp_dur_var.get().strip()
+        if not ch:
+            messagebox.showwarning("Missing channel", "Enter a channel ID."); return
+        try:
+            ch_id = int(ch)
+        except ValueError:
+            messagebox.showwarning("Invalid channel", "Channel ID must be a number."); return
+        end_at = self._parse_bp_deadline(dur)
+        if not end_at:
+            messagebox.showwarning("Invalid duration",
+                "Use '7d', '2h30m', or a date like '2026-09-01 18:00'."); return
+        import time as _time
+        if end_at <= _time.time():
+            messagebox.showwarning("Past deadline", "The deadline must be in the future."); return
+        if load_battle_pets():
+            if not messagebox.askyesno("Overwrite?",
+                    "A Battle of the Pets is already active. Replace it?"):
+                return
+        entry = {"channel_id": ch_id, "end_at": end_at, "message_id": None}
+        save_battle_pets(entry)
+        self._bp_status_lbl.config(
+            text=f"🟢 Active — ends {datetime.fromtimestamp(end_at).strftime('%Y-%m-%d %H:%M')}")
+        self.set_status("Battle of Pets queued — deploying...")
+        self.deploy()
+
+    def _cancel_battle_pets(self):
+        if not messagebox.askyesno("Confirm", "Cancel the active Battle of the Pets?"):
+            return
+        save_battle_pets(None)
+        self._bp_status_lbl.config(text="⚫ No active battle")
+        self.set_status("Battle cancelled — deploying...")
+        self.deploy()
 
     # ── Deploy ────────────────────────────────────────────────────────────────
 

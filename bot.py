@@ -28,8 +28,12 @@ PENDING_REMINDERS_FILE = "pending_reminders.json"
 GIVEAWAYS_FILE         = "giveaways.json"
 QUESTION_TRACKING_FILE = "question_tracking.json"
 REACTION_ROLES_FILE    = "reaction_roles.json"
+BATTLE_PETS_FILE       = "battle_pets.json"
 
 QUESTION_REACTION_WINDOW = 24 * 60 * 60  # seconds
+
+BATTLE_PETS_EMOJIS = ["🐱", "🐶", "🐸"]
+BATTLE_PETS_NAMES  = {"🐱": "Team Cat", "🐶": "Team Dog", "🐸": "Team Frog"}
 
 
 def load_custom_commands():
@@ -321,6 +325,19 @@ def save_reaction_roles(data):
         json.dump(data, f, indent=4)
 
 
+def load_battle_pets():
+    if not os.path.exists(BATTLE_PETS_FILE):
+        return None
+    with open(BATTLE_PETS_FILE) as f:
+        data = json.load(f)
+    return data if data else None
+
+
+def save_battle_pets(entry):
+    with open(BATTLE_PETS_FILE, "w") as f:
+        json.dump(entry or {}, f, indent=4)
+
+
 def load_reminders():
     if not os.path.exists(REMINDERS_FILE):
         return []
@@ -476,6 +493,122 @@ def _push_scores_to_github():
         print(f"[Scores] Push failed: {e}")
 
 
+def _parse_deadline(text):
+    """Parse '7d', '2h30m', '1d12h', or 'YYYY-MM-DD HH:MM' into a UTC timestamp."""
+    now = datetime.now(timezone.utc).timestamp()
+    m = re.fullmatch(r'(?:(\d+)d)?(?:(\d+)h)?(?:(\d+)m)?', text.strip(), re.IGNORECASE)
+    if m and any(m.group(i) for i in (1, 2, 3)):
+        delta = (int(m.group(1) or 0) * 86400 +
+                 int(m.group(2) or 0) * 3600 +
+                 int(m.group(3) or 0) * 60)
+        if delta > 0:
+            return now + delta
+    for fmt in ('%Y-%m-%d %H:%M', '%Y-%m-%d'):
+        try:
+            dt = datetime.strptime(text.strip(), fmt).replace(tzinfo=timezone.utc)
+            return dt.timestamp()
+        except ValueError:
+            pass
+    return None
+
+
+async def _run_battle_pets(entry):
+    channel = bot.get_channel(entry["channel_id"])
+    if not channel:
+        print(f"[BattlePets] Channel {entry['channel_id']} not found.")
+        save_battle_pets(None)
+        return
+
+    now_ts = datetime.now(timezone.utc).timestamp()
+
+    if not entry.get("message_id"):
+        if entry["end_at"] <= now_ts:
+            print("[BattlePets] Entry already expired before posting — clearing.")
+            save_battle_pets(None)
+            return
+        end_ts = int(entry["end_at"])
+        body = (
+            "⚔️ **BATTLE OF THE PETS** ⚔️\n"
+            f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
+            "Pick your camp by reacting below!\n"
+            "🐱 — Team Cat\n"
+            "🐶 — Team Dog\n"
+            "🐸 — Team Frog\n\n"
+            "_One camp only — reacting with a different emoji removes your previous choice._"
+        )
+        msg = await channel.send(body)
+        for emoji in BATTLE_PETS_EMOJIS:
+            await msg.add_reaction(emoji)
+        entry["message_id"] = msg.id
+        save_battle_pets(entry)
+
+    delay = entry["end_at"] - datetime.now(timezone.utc).timestamp()
+    if delay > 0:
+        await asyncio.sleep(delay)
+
+    try:
+        msg = await channel.fetch_message(entry["message_id"])
+    except (discord.NotFound, discord.HTTPException):
+        save_battle_pets(None)
+        return
+
+    camps = {}
+    for emoji in BATTLE_PETS_EMOJIS:
+        reaction = discord.utils.get(msg.reactions, emoji=emoji)
+        camps[emoji] = [u async for u in reaction.users() if not u.bot] if reaction else []
+
+    winner_emoji = random.choice(BATTLE_PETS_EMOJIS)
+    winners = camps[winner_emoji]
+
+    lines = [
+        "⚔️ **BATTLE OF THE PETS — RESULTS** ⚔️",
+        f"The fates have chosen... **{winner_emoji} {BATTLE_PETS_NAMES[winner_emoji]}**!",
+        "",
+    ]
+    if winners:
+        mentions  = " ".join(w.mention for w in winners)
+        team_word = BATTLE_PETS_NAMES[winner_emoji].split()[1]
+        lines.append(f"🎉 Congratulations to all Team {team_word} members: {mentions}")
+    else:
+        lines.append(
+            f"Nobody joined {BATTLE_PETS_NAMES[winner_emoji]}... "
+            f"{winner_emoji} wins with an empty camp — incredible!"
+        )
+    lines += ["", "**Final standings:**"]
+    for emoji in BATTLE_PETS_EMOJIS:
+        marker = " 🏆" if emoji == winner_emoji else ""
+        lines.append(f"{emoji} {BATTLE_PETS_NAMES[emoji]}: {len(camps[emoji])}{marker}")
+
+    await channel.send("\n".join(lines))
+    save_battle_pets(None)
+
+
+async def _reattach_battle_pets():
+    bp = load_battle_pets()
+    if not bp:
+        return
+    now_ts = datetime.now(timezone.utc).timestamp()
+    if bp["end_at"] <= now_ts:
+        print("[BattlePets] Stored battle already expired — clearing.")
+        save_battle_pets(None)
+        return
+    # If message_id is unknown, scan channel history to avoid a duplicate post
+    if not bp.get("message_id"):
+        channel = bot.get_channel(bp["channel_id"])
+        if channel:
+            async for m in channel.history(limit=50):
+                if m.author != bot.user or "BATTLE OF THE PETS" not in m.content:
+                    continue
+                match = re.search(r'<t:(\d+):F>', m.content)
+                if match and abs(float(match.group(1)) - bp["end_at"]) < 60:
+                    bp["message_id"] = m.id
+                    save_battle_pets(bp)
+                    print(f"[BattlePets] Found existing message in history (ID: {m.id}).")
+                    break
+    asyncio.create_task(_run_battle_pets(bp))
+    print(f"[BattlePets] Reattached (message_id={bp.get('message_id')}).")
+
+
 _reminders_sent = {}  # tracks which reminders fired this minute to avoid duplicates
 
 @tasks.loop(seconds=30)
@@ -628,6 +761,9 @@ async def on_ready():
     # Booster giveaway: reattach to existing message or post a new one
     if load_features().get("booster_giveaway_enabled"):
         await _reattach_or_start_booster_giveaway()
+
+    # Battle of the Pets: reattach if one is stored
+    await _reattach_battle_pets()
 
     # Sync the roles info message and add emotes
     await _sync_roles_message()
@@ -824,6 +960,29 @@ async def on_raw_reaction_add(payload):
             ch = bot.get_channel(rr.get("channel_id"))
             if ch:
                 await ch.send(f"⚠️ Can't assign **{role_name}** — move DogBot's role above it in Server Settings → Roles.", delete_after=30)
+
+    # Battle of the Pets — enforce single-camp: remove other pet reactions if user switches
+    bp = load_battle_pets()
+    if bp and payload.message_id == bp.get("message_id"):
+        emoji_str = str(payload.emoji)
+        if emoji_str in BATTLE_PETS_EMOJIS:
+            guild   = bot.get_guild(payload.guild_id)
+            channel = bot.get_channel(payload.channel_id)
+            if guild and channel:
+                try:
+                    member = await guild.fetch_member(payload.user_id)
+                    msg    = await channel.fetch_message(payload.message_id)
+                    for other in BATTLE_PETS_EMOJIS:
+                        if other == emoji_str:
+                            continue
+                        rxn = discord.utils.get(msg.reactions, emoji=other)
+                        if rxn:
+                            users = [u async for u in rxn.users()]
+                            if any(u.id == payload.user_id for u in users):
+                                await msg.remove_reaction(other, member)
+                                print(f"[BattlePets] Removed {other} from {member.display_name} (switched to {emoji_str}).")
+                except Exception as e:
+                    print(f"[BattlePets] Single-camp enforcement error: {e}")
 
 
 @bot.event
@@ -1258,6 +1417,59 @@ async def rerollgiveaway_cmd(ctx, message_id: int = None):
     winner = random.choice(entrants)
     prize_text = f" You won **{prize}**!" if prize else ""
     await ctx.send(f"🎉 Reroll! Congratulations {winner.mention}!{prize_text}")
+
+
+@bot.command(name="battlepets")
+async def battlepets_cmd(ctx, subcommand: str = None, *, args: str = None):
+    if not has_mod_role(ctx.author):
+        return
+    if subcommand and subcommand.lower() == "start":
+        if not args:
+            await ctx.send(
+                "Usage: `!battlepets start <duration or date>`\n"
+                "Examples: `!battlepets start 7d` · `!battlepets start 2h30m` · `!battlepets start 2026-09-01 18:00`"
+            )
+            return
+        end_at = _parse_deadline(args)
+        if not end_at or end_at <= datetime.now(timezone.utc).timestamp():
+            await ctx.send("❌ Invalid deadline. Try `7d`, `2h30m`, or `2026-09-01 18:00`.")
+            return
+        if load_battle_pets():
+            await ctx.send("❌ A Battle of the Pets is already active. Cancel it first with `!battlepets cancel`.")
+            return
+        entry = {"channel_id": ctx.channel.id, "end_at": end_at, "message_id": None}
+        save_battle_pets(entry)
+        asyncio.create_task(_run_battle_pets(entry))
+        await ctx.send(f"⚔️ Battle of the Pets started! Ends <t:{int(end_at)}:R>.")
+    elif subcommand and subcommand.lower() == "cancel":
+        bp = load_battle_pets()
+        if not bp:
+            await ctx.send("❌ No active Battle of the Pets.")
+            return
+        if bp.get("message_id") and bp.get("channel_id"):
+            try:
+                ch = bot.get_channel(bp["channel_id"])
+                if ch:
+                    msg = await ch.fetch_message(bp["message_id"])
+                    await msg.delete()
+            except Exception:
+                pass
+        save_battle_pets(None)
+        await ctx.send("⚔️ Battle of the Pets cancelled.")
+    else:
+        bp = load_battle_pets()
+        if bp:
+            end_ts = int(bp["end_at"])
+            await ctx.send(
+                f"⚔️ **Battle of the Pets** is active — ends <t:{end_ts}:R>.\n"
+                "Use `!battlepets cancel` to cancel it."
+            )
+        else:
+            await ctx.send(
+                "⚔️ **Battle of the Pets** commands (mod only):\n"
+                "`!battlepets start <duration>` — start (e.g. `7d`, `2h30m`, `2026-09-01 18:00`)\n"
+                "`!battlepets cancel` — cancel the active battle"
+            )
 
 
 @bot.command(name="clear")
