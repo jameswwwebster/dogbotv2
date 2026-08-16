@@ -512,6 +512,66 @@ def _parse_deadline(text):
     return None
 
 
+_BP_PRIZE_PER = 10  # M per participant
+
+def _battle_pets_body(end_ts, pool_m, total):
+    s = "s" if total != 1 else ""
+    prize_line = f"**Prize Pool:** {pool_m}M  ({total} participant{s} × {_BP_PRIZE_PER}M)"
+    return (
+        "⚔️ **BATTLE OF THE PETS** ⚔️\n"
+        f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
+        f"{prize_line}\n\n"
+        "Pick your camp by reacting below!\n"
+        "🐱 — Team Cat\n"
+        "🐶 — Team Dog\n"
+        "🐸 — Team Frog\n\n"
+        "_One camp only — reacting with a different emoji removes your previous choice._"
+    )
+
+
+_bp_update_tasks = {}  # message_id -> asyncio.Task
+
+
+async def _update_battle_pets_pool(msg_id, channel_id):
+    bp = load_battle_pets()
+    if not bp or bp.get("message_id") != msg_id:
+        return
+    channel = bot.get_channel(channel_id)
+    if not channel:
+        return
+    try:
+        msg = await channel.fetch_message(msg_id)
+    except (discord.NotFound, discord.HTTPException):
+        return
+    all_users = set()
+    for emoji in BATTLE_PETS_EMOJIS:
+        rxn = discord.utils.get(msg.reactions, emoji=emoji)
+        if rxn:
+            async for u in rxn.users():
+                if not u.bot:
+                    all_users.add(u.id)
+    total   = len(all_users)
+    pool_m  = total * _BP_PRIZE_PER
+    end_ts  = int(bp["end_at"])
+    try:
+        await msg.edit(content=_battle_pets_body(end_ts, pool_m, total))
+    except discord.HTTPException as e:
+        print(f"[BattlePets] Prize pool update failed: {e}")
+
+
+async def _debounced_bp_update(msg_id, channel_id):
+    await asyncio.sleep(3)
+    await _update_battle_pets_pool(msg_id, channel_id)
+    _bp_update_tasks.pop(msg_id, None)
+
+
+def _schedule_bp_pool_update(msg_id, channel_id):
+    existing = _bp_update_tasks.get(msg_id)
+    if existing and not existing.done():
+        existing.cancel()
+    _bp_update_tasks[msg_id] = asyncio.create_task(_debounced_bp_update(msg_id, channel_id))
+
+
 async def _run_battle_pets(entry):
     channel = bot.get_channel(entry["channel_id"])
     if not channel:
@@ -527,16 +587,7 @@ async def _run_battle_pets(entry):
             save_battle_pets(None)
             return
         end_ts = int(entry["end_at"])
-        body = (
-            "⚔️ **BATTLE OF THE PETS** ⚔️\n"
-            f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
-            "Pick your camp by reacting below!\n"
-            "🐱 — Team Cat\n"
-            "🐶 — Team Dog\n"
-            "🐸 — Team Frog\n\n"
-            "_One camp only — reacting with a different emoji removes your previous choice._"
-        )
-        msg = await channel.send(body)
+        msg = await channel.send(_battle_pets_body(end_ts, 0, 0))
         for emoji in BATTLE_PETS_EMOJIS:
             await msg.add_reaction(emoji)
         entry["message_id"] = msg.id
@@ -557,6 +608,10 @@ async def _run_battle_pets(entry):
         reaction = discord.utils.get(msg.reactions, emoji=emoji)
         camps[emoji] = [u async for u in reaction.users() if not u.bot] if reaction else []
 
+    all_participants = {u.id for camp in camps.values() for u in camp}
+    total   = len(all_participants)
+    pool_m  = total * _BP_PRIZE_PER
+
     winner_emoji = random.choice(BATTLE_PETS_EMOJIS)
     winners = camps[winner_emoji]
 
@@ -568,16 +623,24 @@ async def _run_battle_pets(entry):
     if winners:
         mentions  = " ".join(w.mention for w in winners)
         team_word = BATTLE_PETS_NAMES[winner_emoji].split()[1]
+        n = len(winners)
+        per_m = pool_m / n
+        per_str = f"{int(per_m)}M" if per_m == int(per_m) else f"~{per_m:.1f}M"
         lines.append(f"🎉 Congratulations to all Team {team_word} members: {mentions}")
+        lines.append(f"💰 Prize: **{pool_m}M ÷ {n} = {per_str} each**")
     else:
         lines.append(
             f"Nobody joined {BATTLE_PETS_NAMES[winner_emoji]}... "
             f"{winner_emoji} wins with an empty camp — incredible!"
         )
-    lines += ["", "**Final standings:**"]
+    lines += [
+        "",
+        "**Final standings:**",
+    ]
     for emoji in BATTLE_PETS_EMOJIS:
         marker = " 🏆" if emoji == winner_emoji else ""
         lines.append(f"{emoji} {BATTLE_PETS_NAMES[emoji]}: {len(camps[emoji])}{marker}")
+    lines += ["", f"**Total prize pool: {pool_m}M** ({total} participant{'s' if total != 1 else ''} × {_BP_PRIZE_PER}M)"]
 
     await channel.send("\n".join(lines))
     save_battle_pets(None)
@@ -606,6 +669,9 @@ async def _reattach_battle_pets():
                     print(f"[BattlePets] Found existing message in history (ID: {m.id}).")
                     break
     asyncio.create_task(_run_battle_pets(bp))
+    # Refresh the prize pool display in case participants reacted during downtime
+    if bp.get("message_id"):
+        _schedule_bp_pool_update(bp["message_id"], bp["channel_id"])
     print(f"[BattlePets] Reattached (message_id={bp.get('message_id')}).")
 
 
@@ -983,6 +1049,8 @@ async def on_raw_reaction_add(payload):
                                 print(f"[BattlePets] Removed {other} from {member.display_name} (switched to {emoji_str}).")
                 except Exception as e:
                     print(f"[BattlePets] Single-camp enforcement error: {e}")
+            # Update the prize pool display (debounced so rapid reactions only cause one edit)
+            _schedule_bp_pool_update(payload.message_id, payload.channel_id)
 
 
 @bot.event
@@ -1020,6 +1088,12 @@ async def on_raw_reaction_remove(payload):
                         await member.send(f"❌ The **{role_name}** role has been removed. You'll no longer get pinged for **{display}**.")
                     except discord.Forbidden:
                         pass
+
+    # Battle of the Pets — update prize pool when someone leaves a camp
+    bp = load_battle_pets()
+    if bp and payload.message_id == bp.get("message_id"):
+        if str(payload.emoji) in BATTLE_PETS_EMOJIS:
+            _schedule_bp_pool_update(payload.message_id, payload.channel_id)
 
 
 @bot.command(name="commands")
