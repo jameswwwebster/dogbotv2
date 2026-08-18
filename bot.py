@@ -245,13 +245,37 @@ async def _run_giveaway(entry):
         else:
             await channel.send(f"🎉 Congratulations to our {len(picked)} winners: {mentions}! You won **{entry['prize']}**!")
 
+    # Booster giveaway: immediately start the next cycle after drawing a winner
+    if entry.get("booster_only") and load_features().get("booster_giveaway_enabled"):
+        now_ts = datetime.now(timezone.utc).timestamp()
+        already_active = any(g.get("booster_only") and g.get("end_at", 0) > now_ts
+                             for g in load_giveaways())
+        if not already_active:
+            _start_booster_giveaway()
+
     _remove_giveaway_entry(entry)
+
+
+_BOOSTER_MONTHS = [2, 4, 6, 8, 10, 12]
+
+
+def _next_booster_date(after_ts=None):
+    """Return the next Oct/Dec/Feb/Apr/Jun/Aug 1st noon UTC after the given timestamp (or now)."""
+    if after_ts is None:
+        after_ts = datetime.now(timezone.utc).timestamp()
+    after_dt = datetime.fromtimestamp(after_ts, tz=timezone.utc)
+    for year in (after_dt.year, after_dt.year + 1):
+        for month in _BOOSTER_MONTHS:
+            candidate = datetime(year, month, 1, 12, 0, 0, tzinfo=timezone.utc)
+            if candidate.timestamp() > after_ts:
+                return candidate.timestamp()
+    return after_ts + 60 * 86400  # fallback (should never hit)
 
 
 def _start_booster_giveaway():
     feats  = load_features()
     ch_id  = int(feats.get("booster_giveaway_channel", 1536081045345149069))
-    end_at = datetime.now(timezone.utc).timestamp() + 7 * 86400  # 7-day giveaway
+    end_at = _next_booster_date()
     entry  = {
         "channel_id": ch_id, "prize": "Bond",
         "end_at": end_at, "winners": 1,
@@ -291,8 +315,9 @@ async def _reattach_or_start_booster_giveaway():
         asyncio.create_task(_run_giveaway(entry))
         print(f"[BoosterGiveaway] Reattached to existing message (ID: {m.id}).")
         return
-    # Nothing active — wait for the scheduler to post on the correct date
-    print("[BoosterGiveaway] No active giveaway found — will post on next scheduled date.")
+    # Nothing active — post immediately (end date aligns to next scheduled date)
+    print("[BoosterGiveaway] No active giveaway found — posting new one.")
+    _start_booster_giveaway()
 
 
 def load_reaction_roles():
@@ -704,19 +729,6 @@ async def check_reminders():
                     eligible = [q for q in questions if not q.get("last_shown") or q["last_shown"] < cutoff]
                     q = random.choice(eligible if eligible else questions)
                     await _post_question(channel, q)
-
-    # Booster giveaway: post on 1st of Oct/Dec/Feb/Apr/Jun/Aug at noon
-    _BOOSTER_MONTHS = {10, 12, 2, 4, 6, 8}
-    if (features.get("booster_giveaway_enabled") and
-            now.day == 1 and now.hour == 12 and now.minute == 0 and
-            now.month in _BOOSTER_MONTHS and
-            "booster_gw" not in _reminders_sent):
-        _reminders_sent["booster_gw"] = True
-        now_ts = time.time()
-        active = any(g.get("booster_only") and g.get("end_at", 0) > now_ts
-                     for g in load_giveaways())
-        if not active:
-            _start_booster_giveaway()
 
     # Hourly score push back to GitHub
     if _scores_dirty and time.time() - _last_score_push > SCORE_PUSH_INTERVAL:
