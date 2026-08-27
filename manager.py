@@ -935,24 +935,6 @@ class ManagerApp(tk.Tk):
         self.set_status("Booster giveaway disabled.")
         self.deploy()
 
-    def _enable_bimonthly_q(self):
-        d = load_features()
-        d["bimonthly_question_enabled"] = True
-        save_features(d)
-        self._bimonthly_q_on.set(True)
-        self._bimonthly_q_lbl.config(text="✅ Enabled")
-        self.set_status("Bimonthly question enabled — deploying...")
-        self.deploy()
-
-    def _disable_bimonthly_q(self):
-        d = load_features()
-        d["bimonthly_question_enabled"] = False
-        save_features(d)
-        self._bimonthly_q_on.set(False)
-        self._bimonthly_q_lbl.config(text="❌ Disabled")
-        self.set_status("Bimonthly question disabled.")
-        self.deploy()
-
     def _get_gw_offset(self):
         try:
             return int(self._offset_var.get())
@@ -1254,31 +1236,6 @@ class ManagerApp(tk.Tk):
         bf2.pack(padx=12, pady=(0, 12), fill="x")
         btn(bf2, "▶ Start Battle", GREEN, self._start_battle_pets ).pack(side="left", expand=True, fill="x", padx=(0, 4))
         btn(bf2, "✖ Cancel Battle", RED,  self._cancel_battle_pets).pack(side="left", expand=True, fill="x", padx=(4, 0))
-
-        # ── Bimonthly Question ────────────────────────────────────────────────
-        tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(12, 6))
-
-        feats_bq = load_features()
-        card3 = tk.Frame(p, bg=BG_CARD)
-        card3.pack(padx=20, pady=6, fill="x")
-        hdr3 = tk.Frame(card3, bg=BG_CARD)
-        hdr3.pack(fill="x", padx=12, pady=(8, 4))
-        tk.Label(hdr3, text="📅 Bimonthly Question", bg=BG_CARD, fg=FG,
-                 font=("Segoe UI", 11, "bold")).pack(side="left")
-        self._bimonthly_q_on = tk.BooleanVar(value=feats_bq.get("bimonthly_question_enabled", False))
-        bq_status = "✅ Enabled" if self._bimonthly_q_on.get() else "❌ Disabled"
-        self._bimonthly_q_lbl = tk.Label(hdr3, text=bq_status, bg=BG_CARD, fg=FG_DIM,
-                                         font=("Segoe UI", 9))
-        self._bimonthly_q_lbl.pack(side="right")
-        tk.Label(card3,
-                 text="Auto-posts a random question to the daily question channel on\n"
-                      "the 1st of Oct · Dec · Feb · Apr · Jun · Aug at noon UTC.",
-                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
-                 justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 8))
-        bf3 = tk.Frame(card3, bg=BG_CARD)
-        bf3.pack(padx=12, pady=(0, 12), fill="x")
-        btn(bf3, "✅ Enable",  GREEN, self._enable_bimonthly_q ).pack(side="left", expand=True, fill="x", padx=(0, 4))
-        btn(bf3, "❌ Disable", RED,   self._disable_bimonthly_q).pack(side="left", expand=True, fill="x", padx=(4, 0))
 
         btn(p, "Save & Deploy", GREEN, self.deploy).pack(padx=20, pady=(12, 6), fill="x")
 
