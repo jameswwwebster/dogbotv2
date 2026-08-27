@@ -209,9 +209,10 @@ async def _run_giveaway(entry):
                 body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
                         f"**Prize:** {entry['prize']}\n"
                         f"{winner_line}"
-                        f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
-                        f"🚀 New giveaway initiated! Boosters active for at least 35 days are automatically eligible.\n"
-                        f"**Currently eligible ({len(eligible)}):** {eligible_str}")
+                        f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
+                        f"💜 Thank you for boosting the server!\n"
+                        f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
+                        f"**Eligible members ({len(eligible)}):** {eligible_str}")
                 msg = await channel.send(body)
             else:
                 body = (f"🎉 **GIVEAWAY** 🎉\n"
