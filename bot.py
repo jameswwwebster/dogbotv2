@@ -202,7 +202,7 @@ async def _run_giveaway(entry):
         else:
             winner_line = f"**Winners:** {winners}\n" if winners > 1 else ""
             if entry.get("booster_only"):
-                threshold_ts = (datetime.now(timezone.utc) - timedelta(days=35)).timestamp()
+                threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
                 eligible = [m for m in channel.guild.members
                             if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                 eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
@@ -235,7 +235,7 @@ async def _run_giveaway(entry):
         return
 
     if entry.get("booster_only"):
-        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=35)).timestamp()
+        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
         entrants = [m for m in channel.guild.members
                     if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
     else:
@@ -1552,7 +1552,7 @@ async def boosterdebug_cmd(ctx):
             lines.append(f"Active giveaway in JSON: ✅ (ends <t:{int(active['end_at'])}:R>, msg_id={active.get('message_id')})")
         else:
             lines.append("Active giveaway in JSON: ❌ none")
-        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=35)).timestamp()
+        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
         eligible = [m for m in channel.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
         lines.append(f"Members cached: {len(channel.guild.members)}")
         lines.append(f"Eligible (boosting 35+ days): {len(eligible)}")
