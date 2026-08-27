@@ -58,6 +58,7 @@ def load_features():
         "trivia_event_enabled": False,
         "trivia_submit_channel": 1536070084005466243,
         "trivia_output_channel": 1536070221876428941,
+        "bimonthly_question_enabled": False,
     }
     if not os.path.exists(FEATURES_FILE):
         return defaults
@@ -325,6 +326,31 @@ async def _reattach_or_start_booster_giveaway():
     # Nothing active — post immediately (end date aligns to next scheduled date)
     print("[BoosterGiveaway] No active giveaway found — posting new one.")
     _start_booster_giveaway()
+
+
+_bimonthly_q_task = None
+
+
+async def _run_bimonthly_question():
+    global _bimonthly_q_task
+    while True:
+        feats = load_features()
+        if not feats.get("bimonthly_question_enabled"):
+            _bimonthly_q_task = None
+            return
+        now_ts  = datetime.now(timezone.utc).timestamp()
+        next_ts = _next_booster_date(now_ts)
+        await asyncio.sleep(next_ts - now_ts)
+        feats = load_features()
+        if not feats.get("bimonthly_question_enabled"):
+            _bimonthly_q_task = None
+            return
+        ch_id   = int(feats.get("daily_question_channel", 472851820448972800))
+        channel = bot.get_channel(ch_id)
+        if channel:
+            questions = load_questions().get("questions", [])
+            if questions:
+                await _post_question(channel, random.choice(questions))
 
 
 def load_reaction_roles():
@@ -845,6 +871,12 @@ async def on_ready():
     # Booster giveaway: reattach to existing message or post a new one
     if load_features().get("booster_giveaway_enabled"):
         await _reattach_or_start_booster_giveaway()
+
+    # Bimonthly question: start background task if enabled
+    if load_features().get("bimonthly_question_enabled"):
+        global _bimonthly_q_task
+        if _bimonthly_q_task is None or _bimonthly_q_task.done():
+            _bimonthly_q_task = asyncio.create_task(_run_bimonthly_question())
 
     # Battle of the Pets: reattach if one is stored
     await _reattach_battle_pets()
