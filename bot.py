@@ -202,9 +202,9 @@ async def _run_giveaway(entry):
         else:
             winner_line = f"**Winners:** {winners}\n" if winners > 1 else ""
             if entry.get("booster_only"):
-                threshold = datetime.now(timezone.utc) - timedelta(days=35)
+                threshold_ts = (datetime.now(timezone.utc) - timedelta(days=35)).timestamp()
                 eligible = [m for m in channel.guild.members
-                            if m.premium_since and m.premium_since <= threshold]
+                            if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                 eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
                 body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
                         f"**Prize:** {entry['prize']}\n"
@@ -235,9 +235,9 @@ async def _run_giveaway(entry):
         return
 
     if entry.get("booster_only"):
-        threshold = datetime.now(timezone.utc) - timedelta(days=35)
+        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=35)).timestamp()
         entrants = [m for m in channel.guild.members
-                    if m.premium_since and m.premium_since <= threshold]
+                    if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
     else:
         reaction = discord.utils.get(msg.reactions, emoji="🎉")
         entrants = [u async for u in reaction.users() if not u.bot] if reaction else []
