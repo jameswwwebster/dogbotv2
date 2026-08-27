@@ -202,19 +202,25 @@ async def _run_giveaway(entry):
         else:
             winner_line = f"**Winners:** {winners}\n" if winners > 1 else ""
             if entry.get("booster_only"):
+                threshold = datetime.now(timezone.utc) - timedelta(days=35)
+                eligible = [m for m in channel.guild.members
+                            if m.premium_since and m.premium_since <= threshold]
+                eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
                 body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
                         f"**Prize:** {entry['prize']}\n"
                         f"{winner_line}"
                         f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
-                        f"🚀 Server Boosters only! React with 🎉 to enter!")
+                        f"🚀 New giveaway initiated! Boosters active for at least 35 days are automatically eligible.\n"
+                        f"**Currently eligible ({len(eligible)}):** {eligible_str}")
+                msg = await channel.send(body)
             else:
                 body = (f"🎉 **GIVEAWAY** 🎉\n"
                         f"**Prize:** {entry['prize']}\n"
                         f"{winner_line}"
                         f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n"
                         f"React with 🎉 to enter!")
-            msg = await channel.send(body)
-            await msg.add_reaction("🎉")
+                msg = await channel.send(body)
+                await msg.add_reaction("🎉")
             entry["message_id"] = msg.id
             _update_giveaway_entry(entry)
 
@@ -228,12 +234,13 @@ async def _run_giveaway(entry):
         _remove_giveaway_entry(entry)
         return
 
-    reaction = discord.utils.get(msg.reactions, emoji="🎉")
-    entrants = [u async for u in reaction.users() if not u.bot] if reaction else []
     if entry.get("booster_only"):
-        entrants = [u for u in entrants
-                    if (channel.guild.get_member(u.id) or None) and
-                       channel.guild.get_member(u.id).premium_since]
+        threshold = datetime.now(timezone.utc) - timedelta(days=35)
+        entrants = [m for m in channel.guild.members
+                    if m.premium_since and m.premium_since <= threshold]
+    else:
+        reaction = discord.utils.get(msg.reactions, emoji="🎉")
+        entrants = [u async for u in reaction.users() if not u.bot] if reaction else []
     if not entrants:
         await channel.send(f"🎉 The giveaway for **{entry['prize']}** ended with no eligible entries!")
     else:
