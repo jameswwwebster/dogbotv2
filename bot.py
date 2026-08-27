@@ -1511,6 +1511,33 @@ async def rerollgiveaway_cmd(ctx, message_id: int = None):
     await ctx.send(f"🎉 Reroll! Congratulations {winner.mention}!{prize_text}")
 
 
+@bot.command(name="boosterdebug")
+async def boosterdebug_cmd(ctx):
+    if not has_mod_role(ctx.author):
+        return
+    feats   = load_features()
+    enabled = feats.get("booster_giveaway_enabled", False)
+    ch_id   = int(feats.get("booster_giveaway_channel", 1536081045345149069))
+    channel = bot.get_channel(ch_id)
+    lines   = ["**🚀 Booster Giveaway Debug**"]
+    lines.append(f"Enabled: {'✅' if enabled else '❌'}")
+    lines.append(f"Channel ID: `{ch_id}` → {channel.mention if channel else '❌ NOT FOUND'}")
+    if channel:
+        now_ts = datetime.now(timezone.utc).timestamp()
+        active = next((g for g in load_giveaways() if g.get("booster_only") and g.get("end_at", 0) > now_ts), None)
+        if active:
+            lines.append(f"Active giveaway in JSON: ✅ (ends <t:{int(active['end_at'])}:R>, msg_id={active.get('message_id')})")
+        else:
+            lines.append("Active giveaway in JSON: ❌ none")
+        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=35)).timestamp()
+        eligible = [m for m in channel.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
+        lines.append(f"Members cached: {len(channel.guild.members)}")
+        lines.append(f"Eligible (boosting 35+ days): {len(eligible)}")
+        if eligible:
+            lines.append(", ".join(m.display_name for m in eligible[:10]) + ("…" if len(eligible) > 10 else ""))
+    await ctx.send("\n".join(lines))
+
+
 @bot.command(name="battlepets")
 async def battlepets_cmd(ctx, subcommand: str = None, *, args: str = None):
     if not has_mod_role(ctx.author):

@@ -896,11 +896,16 @@ class ManagerApp(tk.Tk):
                                         font=("Segoe UI", 9))
         self._booster_gw_lbl.pack(side="right")
         tk.Label(card,
-                 text="Posts a Bond giveaway (boosters only) in the booster channel.\n"
+                 text="Posts a Bond giveaway (boosters only) in the configured channel.\n"
                       "Enabling posts immediately and runs until the next scheduled date.\n"
                       "Winner drawn + new giveaway auto-posted on 1st of Oct · Dec · Feb · Apr · Jun · Aug.",
                  bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9),
-                 justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 8))
+                 justify="left", anchor="w").pack(fill="x", padx=12, pady=(0, 4))
+        self._booster_gw_ch_var = tk.StringVar(value=str(feats.get("booster_giveaway_channel", 1536081045345149069)))
+        self._booster_gw_ch_var.trace_add("write", self._save_booster_gw_channel)
+        row_bgw = field_row(card, ["Channel ID"], [1])
+        inp(row_bgw, self._booster_gw_ch_var).grid(row=1, column=0, sticky="ew")
+        tk.Frame(card, bg=BG_CARD, height=8).pack()
         bf = tk.Frame(card, bg=BG_CARD)
         bf.pack(padx=12, pady=(0, 12), fill="x")
         btn(bf, "✅ Enable",  GREEN, self._enable_booster_gw ).pack(side="left", expand=True, fill="x", padx=(0, 4))
@@ -916,6 +921,15 @@ class ManagerApp(tk.Tk):
                  bg=BG, fg=FG_DIM, font=("Segoe UI", 9),
                  justify="left", anchor="w"
                  ).pack(fill="x", padx=20)
+
+    def _save_booster_gw_channel(self, *_):
+        try:
+            ch_id = int(self._booster_gw_ch_var.get().strip())
+        except ValueError:
+            return
+        d = load_features()
+        d["booster_giveaway_channel"] = ch_id
+        save_features(d)
 
     def _enable_booster_gw(self):
         d = load_features()
