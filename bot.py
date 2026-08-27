@@ -1511,6 +1511,29 @@ async def rerollgiveaway_cmd(ctx, message_id: int = None):
     await ctx.send(f"🎉 Reroll! Congratulations {winner.mention}!{prize_text}")
 
 
+@bot.command(name="boostergw")
+async def boostergw_cmd(ctx, subcommand: str = None):
+    if not has_mod_role(ctx.author):
+        return
+    if subcommand and subcommand.lower() == "repost":
+        now_ts = datetime.now(timezone.utc).timestamp()
+        gs = load_giveaways()
+        booster = next((g for g in gs if g.get("booster_only") and g.get("end_at", 0) > now_ts), None)
+        if booster and booster.get("message_id") and booster.get("channel_id"):
+            ch = bot.get_channel(booster["channel_id"])
+            if ch:
+                try:
+                    old_msg = await ch.fetch_message(booster["message_id"])
+                    await old_msg.delete()
+                except Exception:
+                    pass
+        save_giveaways([g for g in gs if not g.get("booster_only")])
+        _start_booster_giveaway()
+        await ctx.send("🚀 Booster giveaway reposted!")
+    else:
+        await ctx.send("Usage: `!boostergw repost` — delete old message and post fresh one")
+
+
 @bot.command(name="boosterdebug")
 async def boosterdebug_cmd(ctx):
     if not has_mod_role(ctx.author):
