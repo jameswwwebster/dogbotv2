@@ -58,6 +58,7 @@ def load_features():
         "trivia_event_enabled": False,
         "trivia_submit_channel": 1536070084005466243,
         "trivia_output_channel": 1536070221876428941,
+        "compliment_enabled": True,
     }
     if not os.path.exists(FEATURES_FILE):
         return defaults
@@ -1247,6 +1248,21 @@ _FLIRTS = [
     '{sender} tried to flirt with {target}. "I\'d lend you my best gear with no timer."',
 ]
 
+_COMPLIMENTS = [
+    "{sender} thinks {target} is an absolute legend. One of the good ones. 💛",
+    "{sender} says {target} is worth more than their entire bank. And that's saying something.",
+    "{sender} just wants {target} to know they're genuinely appreciated. Keep being awesome. 🌟",
+    "{sender} thinks {target} is rarer than a good drop. Don't let them go.",
+    "{sender} says {target} makes the clan chat a better place just by being in it.",
+    "{sender} reckons {target} is the kind of person you'd want in your team every time. No exceptions.",
+    "{sender} thinks {target} is a real one. Always has been, always will be. ❤️",
+    "{sender} says {target} is one in a million. Genuinely.",
+    "{sender} just wants the world to know that {target} is built different. In the best way.",
+    "{sender} thinks {target} deserves way more credit than they get. Shoutout to them. 🙌",
+    "{sender} says {target} lights up every chat they're in. Don't ever change.",
+    "{sender} believes {target} could solo anything life throws at them. Absolute unit.",
+]
+
 
 @bot.command(name="kill")
 async def kill_cmd(ctx, target: discord.Member = None):
@@ -1323,6 +1339,17 @@ async def spank_cmd(ctx, target: discord.Member = None):
         await ctx.send("Mention someone to spank! e.g. `!spank @user`")
         return
     await ctx.send(f"🥵🥵 {ctx.author.mention} spanks {target.mention}! 🥵🥵")
+
+
+@bot.command(name="compliment")
+async def compliment_cmd(ctx, target: discord.Member = None):
+    if not load_features().get("compliment_enabled"):
+        return
+    if not target:
+        await ctx.send("Mention someone to compliment! e.g. `!compliment @user`")
+        return
+    msg = random.choice(_COMPLIMENTS)
+    await ctx.send(msg.format(sender=ctx.author.mention, target=target.mention))
 
 
 _8BALL_INTROS = [

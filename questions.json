@@ -770,8 +770,8 @@
             "answer": "Hydrix dragon"
         },
         {
-            "question": "How many Explosive components do you get from disassembling a Hand cannon?",
-            "answer": "7 (28 if level 9)"
+            "question": "How many Explosive components do you get from disassembling an augmented Handcannon at level 9?",
+            "answer": "28"
         },
         {
             "question": "How many Ilujankan components do you get from disassembling a Zaros Godsword?",
@@ -2816,6 +2816,86 @@
         {
             "question": "How many players can have a plot in one homestead?",
             "answer": "5"
+        },
+        {
+            "question": "Which entry portal in Castle Wars adds you to the portal with the least players in the lobby?",
+            "answer": "Guthix"
+        },
+        {
+            "question": "How many Ecliptic components do you get from disassembling an augmented Roar of Awakening at level 9?",
+            "answer": "4"
+        },
+        {
+            "question": "How many Avernic components do you get from disassembling an augmented Staff of Sliske's at level 9?",
+            "answer": "0"
+        },
+        {
+            "question": "How many Shadow components do you get from disassembling an augmented Staff of Sliske's at level 9?",
+            "answer": "8"
+        },
+        {
+            "question": "Which vegetable has a chance to be disassembled into Brassican components?",
+            "answer": "Cabbages"
+        },
+        {
+            "question": "How many Noxious components do you get from disassembling an augmented Noxious Staff at level 9?",
+            "answer": "20"
+        },
+        {
+            "question": "How many Ecliptic components do you get from disassembling an augmented Tumeken's Light at level 9?",
+            "answer": "8"
+        },
+        {
+            "question": "When you unlock the Bandos, Armadyl, Saradomin, Zamorak, Seren and Zaros rugs, what do you automatically unlock?",
+            "answer": "Furniture plans (Guthix Rug)"
+        },
+        {
+            "question": "Which rare components are obtained when disassembling an augmented Abyssal Vine Whip at level 9?",
+            "answer": "None"
+        },
+        {
+            "question": "What are the four roles in Barbarian Assault called?",
+            "answer": "Attacker, Healer, Collector and Defender"
+        },
+        {
+            "question": "Do you face the Penance King in wave 10 of Barbarian Assault in normal mode or hard mode?",
+            "answer": "Hard mode"
+        },
+        {
+            "question": "In the achievements minigames tab, there's an achievement to use Ice Barrage a certain amount of times in Castle Wars. How many times?",
+            "answer": "99 times"
+        },
+        {
+            "question": "Which creature is related to the god Crondis?",
+            "answer": "Crocodile"
+        },
+        {
+            "question": "Which creature is related to the god Apmeken?",
+            "answer": "Monkey"
+        },
+        {
+            "question": "Which type of dye is generally the most common and cheapest from clues?",
+            "answer": "Barrows dye"
+        },
+        {
+            "question": "What is the cape called that you can claim when you complete 5000 Castle Wars matches?",
+            "answer": "Castle Wars Professional cape"
+        },
+        {
+            "question": "What is the cape called that you can claim when you complete 1000 Castle Wars matches?",
+            "answer": "Castle Wars Enthusiast cape"
+        },
+        {
+            "question": "How many gold tickets are required to buy a complete set of Profound armour in Castle Wars?",
+            "answer": "4150"
+        },
+        {
+            "question": "Which 'base' chinchompa is used to craft Mechanized Chinchompas?",
+            "answer": "Carnivorous Chinchompas (also known as red chins)"
+        },
+        {
+            "question": "How many different colours of robes does Rometti's Fine Fashions, located in the Grand Tree, sell?",
+            "answer": "Five (pink, green, blue, cream and turquoise)"
         }
     ]
 }
