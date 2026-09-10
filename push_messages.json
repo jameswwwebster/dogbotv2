@@ -1,7 +1,7 @@
 [
     {
         "channel_id": 472851820448972800,
-        "message": "Test message - Bot has been updated. If this message is shown, update succesfull!",
-        "queued_at": 1788895345.9564824
+        "message": "DogBot has been updated!\n- 20 new questions added to the daily rotation, or use !question to force a question!\n- New fun command added: !Compliment @User - Great for giving people compliments (might backfire)",
+        "queued_at": 1789060383.795834
     }
 ]
