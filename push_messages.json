@@ -1,1 +1,7 @@
-[]
+[
+    {
+        "channel_id": 472851820448972800,
+        "message": "Hello!\n\nDogBot just got upgraded:\n- 10 new questions added.\n- Fixed a bug with the booster-giveaway\n- Added weekly reminder for the booster-giveaway\n\nFall has officially started. Remember to !hug someone!",
+        "queued_at": 1790332888.2389486
+    }
+]
