@@ -204,6 +204,7 @@ async def _run_giveaway(entry):
             winner_line = f"**Winners:** {winners}\n" if winners > 1 else ""
             if entry.get("booster_only"):
                 threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
+                await channel.guild.chunk()
                 eligible = [m for m in channel.guild.members
                             if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                 eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
@@ -238,6 +239,7 @@ async def _run_giveaway(entry):
 
     if entry.get("booster_only"):
         threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
+        await channel.guild.chunk()
         entrants = [m for m in channel.guild.members
                     if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
     else:
@@ -738,6 +740,33 @@ async def check_reminders():
                     eligible = [q for q in questions if not q.get("last_shown") or q["last_shown"] < cutoff]
                     q = random.choice(eligible if eligible else questions)
                     await _post_question(channel, q)
+
+    # Daily booster giveaway eligible-list refresh at 13:55 UTC
+    if features.get("booster_giveaway_enabled") and now.hour == 13 and now.minute == 55 and "booster_refresh" not in _reminders_sent:
+        _reminders_sent["booster_refresh"] = True
+        now_ts = datetime.now(timezone.utc).timestamp()
+        gs = load_giveaways()
+        booster = next((g for g in gs if g.get("booster_only") and g.get("end_at", 0) > now_ts and g.get("message_id") and g.get("channel_id")), None)
+        if booster:
+            ch = bot.get_channel(booster["channel_id"])
+            if ch:
+                try:
+                    msg = await ch.fetch_message(booster["message_id"])
+                    await ch.guild.chunk()
+                    threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
+                    eligible = [m for m in ch.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
+                    eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
+                    end_ts = int(booster["end_at"])
+                    body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
+                            f"**Prize:** {booster['prize']}\n"
+                            f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
+                            f"💜 Thank you for boosting the server!\n"
+                            f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
+                            f"**Eligible members ({len(eligible)}):** {eligible_str}")
+                    await msg.edit(content=body)
+                    print(f"[BoosterGiveaway] Refreshed eligible list: {len(eligible)} members.")
+                except Exception as e:
+                    print(f"[BoosterGiveaway] Daily refresh failed: {e}")
 
     # Hourly score push back to GitHub
     if _scores_dirty and time.time() - _last_score_push > SCORE_PUSH_INTERVAL:
