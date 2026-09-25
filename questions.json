@@ -2896,6 +2896,46 @@
         {
             "question": "How many different colours of robes does Rometti's Fine Fashions, located in the Grand Tree, sell?",
             "answer": "Five (pink, green, blue, cream and turquoise)"
+        },
+        {
+            "question": "What is the name of the Agility skilling pet?",
+            "answer": "Dojo Mojo"
+        },
+        {
+            "question": "What is the name of the Firemaking skilling pet?",
+            "answer": "Bernie"
+        },
+        {
+            "question": "Which boss was released earlier: Nex: Angel of Death or Telos?",
+            "answer": "Telos (2016) — Nex: Angel of Death was released in 2017"
+        },
+        {
+            "question": "Which boss was released earlier: Kalphite King or Legiones?",
+            "answer": "Kalphite King (January 2013) — Legiones were released in June 2013"
+        },
+        {
+            "question": "Great Gielinor Run is an achievement that requires the player to run from one part of the map to the other without teleporting. Where does it start and where does it end?",
+            "answer": "It starts at Tyras Camp in Tirannwn (talk to Linford to begin) and ends at the entrance of Castle Drakan in Darkmeyer."
+        },
+        {
+            "question": "At the Anachronia Dinosaur Farm, placing an elder Bagrada rex in a pen with a farm totem gives you a perk. What does this perk do?",
+            "answer": "Gives you a chance to save a bomb when you throw it (5% with one pen, 10% with two pens)."
+        },
+        {
+            "question": "At the Anachronia Dinosaur Farm, placing an elder Malletops in a pen with a farm totem gives you a perk. What does this perk do?",
+            "answer": "Makes Barricade last longer (3 ticks with one pen, 6 ticks with two pens)."
+        },
+        {
+            "question": "At the Anachronia Dinosaur Farm, placing an elder Corbicula rex in a pen with a farm totem gives you a perk. What does this perk do?",
+            "answer": "Raises the critical hit chance of Meteor Strike (20% with one pen, 40% with two pens)."
+        },
+        {
+            "question": "At the Anachronia Dinosaur Farm, placing an elder Scimitops in a pen with a farm totem gives you a perk. What does this perk do?",
+            "answer": "Raises your chance of finding a geode while Mining (1% with one pen, 2% with two pens)."
+        },
+        {
+            "question": "At the Anachronia Dinosaur Farm, placing an elder Pavosaurus rex in a pen with a farm totem gives you a perk. What does this perk do?",
+            "answer": "Increases all Farming Guild reputation you earn (5% with one pen, 10% with two pens)."
         }
     ]
 }
