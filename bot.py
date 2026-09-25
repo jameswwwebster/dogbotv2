@@ -55,6 +55,7 @@ def load_features():
         "eightball_enabled": False,
         "booster_giveaway_enabled": False,
         "booster_giveaway_channel": 1536081045345149069,
+        "booster_reminder_enabled": False,
         "trivia_event_enabled": False,
         "trivia_submit_channel": 1536070084005466243,
         "trivia_output_channel": 1536070221876428941,
@@ -740,6 +741,18 @@ async def check_reminders():
                     eligible = [q for q in questions if not q.get("last_shown") or q["last_shown"] < cutoff]
                     q = random.choice(eligible if eligible else questions)
                     await _post_question(channel, q)
+
+    # Weekly booster reminder every Sunday at 09:59 UTC
+    if features.get("booster_reminder_enabled") and now.weekday() == 6 and now.hour == 9 and now.minute == 59 and "booster_reminder" not in _reminders_sent:
+        _reminders_sent["booster_reminder"] = True
+        ch_id = int(features.get("booster_giveaway_channel", 1536081045345149069))
+        channel = bot.get_channel(ch_id)
+        if channel:
+            await channel.send(
+                "🚀 **Server Booster Reminder!**\n"
+                "Did you know that boosters who have been supporting the server for **30+ days** "
+                "are automatically entered into our bimonthly **Bond giveaway**?"
+            )
 
     # Daily booster giveaway eligible-list refresh at 13:55 UTC
     if features.get("booster_giveaway_enabled") and now.hour == 13 and now.minute == 55 and "booster_refresh" not in _reminders_sent:

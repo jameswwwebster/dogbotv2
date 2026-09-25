@@ -905,6 +905,15 @@ class ManagerApp(tk.Tk):
         self._booster_gw_ch_var.trace_add("write", self._save_booster_gw_channel)
         row_bgw = field_row(card, ["Channel ID"], [1])
         inp(row_bgw, self._booster_gw_ch_var).grid(row=1, column=0, sticky="ew")
+        reminder_row = tk.Frame(card, bg=BG_CARD)
+        reminder_row.pack(fill="x", padx=12, pady=(4, 0))
+        self._booster_reminder_var = tk.BooleanVar(value=feats.get("booster_reminder_enabled", False))
+        tk.Checkbutton(reminder_row, variable=self._booster_reminder_var, bg=BG_CARD,
+                       activebackground=BG_CARD, command=self._save_booster_reminder
+                       ).pack(side="left")
+        tk.Label(reminder_row, text="Send weekly booster reminder (Sun 09:59 UTC)",
+                 bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9), anchor="w"
+                 ).pack(side="left")
         tk.Frame(card, bg=BG_CARD, height=8).pack()
         bf = tk.Frame(card, bg=BG_CARD)
         bf.pack(padx=12, pady=(0, 12), fill="x")
@@ -947,6 +956,14 @@ class ManagerApp(tk.Tk):
         self._booster_gw_on.set(False)
         self._booster_gw_lbl.config(text="❌ Disabled")
         self.set_status("Booster giveaway disabled.")
+        self.deploy()
+
+    def _save_booster_reminder(self):
+        d = load_features()
+        d["booster_reminder_enabled"] = self._booster_reminder_var.get()
+        save_features(d)
+        state = "enabled" if self._booster_reminder_var.get() else "disabled"
+        self.set_status(f"Weekly booster reminder {state}.")
         self.deploy()
 
     def _get_gw_offset(self):
