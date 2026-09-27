@@ -2936,6 +2936,26 @@
         {
             "question": "At the Anachronia Dinosaur Farm, placing an elder Pavosaurus rex in a pen with a farm totem gives you a perk. What does this perk do?",
             "answer": "Increases all Farming Guild reputation you earn (5% with one pen, 10% with two pens)."
+        },
+        {
+            "question": "What do you need to do to unlock the achievement Gotta Patch 'Em All?",
+            "answer": "Have something planted and living in every Farming patch at the same time."
+        },
+        {
+            "question": "Which Ancient Familiar's special attack is used for its AoE crit buff effect?",
+            "answer": "Kal'gerion Demon"
+        },
+        {
+            "question": "Which Rex Matriarch drops the Heart of the Berserker?",
+            "answer": "All of them!"
+        },
+        {
+            "question": "How many different pieces of Third-Age armour can players get from Hard clue scrolls?",
+            "answer": "12"
+        },
+        {
+            "question": "What is Fungicide used for?",
+            "answer": "It is required to be used on Mutated Zygomites in order to kill them."
         }
     ]
 }
