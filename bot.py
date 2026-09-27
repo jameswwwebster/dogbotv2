@@ -57,7 +57,7 @@ def load_features():
         "booster_giveaway_channel": 1536081045345149069,
         "booster_reminder_enabled": False,
         "booster_reminder_channel": 472851820448972800,
-        "booster_force_refresh": False,
+        "booster_force_refresh": 0,
         "trivia_event_enabled": False,
         "trivia_submit_channel": 1536070084005466243,
         "trivia_output_channel": 1536070221876428941,
@@ -898,7 +898,7 @@ async def on_ready():
         await _reattach_or_start_booster_giveaway()
 
     # Force-refresh eligible members if flagged from the manager
-    if feats.get("booster_force_refresh"):
+    if feats.get("booster_force_refresh", 0) > 0 and time.time() - feats["booster_force_refresh"] < 3600:
         now_ts = datetime.now(timezone.utc).timestamp()
         gs = load_giveaways()
         booster = next((g for g in gs if g.get("booster_only") and g.get("end_at", 0) > now_ts and g.get("message_id") and g.get("channel_id")), None)
@@ -925,7 +925,7 @@ async def on_ready():
                 except Exception as e:
                     print(f"[BoosterGiveaway] Force-refresh failed: {e}")
         d = load_features()
-        d["booster_force_refresh"] = False
+        d["booster_force_refresh"] = 0
         save_features(d)
 
     # Battle of the Pets: reattach if one is stored

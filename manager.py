@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 import json
 import os
 import subprocess
+import time
 from datetime import datetime, timezone, timedelta
 
 COMMANDS_FILE        = os.path.join(os.path.dirname(__file__), "commands.json")
@@ -974,7 +975,7 @@ class ManagerApp(tk.Tk):
 
     def _force_booster_refresh(self):
         d = load_features()
-        d["booster_force_refresh"] = True
+        d["booster_force_refresh"] = time.time()
         save_features(d)
         self.set_status("Force refresh flagged — deploying...")
         self.deploy()
