@@ -923,6 +923,8 @@ class ManagerApp(tk.Tk):
         bf.pack(padx=12, pady=(0, 12), fill="x")
         btn(bf, "✅ Enable",  GREEN, self._enable_booster_gw ).pack(side="left", expand=True, fill="x", padx=(0, 4))
         btn(bf, "❌ Disable", RED,   self._disable_booster_gw).pack(side="left", expand=True, fill="x", padx=(4, 0))
+        btn(card, "🔄 Force Update Participants", "#1e6091", self._force_booster_refresh
+            ).pack(padx=12, pady=(0, 12), fill="x")
 
         tk.Frame(p, bg=GREY, height=1).pack(fill="x", padx=20, pady=(0, 8))
         lbl(p, "Reroll a giveaway", dim=False).pack(fill="x", padx=20)
@@ -968,6 +970,13 @@ class ManagerApp(tk.Tk):
         save_features(d)
         state = "enabled" if self._booster_reminder_var.get() else "disabled"
         self.set_status(f"Weekly booster reminder {state}.")
+        self.deploy()
+
+    def _force_booster_refresh(self):
+        d = load_features()
+        d["booster_force_refresh"] = True
+        save_features(d)
+        self.set_status("Force refresh flagged — deploying...")
         self.deploy()
 
     def _save_booster_reminder_channel(self, *_):
