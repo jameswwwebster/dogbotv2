@@ -211,13 +211,15 @@ async def _run_giveaway(entry):
                 eligible = [m for m in channel.guild.members
                             if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                 eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
+                checked_ts = int(datetime.now(timezone.utc).timestamp())
                 body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
                         f"**Prize:** {entry['prize']}\n"
                         f"{winner_line}"
                         f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
                         f"💜 Thank you for boosting the server!\n"
                         f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
-                        f"**Eligible members ({len(eligible)}):** {eligible_str}")
+                        f"**Eligible members ({len(eligible)}):** {eligible_str}\n"
+                        f"🕐 Last checked: <t:{checked_ts}:R>")
                 msg = await channel.send(body)
             else:
                 body = (f"🎉 **GIVEAWAY** 🎉\n"
@@ -772,12 +774,14 @@ async def check_reminders():
                     eligible = [m for m in ch.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                     eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
                     end_ts = int(booster["end_at"])
+                    checked_ts = int(datetime.now(timezone.utc).timestamp())
                     body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
                             f"**Prize:** {booster['prize']}\n"
                             f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
                             f"💜 Thank you for boosting the server!\n"
                             f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
-                            f"**Eligible members ({len(eligible)}):** {eligible_str}")
+                            f"**Eligible members ({len(eligible)}):** {eligible_str}\n"
+                            f"🕐 Last checked: <t:{checked_ts}:R>")
                     await msg.edit(content=body)
                     print(f"[BoosterGiveaway] Refreshed eligible list: {len(eligible)} members.")
                 except Exception as e:
@@ -908,12 +912,14 @@ async def on_ready():
                     eligible = [m for m in ch.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                     eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
                     end_ts = int(booster["end_at"])
+                    checked_ts = int(datetime.now(timezone.utc).timestamp())
                     body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
                             f"**Prize:** {booster['prize']}\n"
                             f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
                             f"💜 Thank you for boosting the server!\n"
                             f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
-                            f"**Eligible members ({len(eligible)}):** {eligible_str}")
+                            f"**Eligible members ({len(eligible)}):** {eligible_str}\n"
+                            f"🕐 Last checked: <t:{checked_ts}:R>")
                     await msg.edit(content=body)
                     print(f"[BoosterGiveaway] Force-refreshed eligible list: {len(eligible)} members.")
                 except Exception as e:
