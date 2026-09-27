@@ -914,6 +914,10 @@ class ManagerApp(tk.Tk):
         tk.Label(reminder_row, text="Send weekly booster reminder (Sun 09:59 UTC)",
                  bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9), anchor="w"
                  ).pack(side="left")
+        self._booster_reminder_ch_var = tk.StringVar(value=str(feats.get("booster_reminder_channel", 472851820448972800)))
+        self._booster_reminder_ch_var.trace_add("write", self._save_booster_reminder_channel)
+        row_br = field_row(card, ["Reminder Channel ID"], [1])
+        inp(row_br, self._booster_reminder_ch_var).grid(row=1, column=0, sticky="ew")
         tk.Frame(card, bg=BG_CARD, height=8).pack()
         bf = tk.Frame(card, bg=BG_CARD)
         bf.pack(padx=12, pady=(0, 12), fill="x")
@@ -965,6 +969,15 @@ class ManagerApp(tk.Tk):
         state = "enabled" if self._booster_reminder_var.get() else "disabled"
         self.set_status(f"Weekly booster reminder {state}.")
         self.deploy()
+
+    def _save_booster_reminder_channel(self, *_):
+        try:
+            ch_id = int(self._booster_reminder_ch_var.get().strip())
+        except ValueError:
+            return
+        d = load_features()
+        d["booster_reminder_channel"] = ch_id
+        save_features(d)
 
     def _get_gw_offset(self):
         try:
