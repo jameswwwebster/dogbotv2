@@ -323,11 +323,11 @@ async def _do_booster_refresh():
         print("[BoosterGiveaway] Refresh: guild not available from channel.")
         return
 
-    # Chunk guild first so member list is complete
+    # Best-effort member chunk with timeout — members are usually already cached
     try:
-        await guild.chunk()
-    except Exception as e:
-        print(f"[BoosterGiveaway] Refresh: guild.chunk() failed: {e}")
+        await asyncio.wait_for(guild.chunk(), timeout=10)
+    except Exception:
+        pass  # Use whatever members are already cached
 
     threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
     eligible = [m for m in guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
@@ -1717,8 +1717,13 @@ async def boosterrefresh_cmd(ctx):
     if not has_mod_role(ctx.author):
         return
     await ctx.send("🔄 Refreshing booster giveaway participants...")
-    await _do_booster_refresh()
-    await ctx.send("✅ Done! Check the giveaway message.")
+    try:
+        await asyncio.wait_for(_do_booster_refresh(), timeout=30)
+        await ctx.send("✅ Done! Check the giveaway message.")
+    except asyncio.TimeoutError:
+        await ctx.send("❌ Refresh timed out. Try again.")
+    except Exception as e:
+        await ctx.send(f"❌ Refresh failed: {e}")
 
 
 @bot.command(name="boosterdebug")
