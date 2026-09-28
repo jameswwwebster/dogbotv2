@@ -1712,6 +1712,15 @@ async def boostergw_cmd(ctx, subcommand: str = None):
         await ctx.send("Usage: `!boostergw repost` — delete old message and post fresh one")
 
 
+@bot.command(name="boosterrefresh")
+async def boosterrefresh_cmd(ctx):
+    if not has_mod_role(ctx.author):
+        return
+    await ctx.send("🔄 Refreshing booster giveaway participants...")
+    await _do_booster_refresh()
+    await ctx.send("✅ Done! Check the giveaway message.")
+
+
 @bot.command(name="boosterdebug")
 async def boosterdebug_cmd(ctx):
     if not has_mod_role(ctx.author):
