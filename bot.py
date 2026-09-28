@@ -928,6 +928,29 @@ async def on_ready():
         d["booster_force_refresh"] = 0
         save_features(d)
 
+    # Catch up daily question if the bot restarted after the scheduled window
+    if feats.get("daily_question_enabled"):
+        try:
+            dq_h, dq_m = map(int, feats.get("daily_question_time", "10:00").split(":"))
+        except Exception:
+            dq_h, dq_m = 10, 0
+        _offset = feats.get("gmt_offset", 0)
+        _now_local = datetime.now(timezone.utc) + timedelta(hours=_offset)
+        _past_scheduled = _now_local.hour > dq_h or (_now_local.hour == dq_h and _now_local.minute >= dq_m)
+        if _past_scheduled:
+            _sched_local = _now_local.replace(hour=dq_h, minute=dq_m, second=0, microsecond=0)
+            _sched_ts = (_sched_local - timedelta(hours=_offset)).timestamp()
+            _qs = load_questions().get("questions", [])
+            _posted_today = any(q.get("last_shown", 0) >= _sched_ts for q in _qs)
+            if not _posted_today and _qs:
+                _dq_ch = bot.get_channel(int(feats.get("daily_question_channel", 472851820448972800)))
+                if _dq_ch:
+                    _cutoff = time.time() - 180 * 86400
+                    _eligible = [q for q in _qs if not q.get("last_shown") or q["last_shown"] < _cutoff]
+                    _q = random.choice(_eligible if _eligible else _qs)
+                    await _post_question(_dq_ch, _q)
+                    print("[DailyQuestion] Catch-up: posted missed question on startup.")
+
     # Battle of the Pets: reattach if one is stored
     await _reattach_battle_pets()
 
