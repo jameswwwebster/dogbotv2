@@ -309,7 +309,7 @@ def _start_booster_giveaway():
 
 
 async def _do_booster_refresh():
-    """Scan the booster channel history, find the active giveaway message, update eligible list."""
+    """Find the active booster giveaway message and update the eligible member list."""
     feats = load_features()
     ch_id = int(feats.get("booster_giveaway_channel", 1536081045345149069))
     try:
@@ -317,41 +317,74 @@ async def _do_booster_refresh():
     except Exception as e:
         print(f"[BoosterGiveaway] Refresh: channel {ch_id} not found: {e}")
         return
+
+    guild = ch.guild
+    if guild is None:
+        print("[BoosterGiveaway] Refresh: guild not available from channel.")
+        return
+
+    # Chunk guild first so member list is complete
+    try:
+        await guild.chunk()
+    except Exception as e:
+        print(f"[BoosterGiveaway] Refresh: guild.chunk() failed: {e}")
+
+    threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
+    eligible = [m for m in guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
+    print(f"[BoosterGiveaway] Refresh: {len(guild.members)} members cached, {len(eligible)} eligible.")
+
+    # Find the active giveaway message — try giveaways.json first, then scan history
     now_ts = datetime.now(timezone.utc).timestamp()
     msg = None
     end_ts = None
     prize = "Bond"
-    async for m in ch.history(limit=500):
-        if m.author != bot.user or "BOOSTER GIVEAWAY" not in m.content:
-            continue
-        match = re.search(r'<t:(\d+):F>', m.content)
-        if not match:
-            continue
-        end_at = float(match.group(1))
-        if end_at <= now_ts:
-            continue
-        msg = m
-        end_ts = int(end_at)
-        prize_match = re.search(r'\*\*Prize:\*\* (.+)', m.content)
-        if prize_match:
-            prize = prize_match.group(1).strip()
-        break
+
+    gs = load_giveaways()
+    entry = next((g for g in gs if g.get("booster_only") and g.get("end_at", 0) > now_ts and g.get("message_id")), None)
+    if entry:
+        try:
+            msg = await ch.fetch_message(entry["message_id"])
+            end_ts = int(entry["end_at"])
+            prize = entry.get("prize", "Bond")
+            print(f"[BoosterGiveaway] Refresh: found message via giveaways.json (id={msg.id})")
+        except Exception as e:
+            print(f"[BoosterGiveaway] Refresh: giveaways.json message_id invalid ({e}), scanning history...")
+
     if not msg:
-        print("[BoosterGiveaway] Refresh: no active giveaway message found in channel history.")
-        return
+        scanned = 0
+        async for m in ch.history(limit=500):
+            scanned += 1
+            if m.author != bot.user or "BOOSTER GIVEAWAY" not in m.content:
+                continue
+            match = re.search(r'<t:(\d+):F>', m.content)
+            if not match:
+                continue
+            end_at = float(match.group(1))
+            if end_at <= now_ts:
+                continue
+            msg = m
+            end_ts = int(end_at)
+            prize_match = re.search(r'\*\*Prize:\*\* (.+)', m.content)
+            if prize_match:
+                prize = prize_match.group(1).strip()
+            print(f"[BoosterGiveaway] Refresh: found message after scanning {scanned} messages (id={m.id})")
+            break
+        if not msg:
+            print(f"[BoosterGiveaway] Refresh: no active message found after {scanned} messages. Posting fresh.")
+            # Nothing found — post a fresh giveaway
+            _start_booster_giveaway()
+            return
+
+    eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
+    checked_ts = int(datetime.now(timezone.utc).timestamp())
+    body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
+            f"**Prize:** {prize}\n"
+            f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
+            f"💜 Thank you for boosting the server!\n"
+            f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
+            f"**Eligible members ({len(eligible)}):** {eligible_str}\n"
+            f"🕐 Last checked: <t:{checked_ts}:R>")
     try:
-        await ch.guild.chunk()
-        threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
-        eligible = [m for m in ch.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
-        eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
-        checked_ts = int(datetime.now(timezone.utc).timestamp())
-        body = (f"🎉 **BOOSTER GIVEAWAY** 🎉\n"
-                f"**Prize:** {prize}\n"
-                f"**Ends:** <t:{end_ts}:F> (<t:{end_ts}:R>)\n\n"
-                f"💜 Thank you for boosting the server!\n"
-                f"Members who have been boosting for at least 30 days are automatically entered.\n\n"
-                f"**Eligible members ({len(eligible)}):** {eligible_str}\n"
-                f"🕐 Last checked: <t:{checked_ts}:R>")
         await msg.edit(content=body)
         print(f"[BoosterGiveaway] Refreshed eligible list: {len(eligible)} members.")
     except Exception as e:
@@ -1689,8 +1722,9 @@ async def boosterdebug_cmd(ctx):
     channel = bot.get_channel(ch_id)
     lines   = ["**🚀 Booster Giveaway Debug**"]
     lines.append(f"Enabled: {'✅' if enabled else '❌'}")
-    lines.append(f"Channel ID: `{ch_id}` → {channel.mention if channel else '❌ NOT FOUND'}")
+    lines.append(f"Channel ID: `{ch_id}` → {channel.mention if channel else '❌ NOT FOUND in cache'}")
     if channel:
+        await channel.guild.chunk()
         now_ts = datetime.now(timezone.utc).timestamp()
         active = next((g for g in load_giveaways() if g.get("booster_only") and g.get("end_at", 0) > now_ts), None)
         if active:
@@ -1698,11 +1732,21 @@ async def boosterdebug_cmd(ctx):
         else:
             lines.append("Active giveaway in JSON: ❌ none")
         threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
-        eligible = [m for m in channel.guild.members if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
+        all_boosters = [m for m in channel.guild.members if m.premium_since]
+        eligible = [m for m in all_boosters if m.premium_since.timestamp() <= threshold_ts]
         lines.append(f"Members cached: {len(channel.guild.members)}")
-        lines.append(f"Eligible (boosting 35+ days): {len(eligible)}")
+        lines.append(f"Current boosters: {len(all_boosters)}")
+        lines.append(f"Eligible (boosting 30+ days): {len(eligible)}")
         if eligible:
             lines.append(", ".join(m.display_name for m in eligible[:10]) + ("…" if len(eligible) > 10 else ""))
+        # Show all boosters with their duration for diagnosis
+        now_dt = datetime.now(timezone.utc)
+        booster_detail = []
+        for m in sorted(all_boosters, key=lambda x: x.premium_since):
+            days = (now_dt - m.premium_since.replace(tzinfo=timezone.utc)).days
+            booster_detail.append(f"{m.display_name} ({days}d)")
+        if booster_detail:
+            lines.append("All boosters: " + ", ".join(booster_detail))
     await ctx.send("\n".join(lines))
 
 
