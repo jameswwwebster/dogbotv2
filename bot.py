@@ -1023,10 +1023,14 @@ async def on_ready():
         now_ts = datetime.now(timezone.utc).timestamp()
         save_push_messages([])  # clear immediately so redeploys never resend
         for entry in pending:
-            # Skip messages queued more than 10 minutes ago (stale from a previous deploy)
-            if entry.get("queued_at") and now_ts - entry["queued_at"] > 600:
+            # Skip messages queued more than 30 minutes ago (stale from a much earlier deploy)
+            if entry.get("queued_at") and now_ts - entry["queued_at"] > 1800:
                 continue
-            channel = bot.get_channel(entry["channel_id"])
+            try:
+                channel = bot.get_channel(entry["channel_id"]) or await bot.fetch_channel(entry["channel_id"])
+            except Exception:
+                print(f"[Push] Channel {entry['channel_id']} not found.")
+                continue
             if channel:
                 if entry.get("is_question"):
                     # Extract question/answer from the formatted message and use _post_question
@@ -1043,8 +1047,6 @@ async def on_ready():
                 else:
                     text = resolve_text(entry["message"], channel.guild)
                     await channel.send(text, allowed_mentions=discord.AllowedMentions(roles=True, everyone=True, users=True))
-            else:
-                print(f"[Push] Channel {entry['channel_id']} not found.")
         save_push_messages([])
 
 
