@@ -1,7 +1,7 @@
 [
     {
         "channel_id": 472851820448972800,
-        "message": "Dogbot got updated!\nLast update for now:\n- Completely fixed the booster giveaway automatisation. Members that have been boosting the server for atleast 30 days are automatically added in a bi-monthly bond giveaway. \n- Added 5 new questions and cleaned up some errors (total 744 questions)\n\nWhen API/Plugins come out, DogBot will be handling a lot of the data coming in adding new functionalities to the discord. Happy scaping (dont forget to !spank someone)",
-        "queued_at": 1790596790.3545668
+        "message": "@carbonmo say that one more time and I will kick you",
+        "queued_at": 1790596821.7945123
     }
 ]
