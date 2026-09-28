@@ -2907,11 +2907,11 @@
         },
         {
             "question": "Which boss was released earlier: Nex: Angel of Death or Telos?",
-            "answer": "Telos (2016) \u00e2\u20ac\u201d Nex: Angel of Death was released in 2017"
+            "answer": "Telos (2016) â€” Nex: Angel of Death was released in 2017"
         },
         {
             "question": "Which boss was released earlier: Kalphite King or Legiones?",
-            "answer": "Kalphite King (January 2013) \u00e2\u20ac\u201d Legiones were released in June 2013"
+            "answer": "Kalphite King (January 2013) â€” Legiones were released in June 2013"
         },
         {
             "question": "Great Gielinor Run is an achievement that requires the player to run from one part of the map to the other without teleporting. Where does it start and where does it end?",
@@ -2956,6 +2956,26 @@
         {
             "question": "What is Fungicide used for?",
             "answer": "It is required to be used on Mutated Zygomites in order to kill them."
+        },
+        {
+            "question": "Which quest was RuneScape's first grandmaster quest?",
+            "answer": "While Guthix Sleeps"
+        },
+        {
+            "question": "Which year was Evolution of Combat (EoC) released?",
+            "answer": "2012"
+        },
+        {
+            "question": "What was the name of Guthix's race?",
+            "answer": "Naragi"
+        },
+        {
+            "question": "Which monster has the highest droprate for the Dragon chainbody?",
+            "answer": "Kalphite Queen"
+        },
+        {
+            "question": "Which pet do you unlock from the Mysterious egg (item)?",
+            "answer": "Mysterious Chicken"
         }
     ]
 }
