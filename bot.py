@@ -179,8 +179,13 @@ def _remove_giveaway_entry(entry):
 async def _run_giveaway(entry):
     channel = bot.get_channel(entry["channel_id"])
     if not channel:
-        print(f"[Giveaway] Channel {entry['channel_id']} not found.")
-        _remove_giveaway_entry(entry)
+        try:
+            channel = await bot.fetch_channel(entry["channel_id"])
+        except Exception:
+            print(f"[Giveaway] Channel {entry['channel_id']} not found — skipping.")
+            return
+    if not channel:
+        print(f"[Giveaway] Channel {entry['channel_id']} not found — skipping.")
         return
 
     now_ts = datetime.now(timezone.utc).timestamp()
@@ -308,8 +313,11 @@ async def _reattach_or_start_booster_giveaway():
     ch_id   = int(feats.get("booster_giveaway_channel", 1536081045345149069))
     channel = bot.get_channel(ch_id)
     if not channel:
-        print(f"[BoosterGiveaway] Channel {ch_id} not found.")
-        return
+        try:
+            channel = await bot.fetch_channel(ch_id)
+        except Exception as e:
+            print(f"[BoosterGiveaway] Channel {ch_id} not found: {e}")
+            return
     now_ts = datetime.now(timezone.utc).timestamp()
     # Scan channel history for an active bot-posted booster giveaway
     async for m in channel.history(limit=50):
