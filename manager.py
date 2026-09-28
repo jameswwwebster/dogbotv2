@@ -50,10 +50,10 @@ def save_reminders(d):
 
 def load_questions():
     if not os.path.exists(QUESTIONS_FILE): return {"command": "", "questions": []}
-    with open(QUESTIONS_FILE) as f: return json.load(f)
+    with open(QUESTIONS_FILE, encoding="utf-8") as f: return json.load(f)
 
 def save_questions(d):
-    with open(QUESTIONS_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(QUESTIONS_FILE, "w", encoding="utf-8") as f: json.dump(d, f, indent=4, ensure_ascii=False)
 
 def load_features():
     defaults = {"gmt_offset": 0, "rng_enabled": False}
