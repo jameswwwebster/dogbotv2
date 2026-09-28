@@ -737,14 +737,17 @@ async def check_reminders():
             dq_h, dq_m = 10, 0
         if now.hour == dq_h and now.minute == dq_m and "daily_q" not in _reminders_sent:
             _reminders_sent["daily_q"] = True
-            channel = bot.get_channel(int(features.get("daily_question_channel", 472851820448972800)))
-            if channel:
+            try:
+                ch_id = int(features.get("daily_question_channel", 472851820448972800))
+                channel = bot.get_channel(ch_id) or await bot.fetch_channel(ch_id)
                 questions = load_questions().get("questions", [])
                 if questions:
                     cutoff = time.time() - 180 * 86400
                     eligible = [q for q in questions if not q.get("last_shown") or q["last_shown"] < cutoff]
                     q = random.choice(eligible if eligible else questions)
                     await _post_question(channel, q)
+            except Exception as e:
+                print(f"[DailyQuestion] Failed to post: {e}")
 
     # Weekly booster reminder every Sunday at 09:59 UTC
     if features.get("booster_reminder_enabled") and now.weekday() == 6 and now.hour == 9 and now.minute == 59 and "booster_reminder" not in _reminders_sent:
@@ -943,7 +946,8 @@ async def on_ready():
             _qs = load_questions().get("questions", [])
             _posted_today = any(q.get("last_shown", 0) >= _sched_ts for q in _qs)
             if not _posted_today and _qs:
-                _dq_ch = bot.get_channel(int(feats.get("daily_question_channel", 472851820448972800)))
+                _dq_ch_id = int(feats.get("daily_question_channel", 472851820448972800))
+                _dq_ch = bot.get_channel(_dq_ch_id) or await bot.fetch_channel(_dq_ch_id)
                 if _dq_ch:
                     _cutoff = time.time() - 180 * 86400
                     _eligible = [q for q in _qs if not q.get("last_shown") or q["last_shown"] < _cutoff]
