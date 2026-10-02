@@ -212,7 +212,10 @@ async def _run_giveaway(entry):
             winner_line = f"**Winners:** {winners}\n" if winners > 1 else ""
             if entry.get("booster_only"):
                 threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
-                await channel.guild.chunk()
+                try:
+                    await asyncio.wait_for(channel.guild.chunk(), timeout=10)
+                except Exception:
+                    pass
                 eligible = [m for m in channel.guild.members
                             if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
                 eligible_str = ", ".join(m.display_name for m in eligible) if eligible else "None yet"
