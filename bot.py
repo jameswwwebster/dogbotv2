@@ -249,7 +249,10 @@ async def _run_giveaway(entry):
 
     if entry.get("booster_only"):
         threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
-        await channel.guild.chunk()
+        try:
+            await asyncio.wait_for(channel.guild.chunk(), timeout=10)
+        except Exception:
+            pass
         entrants = [m for m in channel.guild.members
                     if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
     else:
@@ -1728,6 +1731,50 @@ async def boosterrefresh_cmd(ctx):
         await ctx.send(f"❌ Refresh failed: {e}")
 
 
+@bot.command(name="boosterpick")
+async def boosterpick_cmd(ctx):
+    """Manually pick and announce the winner for a missed booster giveaway, then start next cycle if needed."""
+    if not has_mod_role(ctx.author):
+        return
+    await ctx.send("🎯 Picking booster giveaway winner...")
+    feats = load_features()
+    ch_id = int(feats.get("booster_giveaway_channel", 1536081045345149069))
+    try:
+        ch = bot.get_channel(ch_id) or await bot.fetch_channel(ch_id)
+    except Exception as e:
+        await ctx.send(f"❌ Channel not found: {e}")
+        return
+    try:
+        await asyncio.wait_for(ch.guild.chunk(), timeout=10)
+    except Exception:
+        pass
+    threshold_ts = (datetime.now(timezone.utc) - timedelta(days=30)).timestamp()
+    eligible = [m for m in ch.guild.members
+                if m.premium_since and m.premium_since.timestamp() <= threshold_ts]
+    if not eligible:
+        await ctx.send("❌ No eligible members found (boosting 30+ days).")
+        return
+    winner = random.choice(eligible)
+    await ch.send(
+        f"🎉 **(Late announcement)** Congratulations {winner.mention}! "
+        f"You won the **Bond** from the booster giveaway! 💜"
+    )
+    await ctx.send(f"✅ Winner announced: **{winner.display_name}**")
+    # Start next cycle if none is active
+    now_ts = datetime.now(timezone.utc).timestamp()
+    gs = load_giveaways()
+    # Remove expired booster entries so they don't block the active check
+    gs = [g for g in gs if not (g.get("booster_only") and g.get("end_at", 0) <= now_ts)]
+    save_giveaways(gs)
+    already_active = any(g.get("booster_only") and g.get("end_at", 0) > now_ts for g in gs)
+    if not already_active:
+        _start_booster_giveaway()
+        next_ts = _next_booster_date()
+        await ctx.send(f"✅ New booster giveaway started — ends <t:{int(next_ts)}:F>.")
+    else:
+        await ctx.send("ℹ️ A new giveaway cycle is already running.")
+
+
 @bot.command(name="boosterdebug")
 async def boosterdebug_cmd(ctx):
     if not has_mod_role(ctx.author):
@@ -1740,7 +1787,10 @@ async def boosterdebug_cmd(ctx):
     lines.append(f"Enabled: {'✅' if enabled else '❌'}")
     lines.append(f"Channel ID: `{ch_id}` → {channel.mention if channel else '❌ NOT FOUND in cache'}")
     if channel:
-        await channel.guild.chunk()
+        try:
+            await asyncio.wait_for(channel.guild.chunk(), timeout=10)
+        except Exception:
+            pass
         now_ts = datetime.now(timezone.utc).timestamp()
         active = next((g for g in load_giveaways() if g.get("booster_only") and g.get("end_at", 0) > now_ts), None)
         if active:
