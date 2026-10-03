@@ -6,14 +6,18 @@ import subprocess
 import time
 from datetime import datetime, timezone, timedelta
 
-COMMANDS_FILE        = os.path.join(os.path.dirname(__file__), "commands.json")
-REMINDERS_FILE       = os.path.join(os.path.dirname(__file__), "reminders.json")
-QUESTIONS_FILE       = os.path.join(os.path.dirname(__file__), "questions.json")
-FEATURES_FILE        = os.path.join(os.path.dirname(__file__), "features.json")
-PUSH_MESSAGES_FILE   = os.path.join(os.path.dirname(__file__), "push_messages.json")
-GIVEAWAYS_FILE       = os.path.join(os.path.dirname(__file__), "giveaways.json")
-REACTION_ROLES_FILE  = os.path.join(os.path.dirname(__file__), "reaction_roles.json")
-BATTLE_PETS_FILE     = os.path.join(os.path.dirname(__file__), "battle_pets.json")
+_SERVER_ID = "rs"
+_DIR = os.path.dirname(__file__)
+
+SERVERS = {
+    "rs":   "🗡️ Runescape Server",
+    "osrs": "⚔️ OSRS Server",
+}
+
+def _f(name):
+    if _SERVER_ID == "rs":
+        return os.path.join(_DIR, f"{name}.json")
+    return os.path.join(_DIR, f"{name}_{_SERVER_ID}.json")
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
 
@@ -32,75 +36,81 @@ GOLD     = "#f0b232"
 # ── I/O ───────────────────────────────────────────────────────────────────────
 
 def load_commands():
-    if not os.path.exists(COMMANDS_FILE): return {}
-    with open(COMMANDS_FILE) as f: data = json.load(f)
-    # Migrate old plain-string format {"cmd": "response"} → {"cmd": {"response": ..., "mod_only": false}}
+    p = _f("commands")
+    if not os.path.exists(p): return {}
+    with open(p) as f: data = json.load(f)
     return {cmd: (val if isinstance(val, dict) else {"response": val, "mod_only": False})
             for cmd, val in data.items()}
 
 def save_commands(d):
-    with open(COMMANDS_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(_f("commands"), "w") as f: json.dump(d, f, indent=4)
 
 def load_reminders():
-    if not os.path.exists(REMINDERS_FILE): return []
-    with open(REMINDERS_FILE) as f: return json.load(f)
+    p = _f("reminders")
+    if not os.path.exists(p): return []
+    with open(p) as f: return json.load(f)
 
 def save_reminders(d):
-    with open(REMINDERS_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(_f("reminders"), "w") as f: json.dump(d, f, indent=4)
 
 def load_questions():
-    if not os.path.exists(QUESTIONS_FILE): return {"command": "", "questions": []}
-    with open(QUESTIONS_FILE, encoding="utf-8") as f: return json.load(f)
+    p = _f("questions")
+    if not os.path.exists(p): return {"command": "", "questions": []}
+    with open(p, encoding="utf-8") as f: return json.load(f)
 
 def save_questions(d):
-    with open(QUESTIONS_FILE, "w", encoding="utf-8") as f: json.dump(d, f, indent=4, ensure_ascii=False)
+    with open(_f("questions"), "w", encoding="utf-8") as f: json.dump(d, f, indent=4, ensure_ascii=False)
 
 def load_features():
     defaults = {"gmt_offset": 0, "rng_enabled": False}
-    if not os.path.exists(FEATURES_FILE): return defaults
-    with open(FEATURES_FILE) as f: data = json.load(f)
+    p = _f("features")
+    if not os.path.exists(p): return defaults
+    with open(p) as f: data = json.load(f)
     for k, v in defaults.items(): data.setdefault(k, v)
     return data
 
 def save_features(d):
-    with open(FEATURES_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(_f("features"), "w") as f: json.dump(d, f, indent=4)
 
 def load_push_messages():
-    if not os.path.exists(PUSH_MESSAGES_FILE): return []
-    with open(PUSH_MESSAGES_FILE) as f: return json.load(f)
+    p = _f("push_messages")
+    if not os.path.exists(p): return []
+    with open(p) as f: return json.load(f)
 
 def save_push_messages(d):
-    with open(PUSH_MESSAGES_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(_f("push_messages"), "w") as f: json.dump(d, f, indent=4)
 
 def load_giveaways():
-    if not os.path.exists(GIVEAWAYS_FILE): return []
-    with open(GIVEAWAYS_FILE) as f: return json.load(f)
+    p = _f("giveaways")
+    if not os.path.exists(p): return []
+    with open(p) as f: return json.load(f)
 
 def save_giveaways(d):
-    with open(GIVEAWAYS_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(_f("giveaways"), "w") as f: json.dump(d, f, indent=4)
 
 def load_reaction_roles():
     defaults = {"message_id": 969585509561172028, "channel_id": 969324314983804948,
                 "info_message_id": None, "roles": {}}
-    if not os.path.exists(REACTION_ROLES_FILE): return defaults
-    with open(REACTION_ROLES_FILE) as f: data = json.load(f)
+    p = _f("reaction_roles")
+    if not os.path.exists(p): return defaults
+    with open(p) as f: data = json.load(f)
     for k, v in defaults.items(): data.setdefault(k, v)
-    # Migrate old plain-string format → {"role": ..., "name": ...}
     for emote, val in data["roles"].items():
         if isinstance(val, str):
             data["roles"][emote] = {"role": val, "name": val}
     return data
 
 def save_reaction_roles(d):
-    with open(REACTION_ROLES_FILE, "w") as f: json.dump(d, f, indent=4)
+    with open(_f("reaction_roles"), "w") as f: json.dump(d, f, indent=4)
 
 def load_battle_pets():
-    if not os.path.exists(BATTLE_PETS_FILE): return None
-    with open(BATTLE_PETS_FILE) as f: data = json.load(f)
+    p = _f("battle_pets")
+    if not os.path.exists(p): return None
+    with open(p) as f: data = json.load(f)
     return data if data else None
 
 def save_battle_pets(d):
-    with open(BATTLE_PETS_FILE, "w") as f: json.dump(d or {}, f, indent=4)
+    with open(_f("battle_pets"), "w") as f: json.dump(d or {}, f, indent=4)
 
 
 # ── Widget helpers ─────────────────────────────────────────────────────────────
@@ -172,7 +182,44 @@ class ManagerApp(tk.Tk):
                         padding=[12, 6], font=("Segoe UI", 10, "bold"))
         style.map("TNotebook.Tab", background=[("selected", ACCENT)])
 
-        nb = ttk.Notebook(self)
+        # ── Server selector bar ──────────────────────────────────────────────
+        sel_bar = tk.Frame(self, bg=BG_CARD)
+        sel_bar.pack(fill="x", padx=12, pady=(10, 0))
+        tk.Label(sel_bar, text="Server:", bg=BG_CARD, fg=FG_DIM,
+                 font=("Segoe UI", 10)).pack(side="left", padx=(10, 6), pady=8)
+        self._sel_btns = {}
+        for sid, label in SERVERS.items():
+            b = tk.Button(sel_bar, text=label,
+                          command=lambda s=sid: self._switch_server(s),
+                          font=("Segoe UI", 10, "bold"), relief="flat",
+                          cursor="hand2", padx=14, pady=6)
+            b.pack(side="left", padx=(0, 4), pady=6)
+            self._sel_btns[sid] = b
+        self._update_sel_style()
+
+        # ── Content (rebuilt on server switch) ───────────────────────────────
+        self._content = tk.Frame(self, bg=BG)
+        self._content.pack(fill="both", expand=True)
+        self._build_content()
+
+    def _update_sel_style(self):
+        for sid, b in self._sel_btns.items():
+            b.config(bg=ACCENT if sid == _SERVER_ID else BG_CARD,
+                     fg=FG     if sid == _SERVER_ID else FG_DIM)
+
+    def _switch_server(self, sid):
+        global _SERVER_ID
+        if sid == _SERVER_ID:
+            return
+        _SERVER_ID = sid
+        self._update_sel_style()
+        self._content.destroy()
+        self._content = tk.Frame(self, bg=BG)
+        self._content.pack(fill="both", expand=True)
+        self._build_content()
+
+    def _build_content(self):
+        nb = ttk.Notebook(self._content)
         nb.pack(fill="both", expand=True, padx=12, pady=12)
 
         for name, builder in [
@@ -189,9 +236,10 @@ class ManagerApp(tk.Tk):
             nb.add(f, text=name)
             builder(f)
 
-        btn(self, "Save & Deploy to GitHub", GREEN, self.deploy).pack(
+        btn(self._content, "Save & Deploy to GitHub", GREEN, self.deploy).pack(
             fill="x", padx=12, pady=(0, 6))
-        self._status = tk.Label(self, text="", bg=BG, fg=FG_DIM, font=("Segoe UI", 9))
+        self._status = tk.Label(self._content, text="", bg=BG, fg=FG_DIM,
+                                font=("Segoe UI", 9))
         self._status.pack(pady=(0, 8))
 
     # ── Commands ──────────────────────────────────────────────────────────────

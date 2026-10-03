@@ -19,16 +19,31 @@ intents.reactions = True
 
 bot = commands.Bot(command_prefix="!", intents=intents, help_command=None)
 
-COMMANDS_FILE          = "commands.json"
-REMINDERS_FILE         = "reminders.json"
-QUESTIONS_FILE         = "questions.json"
-FEATURES_FILE          = "features.json"
-PUSH_MESSAGES_FILE     = "push_messages.json"
-PENDING_REMINDERS_FILE = "pending_reminders.json"
-GIVEAWAYS_FILE         = "giveaways.json"
-QUESTION_TRACKING_FILE = "question_tracking.json"
-REACTION_ROLES_FILE    = "reaction_roles.json"
-BATTLE_PETS_FILE       = "battle_pets.json"
+@bot.check
+async def _guild_gate(ctx):
+    if GUILD_ID and ctx.guild and ctx.guild.id != GUILD_ID:
+        return False
+    return True
+
+SERVER_ID = os.getenv("SERVER_ID", "rs")
+GUILD_ID  = int(os.getenv("GUILD_ID", "0"))  # 0 = no filtering
+_DIR = os.path.dirname(os.path.realpath(__file__))
+
+def _f(name):
+    if SERVER_ID == "rs":
+        return os.path.join(_DIR, f"{name}.json")
+    return os.path.join(_DIR, f"{name}_{SERVER_ID}.json")
+
+COMMANDS_FILE          = _f("commands")
+REMINDERS_FILE         = _f("reminders")
+QUESTIONS_FILE         = _f("questions")
+FEATURES_FILE          = _f("features")
+PUSH_MESSAGES_FILE     = _f("push_messages")
+PENDING_REMINDERS_FILE = _f("pending_reminders")
+GIVEAWAYS_FILE         = _f("giveaways")
+QUESTION_TRACKING_FILE = _f("question_tracking")
+REACTION_ROLES_FILE    = _f("reaction_roles")
+BATTLE_PETS_FILE       = _f("battle_pets")
 
 QUESTION_REACTION_WINDOW = 24 * 60 * 60  # seconds
 
