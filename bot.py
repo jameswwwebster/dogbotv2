@@ -1036,11 +1036,22 @@ async def on_ready():
                 _dq_ch_id = int(feats.get("daily_question_channel", 472851820448972800))
                 _dq_ch = bot.get_channel(_dq_ch_id) or await bot.fetch_channel(_dq_ch_id)
                 if _dq_ch:
-                    _cutoff = time.time() - 180 * 86400
-                    _eligible = [q for q in _qs if not q.get("last_shown") or q["last_shown"] < _cutoff]
-                    _q = random.choice(_eligible if _eligible else _qs)
-                    await _post_question(_dq_ch, _q)
-                    print("[DailyQuestion] Catch-up: posted missed question on startup.")
+                    # Guard against Render redeploys: check channel history for a
+                    # question already posted today (last_shown in git may be stale)
+                    _after_dt = datetime.fromtimestamp(_sched_ts, tz=timezone.utc)
+                    _already = False
+                    async for _hm in _dq_ch.history(after=_after_dt, limit=50):
+                        if _hm.author == bot.user and _hm.content.startswith("❓"):
+                            _already = True
+                            break
+                    if not _already:
+                        _cutoff = time.time() - 180 * 86400
+                        _eligible = [q for q in _qs if not q.get("last_shown") or q["last_shown"] < _cutoff]
+                        _q = random.choice(_eligible if _eligible else _qs)
+                        await _post_question(_dq_ch, _q)
+                        print("[DailyQuestion] Catch-up: posted missed question on startup.")
+                    else:
+                        print("[DailyQuestion] Catch-up: question already posted today — skipping.")
 
     # Battle of the Pets: reattach if one is stored
     await _reattach_battle_pets()
