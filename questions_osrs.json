@@ -1,19 +1,61 @@
 {
     "command": "trivia",
     "questions": [
-        {"question": "Where does the ring of returning teleport a player to when rubbed?", "answer": "Their current respawn point"},
-        {"question": "What is the name of the boss pet of Sarachnis?", "answer": "Sraracha"},
-        {"question": "Which Impling has access to the clue drop tables?", "answer": "Lucky Impling"},
-        {"question": "In which kingdom is the farming based minigame Tithe Farm located?", "answer": "The kingdom of Great Kourend"},
-        {"question": "Against what type of creature are weapons crafted with a Tormented synapse especially effective?", "answer": "Demonic creatures"},
-        {"question": "In which area is the Cosmic Altar located?", "answer": "Zanaris"},
-        {"question": "In which area is the Nature Altar located?", "answer": "Karamja"},
-        {"question": "What is the name of the first raid of Oldschool Runescape?", "answer": "Chambers of Xeric"},
-        {"question": "What is the name of the second raid of Oldschool Runescape?", "answer": "Theatre of Blood"},
-        {"question": "What is the name of the third raid of Oldschool Runescape?", "answer": "Tombs of Amascut"},
-        {"question": "What is the name of the fourth raid of Oldschool Runescape?", "answer": "The Fractured Archive"},
-        {"question": "Which ores are required to smith a bronze bar?", "answer": "A copper ore and a tin ore"},
-        {"question": "What is the highest tier Ice spell from the Ancient Magicks spellbook, available at level 94 Magic?", "answer": "Ice Barrage"},
-        {"question": "What type of creature is Doom of Mokhiotl?", "answer": "Demonic"}
+        {
+            "question": "Where does the ring of returning teleport a player to when rubbed?",
+            "answer": "Their current respawn point"
+        },
+        {
+            "question": "What is the name of the boss pet of Sarachnis?",
+            "answer": "Sraracha"
+        },
+        {
+            "question": "Which Impling has access to the clue drop tables?",
+            "answer": "Lucky Impling"
+        },
+        {
+            "question": "In which kingdom is the farming based minigame Tithe Farm located?",
+            "answer": "The kingdom of Great Kourend"
+        },
+        {
+            "question": "Against what type of creature are weapons crafted with a Tormented synapse especially effective?",
+            "answer": "Demonic creatures"
+        },
+        {
+            "question": "In which area is the Cosmic Altar located?",
+            "answer": "Zanaris"
+        },
+        {
+            "question": "In which area is the Nature Altar located?",
+            "answer": "Karamja"
+        },
+        {
+            "question": "What is the name of the first raid of Oldschool Runescape?",
+            "answer": "Chambers of Xeric"
+        },
+        {
+            "question": "What is the name of the second raid of Oldschool Runescape?",
+            "answer": "Theatre of Blood"
+        },
+        {
+            "question": "What is the name of the third raid of Oldschool Runescape?",
+            "answer": "Tombs of Amascut"
+        },
+        {
+            "question": "What is the name of the fourth raid of Oldschool Runescape?",
+            "answer": "The Fractured Archive"
+        },
+        {
+            "question": "Which ores are required to smith a bronze bar?",
+            "answer": "A copper ore and a tin ore"
+        },
+        {
+            "question": "What is the highest tier Ice spell from the Ancient Magicks spellbook, available at level 94 Magic?",
+            "answer": "Ice Barrage"
+        },
+        {
+            "question": "What type of creature is Doom of Mokhiotl?",
+            "answer": "Demonic"
+        }
     ]
 }
