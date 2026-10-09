@@ -984,6 +984,13 @@ async def on_ready():
         check_reminders.start()
     _cleanup_question_tracking()
 
+    # Chunk all guilds so member lookups work everywhere
+    for _guild in bot.guilds:
+        try:
+            await asyncio.wait_for(_guild.chunk(), timeout=10)
+        except Exception:
+            pass
+
     # Restore any !remindme timers that survived a redeploy
     now_ts = datetime.now(timezone.utc).timestamp()
     surviving = []
@@ -1974,10 +1981,10 @@ async def remindme_cmd(ctx, minutes: int = None, *, reminder: str = None):
 
 @bot.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.BadArgument):
-        await ctx.send("Invalid argument — check the command usage with `!commands`.")
-    elif isinstance(error, commands.MemberNotFound):
+    if isinstance(error, commands.MemberNotFound):
         await ctx.send("User not found. Make sure you @mention them.")
+    elif isinstance(error, commands.BadArgument):
+        await ctx.send("Invalid argument — check the command usage with `!commands`.")
     elif isinstance(error, commands.CommandInvokeError):
         await ctx.send(f"Something went wrong: {error.original}")
 
