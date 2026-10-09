@@ -14,6 +14,22 @@ SERVERS = {
     "osrs": "⚔️ OSRS Server",
 }
 
+_CHANNEL_PRESETS = {
+    "rs": [
+        ("General Chat",  "472851820448972800"),
+        ("Announcements", "478724610330722305"),
+        ("Bot Commands",  "473211044307664907"),
+    ],
+    "osrs": [
+        ("General Chat",  "1554536023235502163"),
+        ("Announcements", "1554538092122079323"),
+        ("Bot Commands",  "1557687951289487390"),
+    ],
+}
+
+def _ch_presets():
+    return _CHANNEL_PRESETS.get(_SERVER_ID, _CHANNEL_PRESETS["rs"])
+
 def _f(name):
     if _SERVER_ID == "rs":
         return os.path.join(_DIR, f"{name}.json")
@@ -501,8 +517,7 @@ class ManagerApp(tk.Tk):
         inp(row, self._dq_time_var, width=6).pack(side="left", padx=(4, 14))
         tk.Label(row, text="Channel:", bg=BG_CARD, fg=FG_DIM, font=("Segoe UI", 9)).pack(side="left")
         inp(row, self._dq_ch_var, width=19).pack(side="left", padx=(4, 6))
-        for _name, _cid in [("General Chat", "472851820448972800"),
-                             ("Bot Commands", "473211044307664907")]:
+        for _name, _cid in [(n, c) for n, c in _ch_presets() if n != "Announcements"]:
             tk.Button(row, text=_name, bg=BG_INPUT, fg=FG_DIM,
                       font=("Segoe UI", 9), relief="flat", cursor="hand2",
                       command=lambda c=_cid: self._dq_ch_var.set(c)
@@ -640,14 +655,9 @@ class ManagerApp(tk.Tk):
         inp(p, self._push_ch).pack(padx=20, pady=(2, 6), fill="x")
 
         # Presets
-        presets = [
-            ("General Chat",   "472851820448972800"),
-            ("Announcements",  "478724610330722305"),
-            ("Bot Commands",   "473211044307664907"),
-        ]
         pf = tk.Frame(p, bg=BG)
         pf.pack(padx=20, pady=(0, 10), fill="x")
-        for name, ch_id in presets:
+        for name, ch_id in _ch_presets():
             tk.Button(pf, text=name, bg=BG_CARD, fg=FG_DIM,
                       font=("Segoe UI", 9), relief="flat", cursor="hand2",
                       command=lambda c=ch_id: self._push_ch.set(c)
@@ -846,11 +856,9 @@ class ManagerApp(tk.Tk):
 
     # ── Giveaway ──────────────────────────────────────────────────────────────
 
-    _GW_PRESETS = {
-        472851820448972800: "General Chat",
-        478724610330722305: "Announcements",
-        473211044307664907: "Bot Commands",
-    }
+    @staticmethod
+    def _gw_presets():
+        return {int(cid): name for name, cid in _ch_presets()}
 
     def _build_giveaway_tab(self, p):
         section(p, "Giveaway", "Schedule a giveaway — the bot posts the message and picks a winner.")
@@ -869,9 +877,7 @@ class ManagerApp(tk.Tk):
 
         pf = tk.Frame(p, bg=BG)
         pf.pack(padx=20, pady=(0, 8), fill="x")
-        for name, ch_id in [("General Chat",  "472851820448972800"),
-                             ("Announcements", "478724610330722305"),
-                             ("Bot Commands",  "473211044307664907")]:
+        for name, ch_id in _ch_presets():
             tk.Button(pf, text=name, bg=BG_CARD, fg=FG_DIM,
                       font=("Segoe UI", 9), relief="flat", cursor="hand2",
                       command=lambda c=ch_id: self._gw_ch.set(c)
