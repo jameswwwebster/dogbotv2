@@ -14,12 +14,16 @@ services:
     plan: starter                      # background workers aren't available on the free tier
     branch: master
     buildCommand: pip install -r requirements.txt
-    startCommand: python bot.py
+    startCommand: python run_all.py    # one bot.py process per server, see run_all.py
     autoDeploy: true
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.0"
       - key: DISCORD_TOKEN             # required — set the value in the Render dashboard
+        sync: false
+      - key: DISCORD_TOKEN_OSRS        # optional — OSRS bot token; starts a second bot (SERVER_ID=osrs) in this worker
+        sync: false
+      - key: GUILD_ID_OSRS             # optional — OSRS server ID, so that bot ignores other servers
         sync: false
       - key: GITHUB_TOKEN              # optional — only used by the score push-to-git feature
         sync: false

@@ -1,5 +1,7 @@
 import asyncio
+import contextlib
 import discord
+import fcntl
 import json
 import os
 import re
@@ -577,7 +579,23 @@ async def _fire_reminder(user_id, channel_id, message, delay_seconds):
         _active_reminders[user_id] -= 1
 
 
+@contextlib.contextmanager
+def _git_lock():
+    """Serialise git operations when several bots share this checkout (run_all.py)."""
+    with open(os.path.join(_DIR, ".git-push.lock"), "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
 def _push_reaction_roles_to_github():
+    with _git_lock():
+        return _push_reaction_roles_to_github_locked()
+
+
+def _push_reaction_roles_to_github_locked():
     token = os.getenv("GITHUB_TOKEN")
     if not token:
         print("[ReactionRoles] GITHUB_TOKEN not set — skipping push.")
@@ -612,6 +630,11 @@ SCORE_PUSH_INTERVAL = 3600  # push at most once per hour
 
 
 def _push_scores_to_github():
+    with _git_lock():
+        _push_scores_to_github_locked()
+
+
+def _push_scores_to_github_locked():
     global _scores_dirty, _last_score_push
     token = os.getenv("GITHUB_TOKEN")
     if not token:
