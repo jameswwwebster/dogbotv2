@@ -55,13 +55,13 @@
             "role": "Amascut",
             "name": "Amascut"
         },
-        "<:CP:473825456953753600>": {
-            "role": "Minigames",
-            "name": "Minigames"
-        },
         "<:Ghrazi_Blood_Knights:1559275959742632068>": {
             "role": "@Ghrazi Blood Knights",
             "name": "Ghrazi Blood Knights"
+        },
+        "<:CP:473825456953753600>": {
+            "role": "Minigames",
+            "name": "Minigames"
         }
     }
 }
