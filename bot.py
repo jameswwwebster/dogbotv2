@@ -923,6 +923,12 @@ async def _sync_roles_message():
     rr = load_reaction_roles()
     channel = bot.get_channel(rr["channel_id"])
     if not channel:
+        try:
+            channel = await bot.fetch_channel(rr["channel_id"])
+        except Exception as e:
+            print(f"[ReactionRoles] Channel not found for sync: {e}")
+            return
+    if not channel:
         print("[ReactionRoles] Channel not found for sync.")
         return
 
@@ -1081,8 +1087,8 @@ async def on_ready():
                 for emote in rr["roles"]:
                     try:
                         await rr_msg.add_reaction(emote)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        print(f"[ReactionRoles] Could not add reaction {emote}: {e}")
             except Exception as e:
                 print(f"[ReactionRoles] Could not fetch message: {e}")
 
