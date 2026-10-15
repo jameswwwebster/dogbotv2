@@ -1066,11 +1066,18 @@ async def on_ready():
     # Sync the roles info message and add emotes
     await _sync_roles_message()
     rr = load_reaction_roles()
-    if rr.get("message_id") and rr.get("channel_id") and rr["roles"]:
+    # Use message_id if set, otherwise fall back to info_message_id (the text list message)
+    _rr_react_id = rr.get("message_id") or rr.get("info_message_id")
+    if _rr_react_id and rr.get("channel_id") and rr["roles"]:
         rr_channel = bot.get_channel(rr["channel_id"])
+        if not rr_channel:
+            try:
+                rr_channel = await bot.fetch_channel(rr["channel_id"])
+            except Exception:
+                pass
         if rr_channel:
             try:
-                rr_msg = await rr_channel.fetch_message(rr["message_id"])
+                rr_msg = await rr_channel.fetch_message(_rr_react_id)
                 for emote in rr["roles"]:
                     try:
                         await rr_msg.add_reaction(emote)
