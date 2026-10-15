@@ -1,55 +1,205 @@
 {
     "command": "trivia",
     "questions": [
-        {"question": "Where does the ring of returning teleport a player to when rubbed?", "answer": "Their current respawn point"},
-        {"question": "What is the name of the boss pet of Sarachnis?", "answer": "Sraracha"},
-        {"question": "Which Impling has access to the clue drop tables?", "answer": "Lucky Impling"},
-        {"question": "In which kingdom is the farming based minigame Tithe Farm located?", "answer": "The kingdom of Great Kourend"},
-        {"question": "Against what type of creature are weapons crafted with a Tormented synapse especially effective?", "answer": "Demonic creatures"},
-        {"question": "In which area is the Cosmic Altar located?", "answer": "Zanaris"},
-        {"question": "In which area is the Nature Altar located?", "answer": "Karamja"},
-        {"question": "What is the name of the first raid of Oldschool Runescape?", "answer": "Chambers of Xeric"},
-        {"question": "What is the name of the second raid of Oldschool Runescape?", "answer": "Theatre of Blood"},
-        {"question": "What is the name of the third raid of Oldschool Runescape?", "answer": "Tombs of Amascut"},
-        {"question": "What is the name of the fourth raid of Oldschool Runescape?", "answer": "The Fractured Archive"},
-        {"question": "Which ores are required to smith a bronze bar?", "answer": "A copper ore and a tin ore"},
-        {"question": "What is the highest tier Ice spell from the Ancient Magicks spellbook, available at level 94 Magic?", "answer": "Ice Barrage"},
-        {"question": "What type of creature is Doom of Mokhiotl?", "answer": "Demonic"},
-        {"question": "How long is one game tick in Old School RuneScape?", "answer": "0.6 seconds"},
-        {"question": "How many coins is a brand new player's bank pre-stocked with?", "answer": "25 gp"},
-        {"question": "Which NPC in Draynor Village sells the Chronicle teleport book?", "answer": "Diango"},
-        {"question": "Which Ironman type can neither trade nor use banks to store items?", "answer": "Ultimate Ironman"},
-        {"question": "What colour chat crown do Jagex Moderators have?", "answer": "Gold"},
-        {"question": "What message appears in your chat box when you die?", "answer": "Oh dear, you are dead!"},
-        {"question": "Which shop in Varrock Square sells elemental staves?", "answer": "Zaff's Superior Staffs!"},
-        {"question": "What is the name of the dragon you slay in Dragon Slayer I?", "answer": "Elvarg"},
-        {"question": "Who agrees to sell you a rune platebody once you've slain Elvarg?", "answer": "Oziach"},
-        {"question": "Which Draynor Village NPC captains your ship to Crandor in Dragon Slayer I?", "answer": "Ned"},
-        {"question": "Which Lumbridge Castle NPC gives you an anti-dragon shield for free?", "answer": "Duke Horacio"},
-        {"question": "What are the tokens you collect on Rooftop Agility courses to buy the graceful outfit?", "answer": "Marks of grace"},
-        {"question": "What is the name of the skilling pet you can get from training Agility?", "answer": "Giant squirrel"},
-        {"question": "Which rooftop course is the highest level one, requiring 90 Agility?", "answer": "Ardougne Rooftop Course"},
-        {"question": "Which item do you collect at the top of the Agility Pyramid in the Kharidian Desert?", "answer": "Pyramid top"},
-        {"question": "Which ring do you need to wear to reach the Werewolf Agility Course?", "answer": "Ring of Charos"},
-        {"question": "Which village has the lowest level Rooftop Agility course, at level 1?", "answer": "Draynor Village"},
-        {"question": "Which Slayer Master in Burthorpe gives the easiest tasks and can swap out a hard task for an easy one?", "answer": "Turael"},
-        {"question": "Which Slayer Master only gives tasks in the Wilderness?", "answer": "Krystilia"},
-        {"question": "What is the name of the hellhound boss you can kill on a hellhound task?", "answer": "Cerberus"},
-        {"question": "Which Slayer Master also tags each task with a location, and lives at Mount Karuulm?", "answer": "Konar quo Maten"},
-        {"question": "Which Slayer Master can be found on the top floor of the Fishing store in Shilo Village?", "answer": "Duradel"},
-        {"question": "Which Slayer Master also teaches combat on Tutorial Island?", "answer": "Vannaka"},
-        {"question": "Which item lets you check how many kills are left on your Slayer task?", "answer": "Enchanted gem"},
-        {"question": "What is the name of the Farming skilling pet?", "answer": "Tangleroot"},
-        {"question": "Which NPC found at every farming patch looks after your farming tools?", "answer": "Tool Leprechaun"},
-        {"question": "What is the name of the plant boss you grow and fight in the Farming Guild?", "answer": "Hespori"},
-        {"question": "Which item do you add to supercompost to turn it into ultracompost?", "answer": "Volcanic ash"},
-        {"question": "During which quest do you obtain the magic secateurs?", "answer": "Fairytale I - Growing Pains"},
-        {"question": "What Farming level do you need to enter the Farming Guild?", "answer": "45"},
-        {"question": "Which item, dropped by Hespori, holds up to 10,000 compost and doubles any compost you add?", "answer": "Bottomless compost bucket"},
-        {"question": "Which Barrows brother fights with Magic?", "answer": "Ahrim the Blighted"},
-        {"question": "Which Mahjarrat turned the Barrows brothers into wights?", "answer": "Sliske"},
-        {"question": "East of which Morytania town are the Barrows mounds?", "answer": "Mort'ton"},
-        {"question": "Which Barrows brother uses a crossbow?", "answer": "Karil the Tainted"},
-        {"question": "Which weapon does Verac the Defiled wield?", "answer": "A flail"}
+        {
+            "question": "Where does the ring of returning teleport a player to when rubbed?",
+            "answer": "Their current respawn point"
+        },
+        {
+            "question": "What is the name of the boss pet of Sarachnis?",
+            "answer": "Sraracha"
+        },
+        {
+            "question": "Which Impling has access to the clue drop tables?",
+            "answer": "Lucky Impling"
+        },
+        {
+            "question": "In which kingdom is the farming based minigame Tithe Farm located?",
+            "answer": "The kingdom of Great Kourend"
+        },
+        {
+            "question": "Against what type of creature are weapons crafted with a Tormented synapse especially effective?",
+            "answer": "Demonic creatures"
+        },
+        {
+            "question": "In which area is the Cosmic Altar located?",
+            "answer": "Zanaris"
+        },
+        {
+            "question": "In which area is the Nature Altar located?",
+            "answer": "Karamja"
+        },
+        {
+            "question": "What is the name of the first raid of Oldschool Runescape?",
+            "answer": "Chambers of Xeric"
+        },
+        {
+            "question": "What is the name of the second raid of Oldschool Runescape?",
+            "answer": "Theatre of Blood"
+        },
+        {
+            "question": "What is the name of the third raid of Oldschool Runescape?",
+            "answer": "Tombs of Amascut"
+        },
+        {
+            "question": "What is the name of the fourth raid of Oldschool Runescape?",
+            "answer": "The Fractured Archive"
+        },
+        {
+            "question": "Which ores are required to smith a bronze bar?",
+            "answer": "A copper ore and a tin ore"
+        },
+        {
+            "question": "What is the highest tier Ice spell from the Ancient Magicks spellbook, available at level 94 Magic?",
+            "answer": "Ice Barrage"
+        },
+        {
+            "question": "What type of creature is Doom of Mokhiotl?",
+            "answer": "Demonic"
+        },
+        {
+            "question": "How long is one game tick in Old School RuneScape?",
+            "answer": "0.6 seconds"
+        },
+        {
+            "question": "How many coins is a brand new player's bank pre-stocked with?",
+            "answer": "25 gp"
+        },
+        {
+            "question": "Which NPC in Draynor Village sells the Chronicle teleport book?",
+            "answer": "Diango"
+        },
+        {
+            "question": "Which Ironman type can neither trade nor use banks to store items?",
+            "answer": "Ultimate Ironman"
+        },
+        {
+            "question": "What colour chat crown do Jagex Moderators have?",
+            "answer": "Gold"
+        },
+        {
+            "question": "What message appears in your chat box when you die?",
+            "answer": "Oh dear, you are dead!"
+        },
+        {
+            "question": "Which shop in Varrock Square sells elemental staves?",
+            "answer": "Zaff's Superior Staffs!"
+        },
+        {
+            "question": "What is the name of the dragon you slay in Dragon Slayer I?",
+            "answer": "Elvarg"
+        },
+        {
+            "question": "Who agrees to sell you a rune platebody once you've slain Elvarg?",
+            "answer": "Oziach"
+        },
+        {
+            "question": "Which Draynor Village NPC captains your ship to Crandor in Dragon Slayer I?",
+            "answer": "Ned"
+        },
+        {
+            "question": "Which Lumbridge Castle NPC gives you an anti-dragon shield for free?",
+            "answer": "Duke Horacio"
+        },
+        {
+            "question": "What are the tokens you collect on Rooftop Agility courses to buy the graceful outfit?",
+            "answer": "Marks of grace"
+        },
+        {
+            "question": "What is the name of the skilling pet you can get from training Agility?",
+            "answer": "Giant squirrel"
+        },
+        {
+            "question": "Which rooftop course is the highest level one, requiring 90 Agility?",
+            "answer": "Ardougne Rooftop Course"
+        },
+        {
+            "question": "Which item do you collect at the top of the Agility Pyramid in the Kharidian Desert?",
+            "answer": "Pyramid top"
+        },
+        {
+            "question": "Which ring do you need to wear to reach the Werewolf Agility Course?",
+            "answer": "Ring of Charos"
+        },
+        {
+            "question": "Which village has the lowest level Rooftop Agility course, at level 1?",
+            "answer": "Draynor Village"
+        },
+        {
+            "question": "Which Slayer Master in Burthorpe gives the easiest tasks and can swap out a hard task for an easy one?",
+            "answer": "Turael"
+        },
+        {
+            "question": "Which Slayer Master only gives tasks in the Wilderness?",
+            "answer": "Krystilia"
+        },
+        {
+            "question": "What is the name of the hellhound boss you can kill on a hellhound task?",
+            "answer": "Cerberus"
+        },
+        {
+            "question": "Which Slayer Master also tags each task with a location, and lives at Mount Karuulm?",
+            "answer": "Konar quo Maten"
+        },
+        {
+            "question": "Which Slayer Master can be found on the top floor of the Fishing store in Shilo Village?",
+            "answer": "Duradel"
+        },
+        {
+            "question": "Which Slayer Master also teaches combat on Tutorial Island?",
+            "answer": "Vannaka"
+        },
+        {
+            "question": "Which item lets you check how many kills are left on your Slayer task?",
+            "answer": "Enchanted gem"
+        },
+        {
+            "question": "What is the name of the Farming skilling pet?",
+            "answer": "Tangleroot"
+        },
+        {
+            "question": "Which NPC found at every farming patch looks after your farming tools?",
+            "answer": "Tool Leprechaun"
+        },
+        {
+            "question": "What is the name of the plant boss you grow and fight in the Farming Guild?",
+            "answer": "Hespori"
+        },
+        {
+            "question": "Which item do you add to supercompost to turn it into ultracompost?",
+            "answer": "Volcanic ash"
+        },
+        {
+            "question": "During which quest do you obtain the magic secateurs?",
+            "answer": "Fairytale I - Growing Pains"
+        },
+        {
+            "question": "What Farming level do you need to enter the Farming Guild?",
+            "answer": "45"
+        },
+        {
+            "question": "Which item, dropped by Hespori, holds up to 10,000 compost and doubles any compost you add?",
+            "answer": "Bottomless compost bucket"
+        },
+        {
+            "question": "Which Barrows brother fights with Magic?",
+            "answer": "Ahrim the Blighted"
+        },
+        {
+            "question": "Which Mahjarrat turned the Barrows brothers into wights?",
+            "answer": "Sliske"
+        },
+        {
+            "question": "East of which Morytania town are the Barrows mounds?",
+            "answer": "Mort'ton"
+        },
+        {
+            "question": "Which Barrows brother uses a crossbow?",
+            "answer": "Karil the Tainted"
+        },
+        {
+            "question": "Which weapon does Verac the Defiled wield?",
+            "answer": "A flail"
+        }
     ]
 }

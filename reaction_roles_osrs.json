@@ -2,5 +2,26 @@
     "message_id": null,
     "channel_id": null,
     "info_message_id": null,
-    "roles": {}
+    "roles": {
+        "<:Tempoross:1560227453174022154>": {
+            "role": "Skilling Bosses",
+            "name": "Skilling Bosses"
+        },
+        "<:Chambers_Of_Xerics:1560228463942697031>": {
+            "role": "Chambers of Xeric",
+            "name": "Chambers of Xeric"
+        },
+        "<:Theatre_Of_Blood:1560228812191436800>": {
+            "role": "Theatre of Blood",
+            "name": "Theatre of Blood"
+        },
+        "<:Tombs_Of_Amascut:1560229525185626184>": {
+            "role": "Tombs of Amascut",
+            "name": "Tombs of Amascut"
+        },
+        "<:The_Fractured_Archive:1560370725020242072>": {
+            "role": "The Fractured Archive",
+            "name": "The Fractured Archive"
+        }
+    }
 }
