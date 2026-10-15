@@ -22,6 +22,26 @@
         "<:The_Fractured_Archive:1560370725020242072>": {
             "role": "The Fractured Archive",
             "name": "The Fractured Archive"
+        },
+        "<:Scurrius:1560228125344800798>": {
+            "role": "Scurrius",
+            "name": "Scurrius"
+        },
+        "<:Yama:1560228212045516802>": {
+            "role": "Yama",
+            "name": "Yama"
+        },
+        "<:Nex:1560227885896175626>": {
+            "role": "Nex",
+            "name": "Nex"
+        },
+        "<:Royal_Titans:1560227667230588928>": {
+            "role": "Royal titans",
+            "name": "Royal Titans"
+        },
+        "<:Nightmare:1560227991735373955>": {
+            "role": "Nightmare",
+            "name": "Nightmare"
         }
     }
 }
