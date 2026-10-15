@@ -1240,7 +1240,8 @@ async def on_raw_reaction_add(payload):
 
     # Reaction roles
     rr = load_reaction_roles()
-    if payload.message_id == rr.get("message_id"):
+    _rr_target_id = rr.get("message_id") or rr.get("info_message_id")
+    if _rr_target_id and payload.message_id == _rr_target_id:
         emoji_str = str(payload.emoji)
         rr_entry  = rr["roles"].get(emoji_str)
         role_name = _rr_role_name(rr_entry) if rr_entry else None
@@ -1319,7 +1320,8 @@ async def on_raw_reaction_remove(payload):
 
     # Reaction roles
     rr = load_reaction_roles()
-    if payload.message_id == rr.get("message_id"):
+    _rr_target_id = rr.get("message_id") or rr.get("info_message_id")
+    if _rr_target_id and payload.message_id == _rr_target_id:
         rr_entry  = rr["roles"].get(str(payload.emoji))
         role_name = _rr_role_name(rr_entry) if rr_entry else None
         if role_name:
