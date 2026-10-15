@@ -1084,11 +1084,13 @@ async def on_ready():
         if rr_channel:
             try:
                 rr_msg = await rr_channel.fetch_message(_rr_react_id)
-                for emote in rr["roles"]:
+                for emote_str in rr["roles"]:
                     try:
+                        m = re.match(r'<:(\w+):(\d+)>', emote_str)
+                        emote = discord.PartialEmoji(name=m.group(1), id=int(m.group(2))) if m else emote_str
                         await rr_msg.add_reaction(emote)
                     except Exception as e:
-                        print(f"[ReactionRoles] Could not add reaction {emote}: {e}")
+                        print(f"[ReactionRoles] Could not add reaction {emote_str}: {e}")
             except Exception as e:
                 print(f"[ReactionRoles] Could not fetch message: {e}")
 
