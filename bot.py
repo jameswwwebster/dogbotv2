@@ -217,7 +217,7 @@ async def _run_giveaway(entry):
         winners = int(entry.get("winners", 1))
         # Search channel history for an existing message in case of a redeploy mid-giveaway
         existing = None
-        async for m in channel.history(limit=50):
+        async for m in channel.history(limit=200):
             if m.author == bot.user and f"<t:{end_ts}:" in m.content and entry["prize"] in m.content:
                 existing = m
                 break
