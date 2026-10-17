@@ -1807,6 +1807,49 @@ async def boosterrefresh_cmd(ctx):
         await ctx.send(f"❌ Refresh failed: {e}")
 
 
+@bot.command(name="giveawaypick")
+async def giveawaypick_cmd(ctx, message_id: int = None):
+    """Manually pick a winner from a giveaway message by its ID. Usage: !giveawaypick <message_id>"""
+    if not has_mod_role(ctx.author):
+        return
+    if not message_id:
+        await ctx.send("❌ Usage: `!giveawaypick <message_id>`")
+        return
+    try:
+        msg = await ctx.channel.fetch_message(message_id)
+    except discord.NotFound:
+        # Try fetching from other channels in the guild
+        msg = None
+        for ch in ctx.guild.text_channels:
+            try:
+                msg = await ch.fetch_message(message_id)
+                break
+            except Exception:
+                continue
+    if not msg:
+        await ctx.send("❌ Message not found. Run this command in the same channel as the giveaway.")
+        return
+    reaction = discord.utils.get(msg.reactions, emoji="🎉")
+    if not reaction:
+        await ctx.send("❌ No 🎉 reactions found on that message.")
+        return
+    entrants = [u async for u in reaction.users() if not u.bot]
+    if not entrants:
+        await ctx.send("❌ No eligible entrants (no non-bot 🎉 reactions).")
+        return
+    winner = random.choice(entrants)
+    prize_line = ""
+    for line in msg.content.splitlines():
+        if line.lower().startswith("**prize:**"):
+            prize_line = line.replace("**Prize:**", "").replace("**prize:**", "").strip()
+            break
+    prize_txt = f"**{prize_line}**" if prize_line else "the giveaway"
+    await msg.channel.send(
+        f"🎉 **(Late announcement)** Congratulations {winner.mention}! You won {prize_txt}!"
+    )
+    await ctx.send(f"✅ Winner announced: **{winner.display_name}** ({len(entrants)} entrants)")
+
+
 @bot.command(name="boosterpick")
 async def boosterpick_cmd(ctx):
     """Manually pick and announce the winner for a missed booster giveaway, then start next cycle if needed."""
