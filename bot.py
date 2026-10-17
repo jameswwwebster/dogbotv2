@@ -1810,7 +1810,8 @@ async def boosterrefresh_cmd(ctx):
 @bot.command(name="giveawaypick")
 async def giveawaypick_cmd(ctx, message_id: int = None):
     """Manually pick a winner from a giveaway message by its ID. Usage: !giveawaypick <message_id>"""
-    if not has_mod_role(ctx.author):
+    if not (has_mod_role(ctx.author) or ctx.author.guild_permissions.administrator):
+        await ctx.send("❌ You need the mod role or administrator permission to use this.")
         return
     if not message_id:
         await ctx.send("❌ Usage: `!giveawaypick <message_id>`")
