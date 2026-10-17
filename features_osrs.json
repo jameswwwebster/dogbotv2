@@ -6,7 +6,7 @@
     "clear_enabled": true,
     "remindme_enabled": true,
     "spank_enabled": true,
-    "mod_role": "Moderators",
+    "mod_role": "Administrator",
     "pickgroupboss_enabled": false,
     "daily_question_enabled": true,
     "daily_question_time": "10:00",
