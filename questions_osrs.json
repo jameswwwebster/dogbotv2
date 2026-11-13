@@ -200,6 +200,86 @@
         {
             "question": "Which weapon does Verac the Defiled wield?",
             "answer": "A flail"
+        },
+        {
+            "question": "Which quest must you complete before you can take on The Fractured Archive?",
+            "answer": "While Guthix Sleeps"
+        },
+        {
+            "question": "In which location is the entrance to The Fractured Archive?",
+            "answer": "The Chasm of Tears"
+        },
+        {
+            "question": "What is the name of the final boss of The Fractured Archive, who you fight in every run?",
+            "answer": "Ocellus"
+        },
+        {
+            "question": "What is the name of the pet you can get from The Fractured Archive?",
+            "answer": "Orion"
+        },
+        {
+            "question": "Which new prayer does the Horn of Bran from The Fractured Archive unlock?",
+            "answer": "Zeal"
+        },
+        {
+            "question": "How many bosses do you fight in a single run of The Fractured Archive?",
+            "answer": "Five"
+        },
+        {
+            "question": "What is the name of the first boss you always face in The Fractured Archive?",
+            "answer": "The Archive Guardian"
+        },
+        {
+            "question": "Which Slayer Master is located in Shilo Village?",
+            "answer": "Duradel"
+        },
+        {
+            "question": "How many Slayer reward points does it cost to cancel a task?",
+            "answer": "30"
+        },
+        {
+            "question": "Which Slayer Master can be found in Zanaris?",
+            "answer": "Chaeldar"
+        },
+        {
+            "question": "Which Slayer Master only assigns tasks in the Wilderness?",
+            "answer": "Krystilia"
+        },
+        {
+            "question": "Which Slayer Master can be found in Canifis?",
+            "answer": "Mazchna"
+        },
+        {
+            "question": "Which Slayer Master can be found in the Edgeville Dungeon?",
+            "answer": "Vannaka"
+        },
+        {
+            "question": "What Agility level do you need to use the Ardougne rooftop course?",
+            "answer": "90"
+        },
+        {
+            "question": "Which quest do you need to complete to use the Penguin Agility Course?",
+            "answer": "Cold War"
+        },
+        {
+            "question": "Which quest do you need to complete to use the Werewolf Agility Course?",
+            "answer": "Creature of Fenkenstrain"
+        },
+        {
+            "question": "Which quest do you need to complete to use the Prifddinas Agility Course?",
+            "answer": "Song of the Elves"
+        },
+        {
+            "question": "Which miniquest do you need to complete to use the Barbarian Outpost Agility Course?",
+            "answer": "Alfred Grimhand's Barcrawl"
+        },
+        {
+            "question": "Which miniquest do you need to complete to automatically smash empty vials?",
+            "answer": "Alfred Grimhand's Barcrawl"
+        },
+        {
+            "question": "Which quest do you need to complete to enter the Hallowed Sepulchre?",
+            "answer": "Sins of the Father"
         }
     ]
 }
