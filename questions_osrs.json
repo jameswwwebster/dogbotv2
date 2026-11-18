@@ -280,6 +280,162 @@
         {
             "question": "Which quest do you need to complete to enter the Hallowed Sepulchre?",
             "answer": "Sins of the Father"
+        },
+        {
+            "question": "At which level do you gain access to the last Pyramid Plunder room, room 8?",
+            "answer": "Level 91"
+        },
+        {
+            "question": "What level do you need to use a Dragon Harpoon for fishing?",
+            "answer": "Level 61"
+        },
+        {
+            "question": "Besides a super combat potion, what ingredient do you need to make a Divine super combat potion?",
+            "answer": "Crystal dust"
+        },
+        {
+            "question": "What is a felling axe used for?",
+            "answer": "When used with Forester's rations they offer 10% more Woodcutting experience than regular axes while also having a 20% chance to not obtain a log"
+        },
+        {
+            "question": "Which quest allows players to have dogs as pets?",
+            "answer": "A Ruff Situation"
+        },
+        {
+            "question": "In which quest does the player visit Melzar's Maze?",
+            "answer": "Dragon Slayer I"
+        },
+        {
+            "question": "In which guild is the Wrath Altar located?",
+            "answer": "Myth's Guild"
+        },
+        {
+            "question": "What Hunter level do you need to start doing expert hunter rumours?",
+            "answer": "72"
+        },
+        {
+            "question": "Which type of chinchompas can be found on the Great Conch?",
+            "answer": "Red/Carnivorous Chinchompas"
+        },
+        {
+            "question": "Which quest do you need to complete to play Guardians of the Rift?",
+            "answer": "Temple of the Eye"
+        },
+        {
+            "question": "Which item stops you from getting skulled when you enter the Abyss?",
+            "answer": "Abyssal bracelet"
+        },
+        {
+            "question": "Which necklace gives a 100% success rate when crafting combination runes?",
+            "answer": "Binding necklace"
+        },
+        {
+            "question": "What is the name of the Runecraft outfit you can get from Guardians of the Rift?",
+            "answer": "Raiments of the Eye"
+        },
+        {
+            "question": "In which Kourend house's territory are the Blood and Soul altars that use dark essence fragments?",
+            "answer": "Arceuus"
+        },
+        {
+            "question": "Which type of essence gives a 50% XP bonus on the runes it makes?",
+            "answer": "Daeyalt essence"
+        },
+        {
+            "question": "What is the name of the pet you can get from Guardians of the Rift?",
+            "answer": "Abyssal protector"
+        },
+        {
+            "question": "Which quest must you complete before you can use box traps?",
+            "answer": "Eagles' Peak"
+        },
+        {
+            "question": "In which realm can you find implings in large numbers?",
+            "answer": "Puro-Puro"
+        },
+        {
+            "question": "Which Hunter creature do you track to get the pet Herbi?",
+            "answer": "Herbiboar"
+        },
+        {
+            "question": "Which of these skills doesn't have a guild: Mining, Fishing, Cooking or Agility?",
+            "answer": "Agility"
+        },
+        {
+            "question": "Which of these skills doesn't have a guild: Woodcutting, Farming, Hunter or Firemaking?",
+            "answer": "Firemaking"
+        },
+        {
+            "question": "Which of these skills doesn't have a guild: Slayer, Woodcutting, Mining or Fishing?",
+            "answer": "Slayer"
+        },
+        {
+            "question": "Which of these guilds does NOT give a +7 skill boost inside: Fishing Guild, Mining Guild, Woodcutting Guild or Cooks' Guild?",
+            "answer": "Cooks' Guild"
+        },
+        {
+            "question": "Which of these guilds is free-to-play: Heroes' Guild, Legends' Guild, Champions' Guild or Myths' Guild?",
+            "answer": "Champions' Guild"
+        },
+        {
+            "question": "Which skillcape is the most common in OSRS?",
+            "answer": "Strength cape"
+        },
+        {
+            "question": "What is the primary colour of the Cooking cape?",
+            "answer": "Purple"
+        },
+        {
+            "question": "What is the primary colour of the Firemaking cape?",
+            "answer": "Orange"
+        },
+        {
+            "question": "Which skillcape has black as its primary colour?",
+            "answer": "Slayer cape"
+        },
+        {
+            "question": "Which two skillcapes have purple as their primary colour?",
+            "answer": "Cooking and Thieving"
+        },
+        {
+            "question": "What is the primary colour of the Prayer cape?",
+            "answer": "White"
+        },
+        {
+            "question": "What is the primary colour of the Hitpoints cape?",
+            "answer": "White"
+        },
+        {
+            "question": "What is the primary colour of the Agility cape?",
+            "answer": "Blue"
+        },
+        {
+            "question": "Which of these skillcapes does NOT have green as its primary colour: Farming, Herblore, Strength or Fishing?",
+            "answer": "Fishing"
+        },
+        {
+            "question": "Which NPC appears to give you your next clue after you finish an emote clue?",
+            "answer": "Uri"
+        },
+        {
+            "question": "Which pet can you get from master clue scrolls?",
+            "answer": "Bloodhound"
+        },
+        {
+            "question": "Which master clue NPC sings a ballad about an item you need to bring him?",
+            "answer": "Falo the Bard"
+        },
+        {
+            "question": "Which of these is NOT a clue scroll tier: Beginner, Elite, Master or Expert?",
+            "answer": "Expert"
+        },
+        {
+            "question": "Which quest rewards you with a beginner clue scroll from Veos?",
+            "answer": "X Marks the Spot"
+        },
+        {
+            "question": "Which monster can jump out of a casket when you open an elite or master clue reward?",
+            "answer": "The Mimic"
         }
     ]
 }
